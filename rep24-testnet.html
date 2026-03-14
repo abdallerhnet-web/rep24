@@ -447,7 +447,6 @@
 <div class="glow"></div>
 <div class="container">
 
-  <!-- Header -->
   <header>
     <div class="logo">
       <div class="logo-mark">r24</div>
@@ -457,20 +456,17 @@
     <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
   </header>
 
-  <!-- Network warning -->
   <div id="networkWarn">
     ⚠ &nbsp;Switch to Base Sepolia (Chain ID: 84532) to use this app.
     <button class="btn btn-outline" style="padding:6px 14px;font-size:12px;margin-left:auto" onclick="switchNetwork()">Switch</button>
   </div>
 
-  <!-- Status bar -->
   <div id="statusBar">
     <div class="dot"></div>
     <span id="walletAddr">—</span>
     <span style="color:var(--muted);margin-left:auto;font-size:11px">Base Sepolia</span>
   </div>
 
-  <!-- Stats -->
   <div class="section-label">Your Overview</div>
   <div class="stats-row" id="statsRow">
     <div class="stat-box">
@@ -487,7 +483,6 @@
     </div>
   </div>
 
-  <!-- Score Bar -->
   <div class="score-bar-wrap" id="scoreBarWrap" style="margin-bottom:28px;display:none">
     <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)">
       <span>Reputation</span><span id="scoreBarPct">0%</span>
@@ -497,13 +492,11 @@
     </div>
   </div>
 
-  <!-- RepBadge -->
   <div class="section-label">Rep Badge</div>
   <div class="card" id="badgeCard">
     <div id="badgeContent" class="badge-none">Connect wallet to view your RepBadge</div>
   </div>
 
-  <!-- Stake -->
   <div class="section-label">Stake USDC → Earn RepBadge</div>
   <div class="card" id="stakeCard">
     <div class="card-header">
@@ -525,11 +518,9 @@
     </div>
   </div>
 
-  <!-- Activity Log -->
   <div class="section-label">Transaction Log</div>
   <div id="txLog"><div class="log-entry">Waiting for wallet connection...</div></div>
 
-  <!-- Contracts -->
   <hr class="divider"/>
   <div class="section-label">Contract Addresses</div>
   <div class="contracts-grid">
@@ -587,10 +578,10 @@ const ERC20_ABI = [
   'function faucet() payable',
 ];
 const REPVAULT_ABI = [
-  'function stake(uint256 amount)',
-  'function unstake()',
+  'function stake(address agentAddress, uint256 amount)',
+  'function unstake(address agentAddress, uint256 amount)',
   'function stakedAmount(address) view returns (uint256)',
-  'function getStake(address) view returns (uint256)',
+  'function getStakeBalance(address) view returns (uint256)',
   'event Staked(address indexed user, uint256 amount)',
   'event Unstaked(address indexed user, uint256 amount)',
 ];
@@ -600,7 +591,7 @@ const REPBADGE_ABI = [
   'function tokenURI(uint256 tokenId) view returns (string)',
 ];
 const REPSCORE_ABI = [
-  'function getScore(address) view returns (uint256)',
+  'function getRepScore(address) view returns (uint256)',
   'function scores(address) view returns (uint256)',
   'function scoreOf(address) view returns (uint256)',
 ];
@@ -682,7 +673,7 @@ async function switchNetwork() {
 
 // ─── INIT CONTRACTS ───────────────────────────────────
 function initContracts() {
-  usdcContract  = new ethers.Contract(CONTRACTS.MockUSDC,  ERC20_ABI,      signer);
+  usdcContract  = new ethers.Contract(CONTRACTS.MockUSDC,  ERC20_ABI,    signer);
   vaultContract = new ethers.Contract(CONTRACTS.RepVault,  REPVAULT_ABI,   signer);
   badgeContract = new ethers.Contract(CONTRACTS.RepBadge,  REPBADGE_ABI,   signer);
   scoreContract = new ethers.Contract(CONTRACTS.RepScore,  REPSCORE_ABI,   signer);
@@ -707,7 +698,7 @@ async function loadData() {
     try {
       let rawStaked;
       try { rawStaked = await vaultContract.stakedAmount(userAddress); }
-      catch { rawStaked = await vaultContract.getStake(userAddress); }
+      catch { rawStaked = await vaultContract.getStakeBalance(userAddress); }
       staked = parseFloat(ethers.utils.formatUnits(rawStaked, 6)).toFixed(2);
     } catch {}
     document.getElementById('stakedVal').textContent = staked;
@@ -716,7 +707,7 @@ async function loadData() {
     let score = 0;
     try {
       let rawScore;
-      try { rawScore = await scoreContract.getScore(userAddress); }
+      try { rawScore = await scoreContract.getRepScore(userAddress); }
       catch {
         try { rawScore = await scoreContract.scores(userAddress); }
         catch { rawScore = await scoreContract.scoreOf(userAddress); }
@@ -773,7 +764,7 @@ async function stakeUSDC() {
     log(`Approved ✓ | tx: ${approveTx.hash.slice(0,14)}...`, 'success');
 
     log(`Staking ${amt} USDC...`, 'pending');
-    const stakeTx = await vaultContract.stake(amount);
+    const stakeTx = await vaultContract.stake(userAddress, amount);
     await stakeTx.wait();
     log(`Staked ✓ | tx: ${stakeTx.hash.slice(0,14)}... | View: https://sepolia.basescan.org/tx/${stakeTx.hash}`, 'success');
 
@@ -788,7 +779,12 @@ async function unstake() {
   if (!signer) { log('Connect wallet first', 'error'); return; }
   try {
     log('Unstaking...', 'pending');
-    const tx = await vaultContract.unstake();
+    
+    let currentStake;
+    try { currentStake = await vaultContract.stakedAmount(userAddress); }
+    catch { currentStake = await vaultContract.getStakeBalance(userAddress); }
+
+    const tx = await vaultContract.unstake(userAddress, currentStake);
     await tx.wait();
     log(`Unstaked ✓ | tx: ${tx.hash.slice(0,14)}...`, 'success');
     await loadData();
