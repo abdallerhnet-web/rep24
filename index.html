@@ -1,20 +1,1020 @@
-// Updated stakeUSDC function with enhanced debugging and error logging
-async function stakeUSDC(amount) {
-    try {
-        console.log('Starting stakeUSDC function with amount:', amount);
-        const gasEstimate = await contract.methods.stakeUSDC(amount).estimateGas();
-        console.log('Gas estimate for staking:', gasEstimate);
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>rep24 — On-Chain Reputation Layer</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+<style>
+  :root[data-theme="dark"] {
+    --base-blue: #0052FF;
+    --base-blue-dim: #0041CC;
+    --base-blue-glow: rgba(0,82,255,0.15);
+    --bg: #080C14;
+    --surface: #0D1320;
+    --surface2: #121B2E;
+    --border: #1C2940;
+    --text: #E8EDF5;
+    --text-secondary: #8A9BB5;
+    --muted: #4A5A75;
+    --green: #00C27A;
+    --green-dim: rgba(0,194,122,0.1);
+    --red: #FF4545;
+    --yellow: #F5A623;
+    --yellow-dim: rgba(245,166,35,0.08);
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --toggle-bg: #1C2940;
+  }
 
-        const receipt = await contract.methods.stakeUSDC(amount).send({ gas: gasEstimate });
-        console.log('Transaction successful:', receipt);
-    } catch (error) {
-        console.error('Error during stakeUSDC execution:', error);
-        if (error.code) {
-            console.error('Error code:', error.code);
-        }
-        if (error.message) {
-            console.error('Error message:', error.message);
-        }
-        console.error('Detailed stack trace:', error.stack);
-    }
+  :root[data-theme="light"] {
+    --base-blue: #0052FF;
+    --base-blue-dim: #0041CC;
+    --base-blue-glow: rgba(0,82,255,0.08);
+    --bg: #F0F4FF;
+    --surface: #FFFFFF;
+    --surface2: #F5F8FF;
+    --border: #D8E2F5;
+    --text: #0D1320;
+    --text-secondary: #4A5A75;
+    --muted: #8A9BB5;
+    --green: #00A868;
+    --green-dim: rgba(0,168,104,0.08);
+    --red: #E03030;
+    --yellow: #C47B00;
+    --yellow-dim: rgba(196,123,0,0.08);
+    --card-shadow: 0 4px 24px rgba(0,82,255,0.06);
+    --toggle-bg: #D8E2F5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--base-blue-glow) 1px, transparent 1px),
+      linear-gradient(90deg, var(--base-blue-glow) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow {
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(ellipse, var(--base-blue-glow) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-mark {
+    width: 34px; height: 34px;
+    background: var(--base-blue);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.5px;
+    box-shadow: 0 0 20px rgba(0,82,255,0.4);
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text span { color: var(--base-blue); }
+
+  .badge-testnet {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--yellow);
+    border: 1px solid rgba(245,166,35,0.3);
+    background: var(--yellow-dim);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* Dark/Light Toggle */
+  .theme-toggle {
+    width: 44px; height: 24px;
+    background: var(--toggle-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--base-blue);
+    transition: transform 0.3s;
+  }
+
+  [data-theme="light"] .theme-toggle::after {
+    transform: translateX(20px);
+  }
+
+  .theme-icon {
+    position: absolute;
+    font-size: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .theme-icon.moon { left: 4px; }
+  .theme-icon.sun  { right: 4px; }
+
+  #connectBtn {
+    background: var(--base-blue);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  #connectBtn:hover { background: var(--base-blue-dim); transform: translateY(-1px); }
+  #connectBtn.connected {
+    background: var(--green-dim);
+    border: 1px solid rgba(0,194,122,0.3);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+  }
+
+  /* ── INTRO SECTION ── */
+  .intro-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro-section::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, var(--base-blue-glow), transparent 70%);
+    pointer-events: none;
+  }
+
+  .intro-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .intro-title span { color: var(--base-blue); }
+
+  .intro-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 540px;
+  }
+
+  .stack-line {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    letter-spacing: 0.3px;
+  }
+
+  .stack-line span { color: var(--base-blue); }
+
+  /* How it works steps */
+  .how-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .step {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .step-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--base-blue);
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .step-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .step-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── STATUS BAR ── */
+  #statusBar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,194,122,0.2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 28px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+  #statusBar.show { display: flex; }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,194,122,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,194,122,0); }
+  }
+
+  /* ── NETWORK WARNING ── */
+  #networkWarn {
+    display: none;
+    background: var(--yellow-dim);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--yellow);
+    margin-bottom: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  #networkWarn.show { display: flex; align-items: center; gap: 10px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--card-shadow);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: rgba(0,82,255,0.25); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .card-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  /* ── STATS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: var(--card-shadow);
+  }
+
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  .stat-value.blue { color: var(--base-blue); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.muted { color: var(--text-secondary); font-size: 17px; }
+
+  /* Score bar */
+  .score-bar-wrap { margin-bottom: 28px; }
+  .score-bar-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .score-bar-track {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .score-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--base-blue), #00C2FF);
+    border-radius: 3px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ── INPUTS & BUTTONS ── */
+  .input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  input[type="number"] {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus { border-color: var(--base-blue); }
+  input::placeholder { color: var(--muted); }
+
+  .btn {
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+  }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .btn-primary { background: var(--base-blue); color: white; }
+  .btn-primary:hover:not(:disabled) { background: var(--base-blue-dim); transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover:not(:disabled) { border-color: var(--base-blue); color: var(--base-blue); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid rgba(255,69,69,0.25);
+  }
+  .btn-danger:hover:not(:disabled) { background: rgba(255,69,69,0.06); }
+
+  .help-text {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.6;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 22px 0; }
+
+  /* ── BADGE ── */
+  .badge-display {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .badge-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--base-blue), #00C2FF);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(0,82,255,0.3);
+  }
+
+  .badge-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .badge-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .badge-none {
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    padding: 24px;
+  }
+
+  /* ── TX LOG ── */
+  #txLog {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    max-height: 160px;
+    overflow-y: auto;
+    color: var(--muted);
+  }
+  #txLog .log-entry { margin-bottom: 5px; line-height: 1.6; }
+  #txLog .log-entry.success { color: var(--green); }
+  #txLog .log-entry.error { color: var(--red); }
+  #txLog .log-entry.info { color: var(--base-blue); }
+  #txLog .log-entry.pending { color: var(--yellow); }
+
+  /* ── CONTRACTS ── */
+  .contracts-grid { display: grid; gap: 8px; }
+  .contract-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+  .contract-name { color: var(--muted); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; min-width: 110px; }
+  .contract-addr { color: var(--text); flex: 1; }
+  .copy-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 13px; padding: 2px 6px;
+    border-radius: 4px; transition: color 0.15s;
+  }
+  .copy-btn:hover { color: var(--base-blue); }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .footer a { color: var(--base-blue); text-decoration: none; }
+
+  @media (max-width: 560px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .how-steps { grid-template-columns: 1fr; }
+    .input-group { flex-direction: column; }
+    .intro-section { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-text">rep<span>24</span></div>
+      <div class="badge-testnet">Testnet</div>
+    </div>
+    <div class="header-right">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+        <span class="theme-icon moon">🌙</span>
+        <span class="theme-icon sun">☀️</span>
+      </button>
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+    </div>
+  </header>
+
+  <!-- Intro -->
+  <div class="intro-section">
+    <div class="intro-title">The Trust Layer for <span>AI Agents</span></div>
+    <div class="intro-sub">
+      rep24 is an on-chain reputation and economic accountability system built on Base. 
+      Agents stake real value to earn reputation — bad work gets slashed, good work grows your score.
+    </div>
+    <div class="stack-line">
+      <span>x402</span> pays &nbsp;·&nbsp; <span>ERC-8004</span> identifies &nbsp;·&nbsp; <span>rep24</span> verifies
+    </div>
+    <div class="how-steps">
+      <div class="step">
+        <div class="step-num">STEP 01</div>
+        <div class="step-title">Stake USDC</div>
+        <div class="step-desc">Deposit a minimum of 10 USDC into RepVault as your reputation bond.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 02</div>
+        <div class="step-title">Earn RepBadge</div>
+        <div class="step-desc">A RepBadge NFT is minted on-chain as proof of your active stake.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 03</div>
+        <div class="step-title">Build Reputation</div>
+        <div class="step-desc">Good performance grows your RepScore. Bad work gets your stake slashed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Network Warning -->
+  <div id="networkWarn">
+    ⚠ &nbsp;Switch to Base Sepolia (Chain ID: 84532) to use this app.
+    <button class="btn btn-outline" style="padding:6px 14px;font-size:11px;margin-left:auto" onclick="switchNetwork()">Switch Network</button>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="statusBar">
+    <div class="dot"></div>
+    <span id="walletAddr">—</span>
+    <span style="color:var(--muted);margin-left:auto;font-size:10px;font-family:'IBM Plex Mono',monospace">Base Sepolia · Connected</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="section-label">Your Overview</div>
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-label">Rep Score</div>
+      <div class="stat-value blue" id="repScoreVal">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Staked USDC</div>
+      <div class="stat-value green" id="stakedVal">—</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">USDC Balance</div>
+      <div class="stat-value muted" id="usdcBalVal">—</div>
+    </div>
+  </div>
+
+  <!-- Score Bar -->
+  <div class="score-bar-wrap" id="scoreBarWrap" style="display:none">
+    <div class="score-bar-meta">
+      <span>Reputation Progress</span>
+      <span id="scoreBarPct">0 / 100</span>
+    </div>
+    <div class="score-bar-track">
+      <div class="score-bar-fill" id="scoreBarFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- RepBadge -->
+  <div class="section-label">Rep Badge</div>
+  <div class="card">
+    <div id="badgeContent" class="badge-none">Connect wallet to view your RepBadge</div>
+  </div>
+
+  <!-- Stake -->
+  <div class="section-label">Stake USDC → Earn RepBadge</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Stake & Earn Reputation</div>
+      <div class="card-icon">🔒</div>
+    </div>
+    <div class="input-group">
+      <input type="number" id="stakeAmount" placeholder="Amount (min. 10 USDC)" min="10" step="1"/>
+      <button class="btn btn-primary" onclick="stakeUSDC()">Stake</button>
+    </div>
+    <div class="help-text">
+      Staking USDC creates your on-chain reputation bond and mints your RepBadge NFT.<br/>
+      Bad performance = stake slashed. Good work = reputation grows. Minimum stake is 10 USDC.
+    </div>
+    <hr class="divider"/>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline" style="flex:1" onclick="getMockUSDC()">🚰 Get Mock USDC</button>
+      <button class="btn btn-danger" style="flex:1" onclick="unstake()">Unstake</button>
+    </div>
+  </div>
+
+  <!-- TX Log -->
+  <div class="section-label">Transaction Log</div>
+  <div id="txLog"><div class="log-entry">Waiting for wallet connection...</div></div>
+
+  <!-- Contracts -->
+  <hr class="divider"/>
+  <div class="section-label">Contract Addresses · Base Sepolia</div>
+  <div class="contracts-grid">
+    <div class="contract-row">
+      <span class="contract-name">RepBadge</span>
+      <span class="contract-addr">0xFc933B...ceAEd3</span>
+      <button class="copy-btn" onclick="copyAddr('0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="contract-name">RepScore</span>
+      <span class="contract-addr">0x2Bcc43...F08c3</span>
+      <button class="copy-btn" onclick="copyAddr('0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="contract-name">RepVault</span>
+      <span class="contract-addr">0x31229...573F</span>
+      <button class="copy-btn" onclick="copyAddr('0x31229262DE71e12B1eC1CE1BEf62d815b565573F')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="contract-name">MockUSDC</span>
+      <span class="contract-addr">0xDdB4dA...95de</span>
+      <button class="copy-btn" onclick="copyAddr('0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="contract-name">SlashingGovernor</span>
+      <span class="contract-addr">0x78ee40...8c77</span>
+      <button class="copy-btn" onclick="copyAddr('0x78ee408d6174FB4836550340a012996136bC8c77')">⎘</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    rep24 · Base Sepolia Testnet · <a href="https://twitter.com/Rep24_io" target="_blank">@Rep24_io</a> · <a href="https://abdallerhnet-web.github.io/rep24/" target="_blank">abdallerhnet-web.github.io/rep24</a>
+  </div>
+
+</div>
+
+<script>
+// ─── THEME ────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('rep24-theme', next);
 }
+
+// Load saved theme
+(function() {
+  const saved = localStorage.getItem('rep24-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+})();
+
+// ─── CONSTANTS ───────────────────────────────────────
+const BASE_SEPOLIA_CHAIN_ID = 84532;
+const CONTRACTS = {
+  RepBadge:         '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
+  RepScore:         '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
+  RepVault:         '0x31229262DE71e12B1eC1CE1BEf62d815b565573F',
+  SlashingGovernor: '0x78ee408d6174FB4836550340a012996136bC8c77',
+  MockUSDC:         '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
+};
+
+const ERC20_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+  'function decimals() view returns (uint8)',
+  'function approve(address spender, uint256 amount) returns (bool)',
+  'function mint(address to, uint256 amount)',
+];
+
+// FIX: stake/unstake require agentAddress + amount
+const REPVAULT_ABI = [
+  'function stake(address agentAddress, uint256 amount)',
+  'function unstake(address agentAddress, uint256 amount)',
+  'function getStakeBalance(address) view returns (uint256)',
+  'event Staked(address indexed user, uint256 amount)',
+  'event Unstaked(address indexed user, uint256 amount)',
+];
+
+const REPBADGE_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+];
+
+// FIX: getRepScore() not getScore()
+const REPSCORE_ABI = [
+  'function getRepScore(address) view returns (uint256)',
+];
+
+let provider, signer, userAddress;
+let usdcContract, vaultContract, badgeContract, scoreContract;
+
+// ─── LOG ─────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const el = document.getElementById('txLog');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  const time = new Date().toLocaleTimeString('en-US', {hour12:false});
+  entry.textContent = `[${time}] ${msg}`;
+  el.insertBefore(entry, el.firstChild);
+}
+
+// ─── CONNECT WALLET ───────────────────────────────────
+async function connectWallet() {
+  if (!window.ethereum) {
+    log('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error');
+    return;
+  }
+  try {
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    userAddress = await signer.getAddress();
+
+    const network = await provider.getNetwork();
+    if (network.chainId !== BASE_SEPOLIA_CHAIN_ID) {
+      document.getElementById('networkWarn').classList.add('show');
+      log('Wrong network — switch to Base Sepolia', 'error');
+    } else {
+      document.getElementById('networkWarn').classList.remove('show');
+    }
+
+    const shortAddr = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
+    document.getElementById('walletAddr').textContent = shortAddr;
+    document.getElementById('statusBar').classList.add('show');
+    const btn = document.getElementById('connectBtn');
+    btn.textContent = shortAddr;
+    btn.classList.add('connected');
+
+    initContracts();
+    await loadData();
+    log(`Wallet connected: ${userAddress}`, 'success');
+
+    window.ethereum.on('accountsChanged', () => location.reload());
+    window.ethereum.on('chainChanged', () => location.reload());
+  } catch(e) {
+    log(`Connection failed: ${e.message}`, 'error');
+  }
+}
+
+// ─── SWITCH NETWORK ───────────────────────────────────
+async function switchNetwork() {
+  try {
+    await window.ethereum.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: '0x14A34' }],
+    });
+  } catch(e) {
+    if (e.code === 4902) {
+      await window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x14A34',
+          chainName: 'Base Sepolia',
+          rpcUrls: ['https://sepolia.base.org'],
+          nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+          blockExplorerUrls: ['https://sepolia.basescan.org'],
+        }]
+      });
+    }
+  }
+}
+
+// ─── INIT CONTRACTS ───────────────────────────────────
+function initContracts() {
+  usdcContract  = new ethers.Contract(CONTRACTS.MockUSDC,  ERC20_ABI,    signer);
+  vaultContract = new ethers.Contract(CONTRACTS.RepVault,  REPVAULT_ABI, signer);
+  badgeContract = new ethers.Contract(CONTRACTS.RepBadge,  REPBADGE_ABI, signer);
+  scoreContract = new ethers.Contract(CONTRACTS.RepScore,  REPSCORE_ABI, signer);
+}
+
+// ─── LOAD DATA ────────────────────────────────────────
+async function loadData() {
+  if (!userAddress) return;
+  log('Loading data...', 'info');
+  try {
+    // USDC Balance
+    let usdcBal = '0.00';
+    try {
+      const decimals = await usdcContract.decimals();
+      const raw = await usdcContract.balanceOf(userAddress);
+      usdcBal = parseFloat(ethers.utils.formatUnits(raw, decimals)).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    } catch {}
+    document.getElementById('usdcBalVal').textContent = usdcBal;
+
+    // Staked Amount — FIX: getStakeBalance()
+    let staked = '0.00';
+    try {
+      const rawStaked = await vaultContract.getStakeBalance(userAddress);
+      staked = parseFloat(ethers.utils.formatUnits(rawStaked, 6)).toFixed(2);
+    } catch {}
+    document.getElementById('stakedVal').textContent = staked;
+
+    // Rep Score — FIX: getRepScore()
+    let score = 0;
+    try {
+      const rawScore = await scoreContract.getRepScore(userAddress);
+      score = rawScore.toNumber ? rawScore.toNumber() : parseInt(rawScore.toString());
+    } catch {}
+    document.getElementById('repScoreVal').textContent = score;
+    const pct = Math.min(score, 100);
+    document.getElementById('scoreBarFill').style.width = pct + '%';
+    document.getElementById('scoreBarPct').textContent = `${score} / 100`;
+    document.getElementById('scoreBarWrap').style.display = 'block';
+
+    // RepBadge
+    let hasBadge = false;
+    try {
+      const bal = await badgeContract.balanceOf(userAddress);
+      hasBadge = bal.toNumber() > 0;
+    } catch {}
+    const badgeContent = document.getElementById('badgeContent');
+    if (hasBadge) {
+      badgeContent.innerHTML = `
+        <div class="badge-display">
+          <div class="badge-icon">🏅</div>
+          <div>
+            <div class="badge-name">RepBadge Active</div>
+            <div class="badge-sub">On-chain reputation bond confirmed · Base Sepolia</div>
+          </div>
+          <div style="margin-left:auto;color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">✓ VERIFIED</div>
+        </div>`;
+    } else {
+      badgeContent.innerHTML = `<div class="badge-none">No RepBadge found — stake USDC below to mint yours</div>`;
+    }
+
+    log('Data loaded', 'success');
+  } catch(e) {
+    log(`Data error: ${e.message}`, 'error');
+  }
+}
+
+// ─── STAKE ────────────────────────────────────────────
+async function stakeUSDC() {
+  if (!signer) { log('Connect wallet first', 'error'); return; }
+  const amt = document.getElementById('stakeAmount').value;
+  if (!amt || parseFloat(amt) < 10) { log('Minimum stake is 10 USDC', 'error'); return; }
+  try {
+    const decimals = await usdcContract.decimals();
+    const amount = ethers.utils.parseUnits(amt.toString(), decimals);
+
+    log(`Approving ${amt} USDC...`, 'pending');
+    const approveTx = await usdcContract.approve(CONTRACTS.RepVault, amount);
+    await approveTx.wait();
+    log(`Approved ✓`, 'success');
+
+    log(`Staking ${amt} USDC...`, 'pending');
+    // FIX: pass userAddress as first argument
+    const stakeTx = await vaultContract.stake(userAddress, amount);
+    await stakeTx.wait();
+    log(`Staked ✓ — View: https://sepolia.basescan.org/tx/${stakeTx.hash}`, 'success');
+
+    await loadData();
+  } catch(e) {
+    log(`Stake failed: ${e.reason || e.message}`, 'error');
+  }
+}
+
+// ─── UNSTAKE ──────────────────────────────────────────
+async function unstake() {
+  if (!signer) { log('Connect wallet first', 'error'); return; }
+  try {
+    const currentStake = await vaultContract.getStakeBalance(userAddress);
+    if (currentStake.isZero()) { log('No staked balance to unstake', 'error'); return; }
+    log('Unstaking...', 'pending');
+    // FIX: pass userAddress + amount
+    const tx = await vaultContract.unstake(userAddress, currentStake);
+    await tx.wait();
+    log(`Unstaked ✓`, 'success');
+    await loadData();
+  } catch(e) {
+    log(`Unstake failed: ${e.reason || e.message}`, 'error');
+  }
+}
+
+// ─── GET MOCK USDC ────────────────────────────────────
+async function getMockUSDC() {
+  if (!signer) { log('Connect wallet first', 'error'); return; }
+  try {
+    log('Minting 1000 mock USDC...', 'pending');
+    const amount = ethers.utils.parseUnits('1000', 6);
+    const tx = await usdcContract.mint(userAddress, amount);
+    await tx.wait();
+    log(`Got 1000 mock USDC ✓`, 'success');
+    await loadData();
+  } catch(e) {
+    log(`Mint failed: ${e.reason || e.message}`, 'error');
+  }
+}
+
+// ─── COPY ─────────────────────────────────────────────
+function copyAddr(addr) {
+  navigator.clipboard.writeText(addr).then(() => log(`Copied: ${addr}`, 'info'));
+}
+</script>
+</body>
+</html>
