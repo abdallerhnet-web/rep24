@@ -550,7 +550,6 @@ hr { border: none; border-top: 1px solid var(--border); }
 </head>
 <body>
 
-<!-- TOPBAR -->
 <div class="topbar">
   <div class="topbar-inner">
     <a class="logo" href="#">
@@ -564,16 +563,13 @@ hr { border: none; border-top: 1px solid var(--border); }
   </div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
-  <!-- Network warning -->
   <div id="networkWarn" class="alert alert-warn">
     ⚠ Switch to Base Sepolia (Chain ID: 84532)
     <button class="alert-btn" onclick="switchNetwork()">Switch Network</button>
   </div>
 
-  <!-- Hero -->
   <div class="hero">
     <div class="hero-text">
       <h1>rep24 Testnet</h1>
@@ -586,7 +582,6 @@ hr { border: none; border-top: 1px solid var(--border); }
     <div class="hero-visual">🔵</div>
   </div>
 
-  <!-- Stats -->
   <div class="stats-grid">
     <div class="stat-card">
       <div class="stat-label">Rep Score</div>
@@ -602,7 +597,6 @@ hr { border: none; border-top: 1px solid var(--border); }
     </div>
   </div>
 
-  <!-- Score bar -->
   <div class="score-section">
     <div class="score-header">
       <span class="score-title">Reputation Progress</span>
@@ -613,7 +607,6 @@ hr { border: none; border-top: 1px solid var(--border); }
     </div>
   </div>
 
-  <!-- RepBadge -->
   <div class="section-label">Rep Badge</div>
   <div class="card">
     <div class="card-head">
@@ -625,7 +618,6 @@ hr { border: none; border-top: 1px solid var(--border); }
     </div>
   </div>
 
-  <!-- Stake -->
   <div class="section-label">Stake & Earn</div>
   <div class="card">
     <div class="card-head">
@@ -645,13 +637,11 @@ hr { border: none; border-top: 1px solid var(--border); }
     </div>
   </div>
 
-  <!-- Log -->
   <div class="section-label">Transaction Log</div>
   <div class="log-box" id="txLog">
     <div class="log-entry">Waiting for wallet connection...</div>
   </div>
 
-  <!-- Contracts -->
   <div class="section-label">Contract Addresses</div>
   <div class="contract-list">
     <div class="contract-row">
@@ -666,8 +656,8 @@ hr { border: none; border-top: 1px solid var(--border); }
     </div>
     <div class="contract-row">
       <span class="c-name">RepVault</span>
-      <span class="c-addr">0x31229262DE71e12B1eC1CE1BEf62d815b565573F</span>
-      <button class="copy-btn" onclick="copyAddr('0x31229262DE71e12B1eC1CE1BEf62d815b565573F')">⎘</button>
+      <span class="c-addr">0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5</span>
+      <button class="copy-btn" onclick="copyAddr('0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5')">⎘</button>
     </div>
     <div class="contract-row">
       <span class="c-name">MockUSDC</span>
@@ -710,7 +700,7 @@ function toggleTheme() {
 const BASE_SEPOLIA_ID = 84532;
 const CONTRACTS = {
   MockUSDC:         '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
-  RepVault:         '0x31229262DE71e12B1eC1CE1BEf62d815b565573F',
+  RepVault:         '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
   RepBadge:         '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
   RepScore:         '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
 };
@@ -723,16 +713,13 @@ const ERC20_ABI = [
   'function faucet() payable',
 ];
 const VAULT_ABI = [
-  'function stake(uint256)',
-  'function unstake()',
-  'function stakedAmount(address) view returns (uint256)',
-  'function getStake(address) view returns (uint256)',
+  'function stake(address agentAddress, uint256 amount)',
+  'function unstake(address agentAddress, uint256 amount)',
+  'function getStakeBalance(address) view returns (uint256)',
 ];
 const BADGE_ABI = ['function balanceOf(address) view returns (uint256)'];
 const SCORE_ABI = [
-  'function getScore(address) view returns (uint256)',
-  'function scores(address) view returns (uint256)',
-  'function scoreOf(address) view returns (uint256)',
+  'function getRepScore(address) view returns (uint256)',
 ];
 
 let provider, signer, userAddress;
@@ -818,8 +805,7 @@ async function loadData() {
     // Staked
     let staked = '—';
     try {
-      let raw;
-      try { raw = await vault.stakedAmount(userAddress); } catch { raw = await vault.getStake(userAddress); }
+      const raw = await vault.getStakeBalance(userAddress);
       staked = parseFloat(ethers.utils.formatUnits(raw, 6)).toFixed(2);
     } catch {}
     document.getElementById('stakedVal').textContent = staked;
@@ -827,9 +813,7 @@ async function loadData() {
     // RepScore
     let s = 0;
     try {
-      let raw;
-      try { raw = await score.getScore(userAddress); }
-      catch { try { raw = await score.scores(userAddress); } catch { raw = await score.scoreOf(userAddress); } }
+      const raw = await score.getRepScore(userAddress);
       s = parseInt(raw.toString());
     } catch {}
     document.getElementById('repScoreVal').textContent = s;
@@ -868,7 +852,7 @@ async function stakeUSDC() {
     await a.wait();
     log(`Approved ✓`, 'success');
     log(`Staking ${amt} USDC...`, 'pending');
-    const tx = await vault.stake(amount);
+    const tx = await vault.stake(userAddress, amount);
     await tx.wait();
     log(`Staked ✓ · basescan.org/tx/${tx.hash.slice(0,12)}...`, 'success');
     await loadData();
@@ -880,7 +864,8 @@ async function unstake() {
   if (!signer) { log('Connect wallet first', 'error'); return; }
   try {
     log('Unstaking...', 'pending');
-    const tx = await vault.unstake();
+    const currentStake = await vault.getStakeBalance(userAddress);
+    const tx = await vault.unstake(userAddress, currentStake);
     await tx.wait();
     log(`Unstaked ✓ · ${tx.hash.slice(0,12)}...`, 'success');
     await loadData();
