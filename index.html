@@ -705,9 +705,11 @@ const CONTRACTS = {
   RepScore:         '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
 };
 
+// FIXED: Added allowance to the ERC20 ABI
 const ERC20_ABI = [
   'function balanceOf(address) view returns (uint256)',
   'function decimals() view returns (uint8)',
+  'function allowance(address owner, address spender) view returns (uint256)',
   'function approve(address, uint256) returns (bool)',
   'function mint(address, uint256)',
   'function faucet() payable',
@@ -844,19 +846,35 @@ async function stakeUSDC() {
   if (!signer) { log('Connect wallet first', 'error'); return; }
   const amt = document.getElementById('stakeAmount').value;
   if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'error'); return; }
+  
   try {
     const dec = await usdc.decimals();
     const amount = ethers.utils.parseUnits(amt.toString(), dec);
-    log(`Approving ${amt} USDC...`, 'pending');
-    const a = await usdc.approve(CONTRACTS.RepVault, amount);
-    await a.wait();
-    log(`Approved ✓`, 'success');
+    
+    // FIXED: Check allowance to prevent RPC lag rejection
+    const currentAllowance = await usdc.allowance(userAddress, CONTRACTS.RepVault);
+    
+    if (currentAllowance.lt(amount)) {
+        log(`Approving ${amt} USDC...`, 'pending');
+        const a = await usdc.approve(CONTRACTS.RepVault, amount);
+        await a.wait();
+        log(`Approved ✓ Waiting 3s for network sync...`, 'pending');
+        
+        // Pause for 3 seconds to let public RPC catch up
+        await new Promise(resolve => setTimeout(resolve, 3000));
+    } else {
+        log(`Pre-approved ✓`, 'success');
+    }
+
     log(`Staking ${amt} USDC...`, 'pending');
     const tx = await vault.stake(userAddress, amount);
     await tx.wait();
     log(`Staked ✓ · basescan.org/tx/${tx.hash.slice(0,12)}...`, 'success');
     await loadData();
-  } catch(e) { log(`Stake failed: ${e.reason || e.message}`, 'error'); }
+    
+  } catch(e) { 
+    log(`Stake failed: ${e.reason || e.message}`, 'error'); 
+  }
 }
 
 // ── UNSTAKE ────────────────────────────────────
