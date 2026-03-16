@@ -122,19 +122,24 @@ body {
 .chip-yellow { color: var(--yellow); border-color: rgba(194,124,0,0.35); background: var(--yellow-soft); }
 .chip-green  { color: var(--green);  border-color: rgba(0,145,90,0.3);  background: var(--green-soft); }
 
-/* Theme toggle */
-.theme-toggle {
-  width: 36px; height: 36px;
+/* Theme toggle & Utilities */
+.theme-toggle, .utility-btn {
+  height: 36px;
   border-radius: 9px;
   border: 1px solid var(--border);
   background: var(--surface2);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  color: var(--text);
   transition: all 0.15s;
   flex-shrink: 0;
 }
-.theme-toggle:hover { border-color: var(--accent); }
+.theme-toggle { width: 36px; }
+.utility-btn { padding: 0 14px; }
+.theme-toggle:hover, .utility-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* Connect button */
 #connectBtn {
@@ -194,7 +199,7 @@ body {
   cursor: pointer;
 }
 
-/* ── WELCOME / HERO ── */
+/* ── HERO ── */
 .hero {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -207,345 +212,154 @@ body {
   justify-content: space-between;
   gap: 20px;
 }
-
-.hero-text h1 {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  margin-bottom: 6px;
-}
-
-.hero-text p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  max-width: 360px;
-  line-height: 1.55;
-}
-
+.hero-text h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+.hero-text p { font-size: 14px; color: var(--text-secondary); max-width: 360px; line-height: 1.55; }
 .hero-visual {
-  flex-shrink: 0;
-  width: 72px; height: 72px;
-  border-radius: 16px;
-  background: var(--accent-soft);
-  border: 1px solid rgba(0,82,255,0.15);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px;
+  flex-shrink: 0; width: 72px; height: 72px; border-radius: 16px;
+  background: var(--accent-soft); border: 1px solid rgba(0,82,255,0.15);
+  display: flex; align-items: center; justify-content: center; font-size: 32px;
 }
 
 /* ── STATS ── */
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
 }
-
 .stat-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow);
-  transition: border-color 0.2s, transform 0.15s;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow); transition: border-color 0.2s, transform 0.15s;
 }
 .stat-card:hover { border-color: rgba(0,82,255,0.25); transform: translateY(-1px); }
-
 .stat-label {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-family: 'DM Mono', monospace;
-  margin-bottom: 10px;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.6px; text-transform: uppercase;
+  color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 10px;
 }
-
-.stat-value {
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.8px;
-  line-height: 1;
-}
+.stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; line-height: 1; }
 .stat-value.blue  { color: var(--accent); }
 .stat-value.green { color: var(--green); }
 .stat-value.gray  { color: var(--text-secondary); font-size: 20px; }
 
 /* ── SCORE BAR ── */
 .score-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 24px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow);
 }
+.score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.score-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+.score-pct { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
+.bar-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #4D9BFF); border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); width: 0%; }
 
-.score-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.score-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.score-pct {
-  font-family: 'DM Mono', monospace;
-  font-size: 13px;
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.bar-track {
-  height: 8px;
-  background: var(--surface2);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), #4D9BFF);
-  border-radius: 4px;
-  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-  width: 0%;
-}
-
-/* ── CARD ── */
+/* ── CARDS ── */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-  transition: border-color 0.2s;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); transition: border-color 0.2s;
 }
-
-.card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.card-title {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
-}
-
+.card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.card-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
 .card-icon {
-  width: 38px; height: 38px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
+  width: 38px; height: 38px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;
 }
 
-/* ── BADGE ── */
-.badge-display {
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 8px; margin-bottom: 20px;
+  background: var(--surface2); padding: 4px; border-radius: 10px; border: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1; padding: 10px; text-align: center; font-weight: 600; font-size: 13px;
+  color: var(--text-secondary); cursor: pointer; border-radius: 8px; transition: all 0.2s;
+}
+.tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+/* ── INPUTS WITH MAX BUTTON ── */
+.input-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  margin-bottom: 14px;
 }
-
-.badge-icon-wrap {
-  width: 48px; height: 48px;
-  background: linear-gradient(135deg, #0052FF, #00A3FF);
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.badge-info-name { font-weight: 700; font-size: 15px; }
-.badge-info-sub {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.badge-empty {
-  padding: 22px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--text-muted);
-  font-family: 'DM Mono', monospace;
-  background: var(--surface2);
-  border-radius: 10px;
-}
-
-/* ── INPUTS ── */
-.input-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-input[type="number"], input[type="text"] {
-  flex: 1;
+.input-wrapper input {
+  width: 100%;
   background: var(--surface2);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: 11px 16px;
+  padding: 14px 70px 14px 16px; /* Right padding makes room for MAX */
   color: var(--text);
   font-family: 'DM Mono', monospace;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.15s;
   -webkit-appearance: none;
 }
-input:focus { border-color: var(--accent); }
-input::placeholder { color: var(--text-muted); }
+.input-wrapper input:focus { border-color: var(--accent); }
+.input-wrapper input::placeholder { color: var(--text-muted); }
 
-.help {
-  font-size: 12px;
-  color: var(--text-secondary);
+.max-btn {
+  position: absolute;
+  right: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--accent);
   font-family: 'DM Mono', monospace;
-  line-height: 1.6;
-  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
 }
+.max-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
+
+.help { font-size: 12px; color: var(--text-secondary); font-family: 'DM Mono', monospace; line-height: 1.6; }
 
 /* ── BUTTONS ── */
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 11px 20px;
-  border-radius: var(--radius-sm);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.15s;
-  white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; width: 100%;
+  padding: 14px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s;
 }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-.btn:hover:not(:disabled) { transform: translateY(-1px); }
-.btn:active:not(:disabled) { transform: translateY(0); }
-
 .btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-danger { background: var(--red); color: white; }
+.btn-danger:hover:not(:disabled) { background: #b82d2d; transform: translateY(-1px); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
 
-.btn-ghost {
-  background: var(--surface2);
-  color: var(--text);
-  border: 1px solid var(--border);
-}
-.btn-ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+/* ── BADGE ── */
+.badge-display { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; }
+.badge-icon-wrap { width: 48px; height: 48px; background: linear-gradient(135deg, #0052FF, #00A3FF); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.badge-info-name { font-weight: 700; font-size: 15px; }
+.badge-info-sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.badge-empty { padding: 22px; text-align: center; font-size: 13px; color: var(--text-muted); font-family: 'DM Mono', monospace; background: var(--surface2); border-radius: 10px; }
 
-.btn-danger {
-  background: var(--red-soft);
-  color: var(--red);
-  border: 1px solid rgba(217,54,54,0.2);
-}
-.btn-danger:hover:not(:disabled) { background: rgba(217,54,54,0.14); }
-
-.btn-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
-}
-.btn-row .btn { flex: 1; }
-
-/* ── LOG ── */
-.log-box {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  font-family: 'DM Mono', monospace;
-  font-size: 12px;
-  max-height: 160px;
-  overflow-y: auto;
-  line-height: 1.7;
-}
+/* ── LOG & CONTRACTS ── */
+.log-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-family: 'DM Mono', monospace; font-size: 12px; max-height: 140px; overflow-y: auto; line-height: 1.7; }
 .log-entry { color: var(--text-muted); }
 .log-entry.success { color: var(--green); }
 .log-entry.error   { color: var(--red); }
 .log-entry.info    { color: var(--accent); }
 .log-entry.pending { color: var(--yellow); }
 
-/* ── CONTRACTS ── */
 .contract-list { display: grid; gap: 8px; }
-
-.contract-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 11px 14px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  font-family: 'DM Mono', monospace;
-  font-size: 12px;
-  transition: border-color 0.15s;
-}
+.contract-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; font-family: 'DM Mono', monospace; font-size: 12px; transition: border-color 0.15s; }
 .contract-row:hover { border-color: rgba(0,82,255,0.25); }
 .c-name { color: var(--text-muted); font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; width: 120px; flex-shrink: 0; }
 .c-addr { color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; }
-.copy-btn {
-  background: none; border: none; cursor: pointer;
-  color: var(--text-muted); padding: 4px 8px; border-radius: 5px;
-  font-size: 13px; transition: color 0.15s, background 0.15s;
-}
+.copy-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 5px; font-size: 13px; transition: color 0.15s, background 0.15s; }
 .copy-btn:hover { color: var(--accent); background: var(--accent-soft); }
 
-/* ── SECTION LABEL ── */
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-family: 'DM Mono', monospace;
-  margin: 24px 0 12px;
-}
+.section-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin: 24px 0 12px; }
+.footer { text-align: center; margin-top: 40px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
 
-/* ── FOOTER ── */
-.footer {
-  text-align: center;
-  margin-top: 40px;
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-/* ── DIVIDER ── */
-hr { border: none; border-top: 1px solid var(--border); }
-
-/* ── RESPONSIVE ── */
 @media (max-width: 520px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .hero { flex-direction: column; align-items: flex-start; }
   .hero-visual { display: none; }
-  .input-row { flex-direction: column; }
-  .btn-row { flex-direction: column; }
 }
 
-/* ── ANIMATIONS ── */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.card, .stats-grid, .score-section, .hero {
-  animation: fadeIn 0.35s ease both;
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
@@ -558,6 +372,7 @@ hr { border: none; border-top: 1px solid var(--border); }
     </a>
     <div class="chip chip-yellow">TESTNET</div>
     <div style="flex:1"></div>
+    <button class="utility-btn" onclick="getMockUSDC()" title="Get Test USDC">🚰 Faucet</button>
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">🌙</button>
     <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
   </div>
@@ -608,7 +423,7 @@ hr { border: none; border-top: 1px solid var(--border); }
   </div>
 
   <div class="section-label">Rep Badge</div>
-  <div class="card">
+  <div class="card" style="margin-bottom:24px;">
     <div class="card-head">
       <div class="card-title">Your Badge</div>
       <div class="card-icon">🏅</div>
@@ -618,22 +433,29 @@ hr { border: none; border-top: 1px solid var(--border); }
     </div>
   </div>
 
-  <div class="section-label">Stake & Earn</div>
+  <div class="section-label">Manage Liquidity</div>
   <div class="card">
-    <div class="card-head">
-      <div class="card-title">Stake USDC → Earn RepBadge</div>
-      <div class="card-icon">🔒</div>
+    <div class="tabs">
+      <div class="tab-btn active" onclick="switchTab('stake')" id="tabStake">Stake</div>
+      <div class="tab-btn" onclick="switchTab('unstake')" id="tabUnstake">Unstake</div>
     </div>
-    <div class="input-row">
-      <input type="number" id="stakeAmount" placeholder="Enter USDC amount" min="1" step="1"/>
-      <button class="btn btn-primary" onclick="stakeUSDC()">Stake</button>
+
+    <div class="tab-pane active" id="paneStake">
+      <div class="input-wrapper">
+        <input type="number" id="stakeAmount" placeholder="Amount to Stake (USDC)" min="1" step="1"/>
+        <button class="max-btn" onclick="setMax('stake')">MAX</button>
+      </div>
+      <button class="btn btn-primary" id="btnStake" onclick="stakeUSDC()">Stake USDC</button>
+      <p class="help" style="margin-top:12px">Staking USDC mints your RepBadge. Bad performance = stake slashed. Good work = reputation grows.</p>
     </div>
-    <p class="help">
-      Stake USDC to mint your on-chain RepBadge. Bad performance = stake slashed. Good work = reputation grows.
-    </p>
-    <div class="btn-row">
-      <button class="btn btn-ghost" onclick="getMockUSDC()">🚰 Get Mock USDC</button>
-      <button class="btn btn-danger" onclick="unstake()">Unstake</button>
+
+    <div class="tab-pane" id="paneUnstake">
+      <div class="input-wrapper">
+        <input type="number" id="unstakeAmount" placeholder="Amount to Unstake (USDC)" min="1" step="1"/>
+        <button class="max-btn" onclick="setMax('unstake')">MAX</button>
+      </div>
+      <button class="btn btn-danger" id="btnUnstake" onclick="unstake()">Unstake USDC</button>
+      <p class="help" style="margin-top:12px">Withdrawing your entire stake will pause your RepScore growth and deactivate your active status.</p>
     </div>
   </div>
 
@@ -664,14 +486,9 @@ hr { border: none; border-top: 1px solid var(--border); }
       <span class="c-addr">0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de</span>
       <button class="copy-btn" onclick="copyAddr('0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de')">⎘</button>
     </div>
-    <div class="contract-row">
-      <span class="c-name">SlashingGov</span>
-      <span class="c-addr">0x78ee408d6174FB4836550340a012996136bC8c77</span>
-      <button class="copy-btn" onclick="copyAddr('0x78ee408d6174FB4836550340a012996136bC8c77')">⎘</button>
-    </div>
   </div>
 
-  <div class="footer" style="margin-top:40px">
+  <div class="footer">
     rep24 testnet · Base Sepolia · <a href="https://twitter.com/Rep24_io" style="color:var(--accent);text-decoration:none">@Rep24_io</a>
   </div>
 
@@ -687,7 +504,6 @@ function toggleTheme() {
   localStorage.setItem('rep24-theme', isDark ? 'light' : 'dark');
 }
 
-// Load saved theme
 (function() {
   const saved = localStorage.getItem('rep24-theme');
   if (saved) {
@@ -696,16 +512,52 @@ function toggleTheme() {
   }
 })();
 
-// ── CONSTANTS ──────────────────────────────────
+// ── UI TABS & MAX BUTTONS ──────────────────────
+function switchTab(tab) {
+  document.getElementById('tabStake').classList.remove('active');
+  document.getElementById('tabUnstake').classList.remove('active');
+  document.getElementById('paneStake').classList.remove('active');
+  document.getElementById('paneUnstake').classList.remove('active');
+
+  if(tab === 'stake') {
+    document.getElementById('tabStake').classList.add('active');
+    document.getElementById('paneStake').classList.add('active');
+  } else {
+    document.getElementById('tabUnstake').classList.add('active');
+    document.getElementById('paneUnstake').classList.add('active');
+  }
+}
+
+// Global variables to store unformatted balances for the MAX buttons
+let rawUsdcBalance = '0';
+let rawStakedBalance = '0';
+let currentUsdcDecimals = 6;
+
+function setMax(type) {
+  if (type === 'stake') {
+    const formatted = ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals);
+    document.getElementById('stakeAmount').value = Math.floor(formatted); // Floor to prevent fractional dust errors
+  } else if (type === 'unstake') {
+    const formatted = ethers.utils.formatUnits(rawStakedBalance, 6);
+    document.getElementById('unstakeAmount').value = formatted;
+  }
+}
+
+function updateBtnState(btnId, isLoading, text) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = isLoading;
+  btn.textContent = text;
+}
+
+// ── CONSTANTS & ABIS ───────────────────────────
 const BASE_SEPOLIA_ID = 84532;
 const CONTRACTS = {
-  MockUSDC:         '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
-  RepVault:         '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
-  RepBadge:         '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
-  RepScore:         '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
+  MockUSDC: '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
+  RepVault: '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
+  RepBadge: '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
+  RepScore: '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
 };
 
-// FIXED: Added allowance to the ERC20 ABI
 const ERC20_ABI = [
   'function balanceOf(address) view returns (uint256)',
   'function decimals() view returns (uint8)',
@@ -722,12 +574,13 @@ const VAULT_ABI = [
 const BADGE_ABI = ['function balanceOf(address) view returns (uint256)'];
 const SCORE_ABI = [
   'function getRepScore(address) view returns (uint256)',
+  'function scores(address) view returns (uint256)', 
+  'function scoreOf(address) view returns (uint256)', 
 ];
 
 let provider, signer, userAddress;
 let usdc, vault, badge, score;
 
-// ── LOG ────────────────────────────────────────
 function log(msg, type = 'info') {
   const box = document.getElementById('txLog');
   const t = new Date().toLocaleTimeString('en-US', {hour12:false});
@@ -739,7 +592,7 @@ function log(msg, type = 'info') {
 
 // ── CONNECT ────────────────────────────────────
 async function connectWallet() {
-  if (!window.ethereum) { log('No wallet found — install MetaMask or Coinbase Wallet', 'error'); return; }
+  if (!window.ethereum) { log('No wallet found — install MetaMask', 'error'); return; }
   try {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
     provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -749,7 +602,6 @@ async function connectWallet() {
 
     if (net.chainId !== BASE_SEPOLIA_ID) {
       document.getElementById('networkWarn').classList.add('show');
-      log('Wrong network — please switch to Base Sepolia', 'error');
     } else {
       document.getElementById('networkWarn').classList.remove('show');
     }
@@ -775,8 +627,7 @@ async function switchNetwork() {
   } catch(e) {
     if (e.code === 4902) {
       await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
-        chainId: '0x14A34',
-        chainName: 'Base Sepolia Testnet',
+        chainId: '0x14A34', chainName: 'Base Sepolia Testnet',
         rpcUrls: ['https://sepolia.base.org'],
         nativeCurrency: { name:'ETH', symbol:'ETH', decimals:18 },
         blockExplorerUrls: ['https://sepolia.basescan.org'],
@@ -794,38 +645,35 @@ function initContracts() {
 
 // ── LOAD DATA ──────────────────────────────────
 async function loadData() {
-  log('Loading data...', 'info');
+  log('Fetching latest blockchain data...', 'info');
+  
   try {
-    // USDC balance
-    let bal = '—';
-    try {
-      const dec = await usdc.decimals();
-      bal = parseFloat(ethers.utils.formatUnits(await usdc.balanceOf(userAddress), dec)).toFixed(2);
-    } catch {}
-    document.getElementById('usdcBalVal').textContent = bal;
+    currentUsdcDecimals = await usdc.decimals();
+    rawUsdcBalance = await usdc.balanceOf(userAddress);
+    document.getElementById('usdcBalVal').textContent = parseFloat(ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals)).toFixed(2);
+  } catch (err) { console.error("USDC Load Error:", err); }
 
-    // Staked
-    let staked = '—';
-    try {
-      const raw = await vault.getStakeBalance(userAddress);
-      staked = parseFloat(ethers.utils.formatUnits(raw, 6)).toFixed(2);
-    } catch {}
-    document.getElementById('stakedVal').textContent = staked;
+  try {
+    rawStakedBalance = await vault.getStakeBalance(userAddress);
+    document.getElementById('stakedVal').textContent = parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6)).toFixed(2);
+  } catch (err) { console.error("Vault Load Error:", err); }
 
-    // RepScore
-    let s = 0;
-    try {
-      const raw = await score.getRepScore(userAddress);
-      s = parseInt(raw.toString());
-    } catch {}
+  try {
+    let rawScore;
+    try { rawScore = await score.getRepScore(userAddress); }
+    catch {
+      try { rawScore = await score.scores(userAddress); }
+      catch { rawScore = await score.scoreOf(userAddress); }
+    }
+    const s = parseInt(rawScore.toString());
     document.getElementById('repScoreVal').textContent = s;
     const pct = Math.min(s, 100);
     document.getElementById('barFill').style.width = pct + '%';
     document.getElementById('scorePct').textContent = `${s} / 100`;
+  } catch (err) { console.error("Score Load Error:", err); }
 
-    // Badge
-    let hasBadge = false;
-    try { hasBadge = (await badge.balanceOf(userAddress)).toNumber() > 0; } catch {}
+  try {
+    const hasBadge = (await badge.balanceOf(userAddress)).toNumber() > 0;
     document.getElementById('badgeContent').innerHTML = hasBadge
       ? `<div class="badge-display">
            <div class="badge-icon-wrap">🏅</div>
@@ -836,9 +684,7 @@ async function loadData() {
            <div style="margin-left:auto;color:var(--green);font-family:'DM Mono',monospace;font-size:12px;font-weight:500">✓ LIVE</div>
          </div>`
       : `<div class="badge-empty">No RepBadge found — stake USDC below to mint yours</div>`;
-
-    log('Data loaded', 'success');
-  } catch(e) { log(`Load error: ${e.message}`, 'error'); }
+  } catch (err) { console.error("Badge Load Error:", err); }
 }
 
 // ── STAKE ──────────────────────────────────────
@@ -847,59 +693,83 @@ async function stakeUSDC() {
   const amt = document.getElementById('stakeAmount').value;
   if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'error'); return; }
   
+  updateBtnState('btnStake', true, 'Processing...');
+  
   try {
-    const dec = await usdc.decimals();
-    const amount = ethers.utils.parseUnits(amt.toString(), dec);
-    
-    // FIXED: Check allowance to prevent RPC lag rejection
+    const amount = ethers.utils.parseUnits(amt.toString(), currentUsdcDecimals);
     const currentAllowance = await usdc.allowance(userAddress, CONTRACTS.RepVault);
     
     if (currentAllowance.lt(amount)) {
+        updateBtnState('btnStake', true, 'Approving USDC...');
         log(`Approving ${amt} USDC...`, 'pending');
         const a = await usdc.approve(CONTRACTS.RepVault, amount);
         await a.wait();
-        log(`Approved ✓ Waiting 3s for network sync...`, 'pending');
-        
-        // Pause for 3 seconds to let public RPC catch up
+        log(`Approved ✓ Waiting for network...`, 'pending');
         await new Promise(resolve => setTimeout(resolve, 3000));
-    } else {
-        log(`Pre-approved ✓`, 'success');
     }
 
+    updateBtnState('btnStake', true, 'Confirming Stake...');
     log(`Staking ${amt} USDC...`, 'pending');
     const tx = await vault.stake(userAddress, amount);
     await tx.wait();
+    
+    updateBtnState('btnStake', true, 'Success ✓');
     log(`Staked ✓ · basescan.org/tx/${tx.hash.slice(0,12)}...`, 'success');
+    
+    document.getElementById('stakeAmount').value = '';
+    await new Promise(resolve => setTimeout(resolve, 4000));
     await loadData();
     
   } catch(e) { 
     log(`Stake failed: ${e.reason || e.message}`, 'error'); 
   }
+  
+  updateBtnState('btnStake', false, 'Stake USDC');
 }
 
 // ── UNSTAKE ────────────────────────────────────
 async function unstake() {
   if (!signer) { log('Connect wallet first', 'error'); return; }
+  const amt = document.getElementById('unstakeAmount').value;
+  if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'error'); return; }
+
+  updateBtnState('btnUnstake', true, 'Processing...');
+  
   try {
-    log('Unstaking...', 'pending');
-    const currentStake = await vault.getStakeBalance(userAddress);
-    const tx = await vault.unstake(userAddress, currentStake);
+    // Vault always expects 6 decimals for staking logic per the contract
+    const amount = ethers.utils.parseUnits(amt.toString(), 6);
+    
+    updateBtnState('btnUnstake', true, 'Confirming Unstake...');
+    log(`Unstaking ${amt} USDC...`, 'pending');
+    
+    const tx = await vault.unstake(userAddress, amount);
     await tx.wait();
+    
+    updateBtnState('btnUnstake', true, 'Success ✓');
     log(`Unstaked ✓ · ${tx.hash.slice(0,12)}...`, 'success');
+    
+    document.getElementById('unstakeAmount').value = '';
+    await new Promise(resolve => setTimeout(resolve, 4000));
     await loadData();
-  } catch(e) { log(`Unstake failed: ${e.reason || e.message}`, 'error'); }
+    
+  } catch(e) { 
+    log(`Unstake failed: ${e.reason || e.message}`, 'error'); 
+  }
+  
+  updateBtnState('btnUnstake', false, 'Unstake USDC');
 }
 
 // ── FAUCET ─────────────────────────────────────
 async function getMockUSDC() {
   if (!signer) { log('Connect wallet first', 'error'); return; }
   try {
-    log('Requesting mock USDC...', 'pending');
+    log('Requesting Mock USDC...', 'pending');
     let tx;
-    try { tx = await usdc.mint(userAddress, ethers.utils.parseUnits('1000', 6)); }
+    try { tx = await usdc.mint(userAddress, ethers.utils.parseUnits('1000', currentUsdcDecimals)); }
     catch { tx = await usdc.faucet({ value: 0 }); }
     await tx.wait();
-    log('Got 1000 mock USDC ✓', 'success');
+    log('Got Mock USDC ✓', 'success');
+    await new Promise(resolve => setTimeout(resolve, 3000));
     await loadData();
   } catch(e) { log(`Faucet failed: ${e.reason || e.message} — try Basescan directly`, 'error'); }
 }
