@@ -1,1954 +1,894 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>rep24 — On-Chain Reputation Layer</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<title>rep24 — Testnet</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+:root {
+  --accent: #0052FF;
+  --accent-hover: #003FCC;
+  --accent-soft: rgba(0,82,255,0.08);
+  --green: #00915A;
+  --green-soft: rgba(0,145,90,0.08);
+  --red: #D93636;
+  --red-soft: rgba(217,54,54,0.08);
+  --yellow: #C27C00;
+  --yellow-soft: rgba(194,124,0,0.08);
 
-/* ── DARK MODE (default) ── */
-:root, [data-theme="dark"] {
-  --glow-warm:    rgba(255, 130, 60, 0.3);
-  --glow-purple:  rgba(160, 70, 255, 0.18);
-  --glow-blue:    rgba(0, 82, 255, 0.2);
-  --blue:         #4B8BFF;
-  --blue-dim:     #2F6FE8;
-  --blue-soft:    rgba(75,139,255,0.1);
-  --blue-border:  rgba(75,139,255,0.2);
-  --green:        #00E87A;
-  --green-soft:   rgba(0,232,122,0.08);
-  --green-border: rgba(0,232,122,0.2);
-  --red:          #FF4560;
-  --yellow:       #FFB830;
-  --yellow-soft:  rgba(255,184,48,0.08);
-  --yellow-border:rgba(255,184,48,0.25);
-  --text:         #F0EDE8;
-  --text2:        rgba(240,237,232,0.55);
-  --text3:        rgba(240,237,232,0.28);
-  --surface:      rgba(255,255,255,0.04);
-  --surface2:     rgba(255,255,255,0.07);
-  --border:       rgba(255,255,255,0.08);
-  --border2:      rgba(255,255,255,0.14);
-  --bg:           #09060D;
-  --shadow:       0 8px 40px rgba(0,0,0,0.7);
-  --rule-bg:      rgba(255,255,255,0.03);
+  --bg: #F5F6FA;
+  --surface: #FFFFFF;
+  --surface2: #F0F1F7;
+  --border: #E2E4EE;
+  --text: #111827;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.09);
+  --radius: 14px;
+  --radius-sm: 8px;
 }
 
-/* ── LIGHT MODE ── */
-[data-theme="light"] {
-  --glow-warm:    rgba(255, 130, 60, 0.12);
-  --glow-purple:  rgba(160, 70, 255, 0.07);
-  --glow-blue:    rgba(0, 82, 255, 0.08);
-  --blue:         #2563EB;
-  --blue-dim:     #1D4ED8;
-  --blue-soft:    rgba(37,99,235,0.08);
-  --blue-border:  rgba(37,99,235,0.18);
-  --green:        #059669;
-  --green-soft:   rgba(5,150,105,0.07);
-  --green-border: rgba(5,150,105,0.2);
-  --red:          #DC2626;
-  --yellow:       #D97706;
-  --yellow-soft:  rgba(217,119,6,0.07);
-  --yellow-border:rgba(217,119,6,0.2);
-  --text:         #0D0A14;
-  --text2:        rgba(13,10,20,0.55);
-  --text3:        rgba(13,10,20,0.35);
-  --surface:      rgba(255,255,255,0.85);
-  --surface2:     rgba(240,236,255,0.7);
-  --border:       rgba(0,0,0,0.08);
-  --border2:      rgba(0,0,0,0.13);
-  --bg:           #F0EDFF;
-  --shadow:       0 8px 40px rgba(37,99,235,0.08);
-  --rule-bg:      rgba(0,0,0,0.02);
+[data-theme="dark"] {
+  --bg: #0C0F17;
+  --surface: #141720;
+  --surface2: #1A1E2E;
+  --border: #252A3D;
+  --text: #F1F3F9;
+  --text-secondary: #8B93A7;
+  --text-muted: #555E75;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.5);
+  --accent-soft: rgba(0,82,255,0.12);
+  --green-soft: rgba(0,145,90,0.12);
+  --red-soft: rgba(217,54,54,0.12);
+  --yellow-soft: rgba(194,124,0,0.12);
 }
 
-[data-theme="light"] body { background: var(--bg); }
-[data-theme="light"] .atmo::before {
-  background: radial-gradient(ellipse,
-    rgba(200,180,255,0.25) 0%,
-    rgba(150,100,255,0.1) 40%,
-    transparent 70%
-  );
-}
-[data-theme="light"] .atmo::after {
-  background: radial-gradient(ellipse,
-    rgba(100,150,255,0.15) 0%,
-    transparent 60%
-  );
-}
-[data-theme="light"] #stars { opacity: 0.1; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
   min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ── ATMOSPHERE ── */
-.atmo {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-.atmo::before {
-  content: '';
-  position: absolute;
-  top: -10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1000px; height: 700px;
-  background: radial-gradient(ellipse,
-    var(--glow-warm) 0%,
-    rgba(200,70,130,0.15) 28%,
-    var(--glow-purple) 55%,
-    transparent 72%
-  );
-  filter: blur(70px);
-  animation: breathe 9s ease-in-out infinite alternate;
-}
-.atmo::after {
-  content: '';
-  position: absolute;
-  bottom: -15%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 800px; height: 500px;
-  background: radial-gradient(ellipse,
-    var(--glow-blue) 0%,
-    rgba(80,40,200,0.1) 50%,
-    transparent 72%
-  );
-  filter: blur(90px);
-  animation: breathe 12s ease-in-out infinite alternate-reverse;
-}
-@keyframes breathe {
-  from { opacity: 0.65; transform: translateX(-50%) scale(1); }
-  to   { opacity: 1;    transform: translateX(-50%) scale(1.1); }
-}
-
-#stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
-/* ── LAYOUT ── */
-.wrap {
-  position: relative;
-  z-index: 1;
-  max-width: 780px;
-  margin: 0 auto;
-  padding: 0 20px 80px;
+  transition: background 0.25s, color 0.25s;
 }
 
 /* ── HEADER ── */
-header {
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.topbar-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 60px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 28px 0 32px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 48px;
+  gap: 12px;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 9px;
+  text-decoration: none;
+  flex: 1;
+}
+
+.logo-mark {
+  width: 30px; height: 30px;
+  background: var(--accent);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
 }
 
 .logo-text {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.4px;
+}
+
+.logo-text em { color: var(--accent); font-style: normal; }
+
+.chip {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.chip-yellow { color: var(--yellow); border-color: rgba(194,124,0,0.35); background: var(--yellow-soft); }
+.chip-green  { color: var(--green);  border-color: rgba(0,145,90,0.3);  background: var(--green-soft); }
+
+/* Theme toggle */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+/* Connect button */
+#connectBtn {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: white;
+  border: none;
   font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#connectBtn:hover { background: var(--accent-hover); }
+#connectBtn.connected {
+  background: var(--green-soft);
+  color: var(--green);
+  border: 1px solid rgba(0,145,90,0.25);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+}
+
+/* ── MAIN ── */
+.main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+}
+
+/* ── ALERTS ── */
+.alert {
+  display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 20px;
+  border: 1px solid;
+}
+.alert.show { display: flex; }
+.alert-warn { background: var(--yellow-soft); border-color: rgba(194,124,0,0.3); color: var(--yellow); }
+.alert-btn {
+  margin-left: auto;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* ── WELCOME / HERO ── */
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.hero-text h1 {
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: var(--text);
-}
-.logo-text b { color: var(--blue); }
-
-.net-pill {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--yellow);
-  background: var(--yellow-soft);
-  border: 1px solid var(--yellow-border);
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
-.hdr-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Toggle */
-.toggle {
-  position: relative;
-  width: 46px; height: 26px;
-  background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 13px;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.toggle::after {
-  content: '';
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: var(--blue);
-  transition: transform 0.3s;
-  box-shadow: 0 0 10px var(--blue-soft);
-}
-.toggle.light::after { transform: translateX(20px); }
-.ti { position: absolute; font-size: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
-.ti.m { left: 5px; } .ti.s { right: 5px; }
-
-#connectBtn {
-  background: var(--blue);
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 20px rgba(75,139,255,0.3);
-  white-space: nowrap;
-}
-#connectBtn:hover { background: var(--blue-dim); transform: translateY(-1px); }
-#connectBtn.connected {
-  background: var(--green-soft);
-  border: 1px solid var(--green-border);
-  color: var(--green);
-  box-shadow: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-}
-
-/* ── STATUS / WARN ── */
-#statusBar {
-  display: none;
-  align-items: center;
-  gap: 10px;
-  background: var(--green-soft);
-  border: 1px solid var(--green-border);
-  border-radius: 12px;
-  padding: 11px 18px;
-  margin-bottom: 24px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-}
-#statusBar.show { display: flex; }
-
-.pulse {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--green);
-  flex-shrink: 0;
-  animation: ping 2s infinite;
-  box-shadow: 0 0 0 0 rgba(0,232,122,0.4);
-}
-@keyframes ping {
-  0%   { box-shadow: 0 0 0 0 rgba(0,232,122,0.4); }
-  70%  { box-shadow: 0 0 0 7px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
-}
-
-#networkWarn {
-  display: none;
-  background: var(--yellow-soft);
-  border: 1px solid var(--yellow-border);
-  border-radius: 12px;
-  padding: 13px 18px;
-  font-size: 12px;
-  color: var(--yellow);
-  margin-bottom: 20px;
-  font-family: 'JetBrains Mono', monospace;
-}
-#networkWarn.show { display: flex; align-items: center; gap: 10px; }
-
-/* ── HERO ── */
-.hero {
-  text-align: center;
-  padding: 20px 0 56px;
-}
-
-.hero-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--blue);
-  background: var(--blue-soft);
-  border: 1px solid var(--blue-border);
-  padding: 6px 14px;
-  border-radius: 20px;
-  margin-bottom: 28px;
-  animation: fadeIn 0.8s ease forwards;
-}
-.hero-tag::before {
-  content: '';
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--blue);
-  box-shadow: 0 0 6px var(--blue);
-  animation: ping 2s infinite;
-}
-
-.hero-h1 {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(38px, 8vw, 70px);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -1.5px;
-  color: var(--text);
-  margin-bottom: 16px;
-  animation: fadeUp 0.8s ease forwards 0.1s;
-  opacity: 0;
-}
-.hero-h1 em {
-  font-style: italic;
-  color: transparent;
-  background: linear-gradient(135deg, #FF9F5A 0%, #E060A0 40%, #8060FF 70%, #4B8BFF 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.hero-sub {
-  font-size: 15px;
-  color: var(--text2);
-  line-height: 1.7;
-  max-width: 480px;
-  margin: 0 auto 20px;
-  font-weight: 300;
-  animation: fadeUp 0.8s ease forwards 0.2s;
-  opacity: 0;
-}
-
-.hero-stack {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 0.5px;
-  margin-bottom: 40px;
-  animation: fadeUp 0.8s ease forwards 0.3s;
-  opacity: 0;
-}
-.hero-stack b { color: var(--blue); }
-
-/* Steps */
-.steps {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  animation: fadeUp 0.8s ease forwards 0.4s;
-  opacity: 0;
-}
-
-.step {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px 16px;
-  text-align: left;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.25s, transform 0.25s;
-  backdrop-filter: blur(10px);
-}
-.step::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-}
-.step:hover { border-color: var(--border2); transform: translateY(-3px); }
-
-.step-n {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--blue);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-.step-t {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
   margin-bottom: 6px;
-  letter-spacing: -0.2px;
-}
-.step-d {
-  font-size: 11px;
-  color: var(--text2);
-  line-height: 1.6;
-  font-family: 'JetBrains Mono', monospace;
 }
 
-/* ── SECTION LABEL ── */
-.slabel {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 2.5px;
-  color: var(--text3);
-  text-transform: uppercase;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.hero-text p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 360px;
+  line-height: 1.55;
 }
-.slabel::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-/* ── STAT CARDS ── */
-.stats3 {
+.hero-visual {
+  flex-shrink: 0;
+  width: 72px; height: 72px;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(0,82,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+}
+
+/* ── STATS ── */
+.stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.scard {
+.stat-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius);
   padding: 20px;
-  backdrop-filter: blur(10px);
-  transition: border-color 0.2s, transform 0.2s;
-  position: relative;
-  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s, transform 0.15s;
 }
-.scard::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-}
-.scard:hover { border-color: var(--border2); transform: translateY(-2px); }
+.stat-card:hover { border-color: rgba(0,82,255,0.25); transform: translateY(-1px); }
 
-.scard-l {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 1.5px;
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
   text-transform: uppercase;
-  color: var(--text3);
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
   margin-bottom: 10px;
 }
-.scard-v {
+
+.stat-value {
   font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
   line-height: 1;
 }
-.blue { color: var(--blue); }
-.green { color: var(--green); }
-.dim { color: var(--text2); font-size: 18px; }
+.stat-value.blue  { color: var(--accent); }
+.stat-value.green { color: var(--green); }
+.stat-value.gray  { color: var(--text-secondary); font-size: 20px; }
 
-/* Score bar */
-.sbar-wrap { margin-bottom: 28px; display: none; }
-.sbar-meta {
+/* ── SCORE BAR ── */
+.score-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.score-header {
   display: flex;
   justify-content: space-between;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text3);
-  margin-bottom: 8px;
+  align-items: center;
+  margin-bottom: 12px;
 }
-.sbar-track {
-  height: 3px;
+
+.score-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.score-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.bar-track {
+  height: 8px;
   background: var(--surface2);
-  border-radius: 2px;
+  border-radius: 4px;
   overflow: hidden;
 }
-.sbar-fill {
+
+.bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--blue), #00C2FF);
-  border-radius: 2px;
-  transition: width 1s cubic-bezier(0.4,0,0.2,1);
-  box-shadow: 0 0 10px rgba(75,139,255,0.4);
+  background: linear-gradient(90deg, var(--accent), #4D9BFF);
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  width: 0%;
 }
 
 /* ── CARD ── */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: var(--radius);
   padding: 24px;
   margin-bottom: 16px;
-  backdrop-filter: blur(12px);
-  position: relative;
-  overflow: hidden;
+  box-shadow: var(--shadow);
   transition: border-color 0.2s;
 }
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-}
-.card:hover { border-color: var(--border2); }
 
-.card-hdr {
+.card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
+
 .card-title {
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.3px;
 }
+
 .card-icon {
-  width: 36px; height: 36px;
-  border-radius: 10px;
+  width: 38px; height: 38px;
   background: var(--surface2);
   border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+/* ── BADGE ── */
+.badge-display {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-
-/* ── BADGE TIERS ── */
-.badge-none {
-  color: var(--text3);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  text-align: center;
-  padding: 28px;
-}
-
-.badge-card {
-  border-radius: 18px;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Silver */
-.badge-card.silver .badge-top {
-  background: linear-gradient(135deg, #6B7A99 0%, #8E9BB8 40%, #B0BDD4 70%, #7A8AAA 100%);
-}
-.badge-card.silver .badge-glow {
-  box-shadow: 0 0 40px rgba(140,160,200,0.3), 0 0 80px rgba(140,160,200,0.1);
-}
-.badge-card.silver .badge-shimmer {
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%);
-}
-
-/* Gold */
-.badge-card.gold .badge-top {
-  background: linear-gradient(135deg, #F5A623 0%, #FFD060 40%, #FFA500 70%, #E8900A 100%);
-}
-.badge-card.gold .badge-glow {
-  box-shadow: 0 0 40px rgba(245,166,35,0.35), 0 0 80px rgba(245,166,35,0.15);
-}
-.badge-card.gold .badge-shimmer {
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%);
-}
-
-/* Diamond */
-.badge-card.diamond .badge-top {
-  background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 35%, #8B5CF6 60%, #06B6D4 100%);
-}
-.badge-card.diamond .badge-glow {
-  box-shadow: 0 0 40px rgba(99,102,241,0.4), 0 0 80px rgba(99,102,241,0.2);
-}
-.badge-card.diamond .badge-shimmer {
-  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%);
-}
-
-.badge-top {
-  padding: 28px 24px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  position: relative;
-  overflow: hidden;
-  min-height: 110px;
-}
-
-/* Orb decorations */
-.badge-top::before {
-  content: '';
-  position: absolute;
-  top: -30px; right: -30px;
-  width: 140px; height: 140px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.08);
-  pointer-events: none;
-}
-.badge-top::after {
-  content: '';
-  position: absolute;
-  bottom: -40px; right: 60px;
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.05);
-  pointer-events: none;
-}
-
-/* Shimmer sweep animation */
-.badge-shimmer {
-  position: absolute;
-  inset: 0;
-  animation: shimmer 3s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes shimmer {
-  0%   { transform: translateX(-100%); }
-  50%  { transform: translateX(100%); }
-  100% { transform: translateX(100%); }
+  gap: 14px;
+  padding: 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
 
 .badge-icon-wrap {
-  width: 60px; height: 60px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #0052FF, #00A3FF);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
   flex-shrink: 0;
-  backdrop-filter: blur(8px);
-  position: relative;
-  z-index: 1;
-  animation: badgePulse 3s ease-in-out infinite;
-}
-@keyframes badgePulse {
-  0%,100% { transform: scale(1); }
-  50%      { transform: scale(1.04); }
 }
 
-.badge-info {
-  flex: 1;
-  position: relative;
-  z-index: 1;
-}
-.badge-eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.65);
-  margin-bottom: 4px;
-}
-.badge-tier-name {
-  font-family: 'Instrument Serif', serif;
-  font-size: 28px;
-  font-weight: 400;
-  color: #fff;
-  letter-spacing: -0.5px;
-  line-height: 1;
-  margin-bottom: 2px;
-}
-.badge-network {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: rgba(255,255,255,0.5);
-}
-.badge-network-pill {
-  position: absolute;
-  top: 0; right: 0;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 20px;
-  padding: 5px 12px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: rgba(255,255,255,0.7);
-  letter-spacing: 0.5px;
-  z-index: 1;
-}
-
-.badge-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  background: rgba(255,255,255,0.03);
-  border-top: 1px solid var(--border);
-}
-.bstat {
-  padding: 16px 12px;
-  text-align: center;
-  border-right: 1px solid var(--border);
-  transition: background 0.2s;
-}
-.bstat:last-child { border-right: none; }
-.bstat:hover { background: rgba(255,255,255,0.04); }
-.bstat-v {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 3px;
-  letter-spacing: -0.3px;
-}
-.bstat-v.blue { color: var(--blue); }
-.bstat-v.green { color: var(--green); }
-.bstat-l {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--text3);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-/* No badge state */
-.no-badge-wrap {
-  padding: 32px 24px;
-  text-align: center;
-}
-.no-badge-tiers {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.tier-preview {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.5;
-  transition: opacity 0.2s;
-}
-.tier-preview:hover { opacity: 0.8; }
-.tier-dot {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  border: 1px solid var(--border);
-}
-.tier-dot.s { background: linear-gradient(135deg, #6B7A99, #B0BDD4); }
-.tier-dot.g { background: linear-gradient(135deg, #F5A623, #FFD060); }
-.tier-dot.d { background: linear-gradient(135deg, #0EA5E9, #8B5CF6); }
-.tier-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 8px;
-  color: var(--text3);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.no-badge-text {
-  font-family: 'JetBrains Mono', monospace;
+.badge-info-name { font-weight: 700; font-size: 15px; }
+.badge-info-sub {
+  font-family: 'DM Mono', monospace;
   font-size: 11px;
-  color: var(--text3);
-  line-height: 1.6;
-}
-.no-badge-sub {
-  font-size: 10px;
-  color: var(--text3);
-  margin-top: 6px;
-  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+  margin-top: 2px;
 }
 
-/* Inputs */
+.badge-empty {
+  padding: 22px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+  background: var(--surface2);
+  border-radius: 10px;
+}
+
+/* ── INPUTS ── */
 .input-row {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
 }
 
-input[type="number"] {
+input[type="number"], input[type="text"] {
   flex: 1;
   background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 16px;
   color: var(--text);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'DM Mono', monospace;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
 }
-input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px var(--blue-soft);
-}
-input::placeholder { color: var(--text3); }
+input:focus { border-color: var(--accent); }
+input::placeholder { color: var(--text-muted); }
 
-.help-t {
-  font-size: 11px;
-  color: var(--text3);
-  font-family: 'JetBrains Mono', monospace;
+.help {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-family: 'DM Mono', monospace;
   line-height: 1.6;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
-/* Buttons */
-.btn-primary {
-  background: var(--blue);
-  color: #fff;
-  border: none;
-  padding: 13px 22px;
-  border-radius: 12px;
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-radius: var(--radius-sm);
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  border: none;
   transition: all 0.15s;
   white-space: nowrap;
-  box-shadow: 0 4px 20px rgba(75,139,255,0.3);
 }
-.btn-primary:hover { background: var(--blue-dim); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:active:not(:disabled) { transform: translateY(0); }
 
-.btn-outline {
-  flex: 1;
-  background: transparent;
-  border: 1px solid var(--border2);
-  color: var(--text2);
-  padding: 12px;
-  border-radius: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
-.btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
 
 .btn-danger {
-  flex: 1;
-  background: transparent;
-  border: 1px solid rgba(255,69,96,0.2);
+  background: var(--red-soft);
   color: var(--red);
-  padding: 12px;
-  border-radius: 12px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s;
+  border: 1px solid rgba(217,54,54,0.2);
 }
-.btn-danger:hover { background: rgba(255,69,96,0.06); }
+.btn-danger:hover:not(:disabled) { background: rgba(217,54,54,0.14); }
 
-.action-row {
+.btn-row {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
 }
+.btn-row .btn { flex: 1; }
 
-.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-/* TX Log */
-.txlog {
-  background: var(--surface);
+/* ── LOG ── */
+.log-box {
+  background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  max-height: 150px;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  max-height: 160px;
   overflow-y: auto;
-  color: var(--text3);
-  backdrop-filter: blur(10px);
-  scrollbar-width: thin;
-  scrollbar-color: var(--border2) transparent;
+  line-height: 1.7;
 }
-.txlog::-webkit-scrollbar { width: 3px; }
-.txlog::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-.le { margin-bottom: 5px; line-height: 1.6; }
-.le.s { color: var(--green); }
-.le.e { color: var(--red); }
-.le.i { color: var(--blue); }
-.le.p { color: var(--yellow); }
+.log-entry { color: var(--text-muted); }
+.log-entry.success { color: var(--green); }
+.log-entry.error   { color: var(--red); }
+.log-entry.info    { color: var(--accent); }
+.log-entry.pending { color: var(--yellow); }
 
-/* Contracts */
-.contracts { display: grid; gap: 8px; }
-.crow {
+/* ── CONTRACTS ── */
+.contract-list { display: grid; gap: 8px; }
+
+.contract-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 11px 16px;
-  background: var(--surface);
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  backdrop-filter: blur(8px);
+  border-radius: 9px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
   transition: border-color 0.15s;
 }
-.crow:hover { border-color: var(--border2); }
-.cname { color: var(--text3); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; min-width: 120px; }
-.caddr { color: var(--text); flex: 1; }
-.cbtn {
+.contract-row:hover { border-color: rgba(0,82,255,0.25); }
+.c-name { color: var(--text-muted); font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; width: 120px; flex-shrink: 0; }
+.c-addr { color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.copy-btn {
   background: none; border: none; cursor: pointer;
-  color: var(--text3); font-size: 14px; padding: 2px 6px;
-  border-radius: 6px; transition: color 0.15s;
+  color: var(--text-muted); padding: 4px 8px; border-radius: 5px;
+  font-size: 13px; transition: color 0.15s, background 0.15s;
 }
-.cbtn:hover { color: var(--blue); }
+.copy-btn:hover { color: var(--accent); background: var(--accent-soft); }
 
-/* ── PROTOCOL STRIP ── */
-.protocol-strip {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr;
-  align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px 24px;
-  margin-bottom: 32px;
-  backdrop-filter: blur(12px);
-  position: relative;
-  overflow: hidden;
-}
-.protocol-strip::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-}
-.pstat { text-align: center; }
-.pstat-l {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 2px;
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  color: var(--text3);
-  margin-bottom: 6px;
-}
-.pstat-v {
-  font-family: 'Instrument Serif', serif;
-  font-size: 28px;
-  font-weight: 400;
-  color: var(--text);
-  line-height: 1;
-  margin-bottom: 4px;
-  letter-spacing: -0.5px;
-  min-height: 32px;
-}
-.pstat-sub {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--text3);
-  letter-spacing: 0.3px;
-}
-.pstat-divider {
-  width: 1px;
-  height: 48px;
-  background: var(--border2);
-  margin: 0 8px;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+  margin: 24px 0 12px;
 }
 
-/* Counter animation */
-@keyframes countUp {
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── DIVIDER ── */
+hr { border: none; border-top: 1px solid var(--border); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 520px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .hero { flex-direction: column; align-items: flex-start; }
+  .hero-visual { display: none; }
+  .input-row { flex-direction: column; }
+  .btn-row { flex-direction: column; }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.pstat-v.loaded { animation: countUp 0.5s ease forwards; }
-
-/* ── LEADERBOARD ── */
-.lb-header {
-  display: grid;
-  grid-template-columns: 36px 1fr 90px 80px 70px;
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--rule-bg);
-}
-.lb-col {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text3);
-}
-.lb-col.stake, .lb-col.badge, .lb-col.score { text-align: right; }
-
-.lb-row {
-  display: grid;
-  grid-template-columns: 36px 1fr 90px 80px 70px;
-  padding: 13px 20px;
-  border-bottom: 1px solid var(--border);
-  align-items: center;
-  transition: background 0.15s;
-}
-.lb-row:last-child { border-bottom: none; }
-.lb-row:hover { background: var(--rule-bg); }
-.lb-row.me { background: var(--blue-soft); border-left: 2px solid var(--blue); }
-
-.lb-rank {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text3);
-}
-.lb-rank.top1 { color: #FFD700; }
-.lb-rank.top2 { color: #C0C0C0; }
-.lb-rank.top3 { color: #CD7F32; }
-
-.lb-agent {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.lb-agent-addr {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--text);
-  font-weight: 500;
-}
-.lb-agent-you {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  color: var(--blue);
-  letter-spacing: 1px;
-}
-
-.lb-stake {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--green);
-  text-align: right;
-  font-weight: 600;
-}
-
-.lb-badge-pill {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  font-weight: 600;
-  padding: 3px 8px;
-  border-radius: 20px;
-  text-align: center;
-  float: right;
-}
-.lb-badge-pill.silver { background: rgba(140,160,200,0.12); color: #9AAAC8; border: 1px solid rgba(140,160,200,0.2); }
-.lb-badge-pill.gold   { background: rgba(245,166,35,0.12);  color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
-.lb-badge-pill.diamond{ background: rgba(99,102,241,0.12);  color: #818CF8; border: 1px solid rgba(99,102,241,0.2); }
-
-.lb-score {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--blue);
-  text-align: right;
-  font-weight: 600;
-}
-
-.lb-empty {
-  padding: 32px;
-  text-align: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--text3);
-}
-
-/* ── SHARE BADGE ── */
-.badge-share-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px;
-  border-top: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-}
-.badge-share-text {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 0.3px;
-}
-.share-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: #000;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.15);
-  padding: 9px 18px;
-  border-radius: 20px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  letter-spacing: 0.2px;
-}
-.share-btn:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
-[data-theme="light"] .share-btn { background: #0f0f0f; }
-.rules-grid { display: grid; }
-.rule-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
-}
-.rule-row:hover { background: var(--rule-bg); }
-.rule-icon {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.rule-body { flex: 1; }
-.rule-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 3px;
-}
-.rule-desc {
-  font-size: 11px;
-  color: var(--text2);
-  line-height: 1.6;
-  font-family: 'JetBrains Mono', monospace;
-}
-.rule-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  white-space: nowrap;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-.rule-badge.green { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-border); }
-.rule-badge.red { background: rgba(255,69,96,0.08); color: var(--red); border: 1px solid rgba(255,69,96,0.2); }
-.rule-badge.yellow { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-border); }
-.rule-badge.blue { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-border); }
-
-/* Thresholds */
-.threshold-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--border);
-}
-.threshold-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text2);
-  min-width: 120px;
-  letter-spacing: 0.3px;
-}
-.threshold-bar-wrap {
-  flex: 1;
-  height: 4px;
-  background: var(--surface2);
-  border-radius: 2px;
-  overflow: hidden;
-}
-.threshold-bar {
-  height: 100%;
-  border-radius: 2px;
-  transition: width 1s cubic-bezier(0.4,0,0.2,1);
-}
-.threshold-pct {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  font-weight: 600;
-  min-width: 70px;
-  text-align: right;
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  padding-top: 32px;
-  border-top: 1px solid var(--border);
-  margin-top: 48px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 0.5px;
-}
-.footer a { color: var(--blue); text-decoration: none; }
-
-/* Animations */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.reveal {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
-.reveal.vis { opacity: 1; transform: none; }
-
-/* Responsive */
-@media (max-width: 560px) {
-  .stats3, .steps { grid-template-columns: 1fr 1fr; }
-  .input-row { flex-direction: column; }
-}
-@media (max-width: 380px) {
-  .steps { grid-template-columns: 1fr; }
+.card, .stats-grid, .score-section, .hero {
+  animation: fadeIn 0.35s ease both;
 }
 </style>
 </head>
 <body>
 
-<div class="atmo"></div>
-<canvas id="stars"></canvas>
-
-<div class="wrap">
-
-  <!-- Header -->
-  <header>
-    <div class="logo">
-      <div class="logo-text">rep<b>24</b></div>
-      <div class="net-pill">Testnet</div>
-    </div>
-    <div class="hdr-right">
-      <button class="toggle" id="themeToggle" onclick="toggleTheme()">
-        <span class="ti m">🌙</span>
-        <span class="ti s">☀️</span>
-      </button>
-      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
-    </div>
-  </header>
-
-  <!-- Network / Status -->
-  <div id="networkWarn">
-    ⚠ &nbsp;Switch to Base Sepolia (84532) to continue.
-    <button class="btn-outline" style="padding:6px 14px;font-size:11px;margin-left:auto;flex:unset" onclick="switchNetwork()">Switch</button>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="logo" href="#">
+      <div class="logo-mark">r24</div>
+      <div class="logo-text">rep<em>24</em></div>
+    </a>
+    <div class="chip chip-yellow">TESTNET</div>
+    <div style="flex:1"></div>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">🌙</button>
+    <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
   </div>
-  <div id="statusBar">
-    <div class="pulse"></div>
-    <span id="walletAddr">—</span>
-    <span style="color:var(--text3);margin-left:auto;font-size:10px">Base Sepolia · Live</span>
+</div>
+
+<div class="main">
+
+  <div id="networkWarn" class="alert alert-warn">
+    ⚠ Switch to Base Sepolia (Chain ID: 84532)
+    <button class="alert-btn" onclick="switchNetwork()">Switch Network</button>
   </div>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-tag">Live on Base · Testnet</div>
-    <h1 class="hero-h1">The trust layer<br/>for <em>AI agents</em></h1>
-    <p class="hero-sub">
-      rep24 is on-chain reputation and economic accountability built on Base.
-      Stake real value — bad work gets slashed, good work grows your score.
+  <div class="hero">
+    <div class="hero-text">
+      <h1>rep24 Testnet</h1>
+      <p>Stake USDC to earn your RepBadge. Test the on-chain reputation layer for the agent economy.</p>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <span class="chip chip-yellow">Base Sepolia</span>
+        <span id="connChip" style="display:none" class="chip chip-green">● Connected</span>
+      </div>
+    </div>
+    <div class="hero-visual">🔵</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Rep Score</div>
+      <div class="stat-value blue" id="repScoreVal">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Staked USDC</div>
+      <div class="stat-value green" id="stakedVal">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">USDC Balance</div>
+      <div class="stat-value gray" id="usdcBalVal">—</div>
+    </div>
+  </div>
+
+  <div class="score-section">
+    <div class="score-header">
+      <span class="score-title">Reputation Progress</span>
+      <span class="score-pct" id="scorePct">0 / 100</span>
+    </div>
+    <div class="bar-track">
+      <div class="bar-fill" id="barFill"></div>
+    </div>
+  </div>
+
+  <div class="section-label">Rep Badge</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Your Badge</div>
+      <div class="card-icon">🏅</div>
+    </div>
+    <div id="badgeContent">
+      <div class="badge-empty">Connect your wallet to view your RepBadge</div>
+    </div>
+  </div>
+
+  <div class="section-label">Stake & Earn</div>
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title">Stake USDC → Earn RepBadge</div>
+      <div class="card-icon">🔒</div>
+    </div>
+    <div class="input-row">
+      <input type="number" id="stakeAmount" placeholder="Enter USDC amount" min="1" step="1"/>
+      <button class="btn btn-primary" onclick="stakeUSDC()">Stake</button>
+    </div>
+    <p class="help">
+      Stake USDC to mint your on-chain RepBadge. Bad performance = stake slashed. Good work = reputation grows.
     </p>
-    <div class="hero-stack">
-      <b>x402</b> pays &nbsp;·&nbsp; <b>ERC-8004</b> identifies &nbsp;·&nbsp; <b>rep24</b> verifies
-    </div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">Step 01</div>
-        <div class="step-t">Stake USDC</div>
-        <div class="step-d">Deposit min. 10 USDC into RepVault as your reputation bond.</div>
-      </div>
-      <div class="step">
-        <div class="step-n">Step 02</div>
-        <div class="step-t">Earn RepBadge</div>
-        <div class="step-d">A soulbound NFT is minted on-chain as proof of your active stake.</div>
-      </div>
-      <div class="step">
-        <div class="step-n">Step 03</div>
-        <div class="step-t">Build Rep</div>
-        <div class="step-d">Good work grows your score. Bad work gets your stake slashed.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Protocol Stats Strip -->
-  <div class="protocol-strip reveal">
-    <div class="pstat">
-      <div class="pstat-l">Agents Staked</div>
-      <div class="pstat-v" id="totalAgents">—</div>
-      <div class="pstat-sub">unique wallets staked</div>
-    </div>
-    <div class="pstat-divider"></div>
-    <div class="pstat">
-      <div class="pstat-l">Total USDC Staked</div>
-      <div class="pstat-v" id="totalStaked">—</div>
-      <div class="pstat-sub">locked in RepVault</div>
-    </div>
-    <div class="pstat-divider"></div>
-    <div class="pstat">
-      <div class="pstat-l">Network</div>
-      <div class="pstat-v" style="color:var(--green);font-size:14px;">● Live</div>
-      <div class="pstat-sub">Base Sepolia</div>
-    </div>
-  </div>
-  <div class="reveal">
-    <div class="slabel">Your Overview</div>
-    <div class="stats3">
-      <div class="scard">
-        <div class="scard-l">Rep Score</div>
-        <div class="scard-v blue" id="repScoreVal">—</div>
-      </div>
-      <div class="scard">
-        <div class="scard-l">Staked USDC</div>
-        <div class="scard-v green" id="stakedVal">—</div>
-      </div>
-      <div class="scard">
-        <div class="scard-l">USDC Balance</div>
-        <div class="scard-v dim" id="usdcBalVal">—</div>
-      </div>
-    </div>
-    <div class="sbar-wrap" id="scoreBarWrap">
-      <div class="sbar-meta">
-        <span>Reputation Progress</span>
-        <span id="scoreBarPct">0 / 100</span>
-      </div>
-      <div class="sbar-track">
-        <div class="sbar-fill" id="scoreBarFill" style="width:0%"></div>
-      </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="getMockUSDC()">🚰 Get Mock USDC</button>
+      <button class="btn btn-danger" onclick="unstake()">Unstake</button>
     </div>
   </div>
 
-  <!-- Badge -->
-  <div class="reveal">
-    <div class="slabel">Rep Badge</div>
-    <div class="card">
-      <div id="badgeContent" class="badge-none">Connect wallet to view your RepBadge</div>
+  <div class="section-label">Transaction Log</div>
+  <div class="log-box" id="txLog">
+    <div class="log-entry">Waiting for wallet connection...</div>
+  </div>
+
+  <div class="section-label">Contract Addresses</div>
+  <div class="contract-list">
+    <div class="contract-row">
+      <span class="c-name">RepBadge</span>
+      <span class="c-addr">0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3</span>
+      <button class="copy-btn" onclick="copyAddr('0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="c-name">RepScore</span>
+      <span class="c-addr">0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3</span>
+      <button class="copy-btn" onclick="copyAddr('0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="c-name">RepVault</span>
+      <span class="c-addr">0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5</span>
+      <button class="copy-btn" onclick="copyAddr('0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="c-name">MockUSDC</span>
+      <span class="c-addr">0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de</span>
+      <button class="copy-btn" onclick="copyAddr('0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de')">⎘</button>
+    </div>
+    <div class="contract-row">
+      <span class="c-name">SlashingGov</span>
+      <span class="c-addr">0x78ee408d6174FB4836550340a012996136bC8c77</span>
+      <button class="copy-btn" onclick="copyAddr('0x78ee408d6174FB4836550340a012996136bC8c77')">⎘</button>
     </div>
   </div>
 
-  <!-- Stake -->
-  <div class="reveal">
-    <div class="slabel">Stake USDC → Earn RepBadge</div>
-    <div class="card">
-      <div class="card-hdr">
-        <div class="card-title">Stake & Earn Reputation</div>
-        <div class="card-icon">🔒</div>
-      </div>
-      <div class="input-row">
-        <input type="number" id="stakeAmount" placeholder="Amount (min. 10 USDC)" min="10" step="1"/>
-        <button class="btn-primary" onclick="stakeUSDC()">Stake</button>
-      </div>
-      <div class="help-t">
-        Staking USDC creates your on-chain reputation bond and mints your RepBadge NFT.<br/>
-        Min stake is 10 USDC · Bad work = stake slashed · Good work = reputation grows.
-      </div>
-      <div class="divider"></div>
-      <div class="action-row">
-        <button class="btn-outline" onclick="getMockUSDC()">🚰 Get Mock USDC</button>
-        <button class="btn-danger" onclick="unstake()">Unstake</button>
-      </div>
-    </div>
+  <div class="footer" style="margin-top:40px">
+    rep24 testnet · Base Sepolia · <a href="https://twitter.com/Rep24_io" style="color:var(--accent);text-decoration:none">@Rep24_io</a>
   </div>
 
-  <!-- TX Log -->
-  <div class="reveal">
-    <div class="slabel">Transaction Log</div>
-    <div class="txlog" id="txLog">
-      <div class="le">Waiting for wallet connection...</div>
-    </div>
-  </div>
-
-  <!-- Contracts -->
-  <hr class="divider"/>
-  <div class="reveal">
-    <div class="slabel">Contract Addresses · Base Sepolia</div>
-    <div class="contracts">
-      <div class="crow"><span class="cname">RepBadge</span><span class="caddr">0xFc933B...ceAEd3</span><button class="cbtn" onclick="copy('0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3')">⎘</button></div>
-      <div class="crow"><span class="cname">RepScore</span><span class="caddr">0x2Bcc43...F08c3</span><button class="cbtn" onclick="copy('0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3')">⎘</button></div>
-      <div class="crow"><span class="cname">RepVault</span><span class="caddr">0x31229...573F</span><button class="cbtn" onclick="copy('0x31229262DE71e12B1eC1CE1BEf62d815b565573F')">⎘</button></div>
-      <div class="crow"><span class="cname">MockUSDC</span><span class="caddr">0xDdB4dA...95de</span><button class="cbtn" onclick="copy('0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de')">⎘</button></div>
-      <div class="crow"><span class="cname">SlashingGovernor</span><span class="caddr">0x78ee40...8c77</span><button class="cbtn" onclick="copy('0x78ee408d6174FB4836550340a012996136bC8c77')">⎘</button></div>
-    </div>
-  </div>
-
-  <!-- Rules -->
-  <hr class="divider"/>
-  <div class="reveal">
-    <div class="slabel">Reputation Rules</div>
-    <div class="card" style="padding:0;overflow:hidden;">
-
-      <!-- Scoring rules -->
-      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);">
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">How RepScore is Calculated</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);line-height:1.6;">Your score is based on stake size, stake duration, and job outcomes.</div>
-      </div>
-
-      <div class="rules-grid">
-        <div class="rule-row">
-          <div class="rule-icon" style="background:var(--blue-soft);color:var(--blue);">🔒</div>
-          <div class="rule-body">
-            <div class="rule-title">Stake Size</div>
-            <div class="rule-desc">More USDC staked = higher base score. Silver (10+), Gold (100+), Diamond (500+).</div>
-          </div>
-          <div class="rule-badge green">+Score</div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon" style="background:var(--green-soft);color:var(--green);">⏱️</div>
-          <div class="rule-body">
-            <div class="rule-title">Stake Duration</div>
-            <div class="rule-desc">The longer your stake stays active, the faster your reputation grows.</div>
-          </div>
-          <div class="rule-badge green">+Score</div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon" style="background:var(--green-soft);color:var(--green);">✅</div>
-          <div class="rule-body">
-            <div class="rule-title">Completed Jobs</div>
-            <div class="rule-desc">Every successfully completed job earns rep points and increases trust rating.</div>
-          </div>
-          <div class="rule-badge green">+Score</div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon" style="background:rgba(255,69,96,0.08);color:var(--red);">⚠️</div>
-          <div class="rule-body">
-            <div class="rule-title">Failed Jobs</div>
-            <div class="rule-desc">Incomplete or disputed jobs are reviewed. Repeated failures trigger governance review.</div>
-          </div>
-          <div class="rule-badge yellow">Review</div>
-        </div>
-        <div class="rule-row">
-          <div class="rule-icon" style="background:rgba(255,69,96,0.08);color:var(--red);">⚡</div>
-          <div class="rule-body">
-            <div class="rule-title">Slashing</div>
-            <div class="rule-desc">Malicious or negligent behaviour results in a portion of your stake being slashed by governance vote.</div>
-          </div>
-          <div class="rule-badge red">-Stake</div>
-        </div>
-        <div class="rule-row" style="border-bottom:none;">
-          <div class="rule-icon" style="background:var(--blue-soft);color:var(--blue);">🗳️</div>
-          <div class="rule-body">
-            <div class="rule-title">Governance Participation</div>
-            <div class="rule-desc">Voting on proposals signals good standing and contributes to protocol health.</div>
-          </div>
-          <div class="rule-badge blue">+Trust</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Slashing thresholds -->
-  <div class="reveal">
-    <div class="slabel">Slash Thresholds</div>
-    <div class="card" style="padding:0;overflow:hidden;">
-      <div class="threshold-row">
-        <div class="threshold-label">Minor offence</div>
-        <div class="threshold-bar-wrap">
-          <div class="threshold-bar" style="width:20%;background:var(--yellow);"></div>
-        </div>
-        <div class="threshold-pct" style="color:var(--yellow);">Up to 20%</div>
-      </div>
-      <div class="threshold-row">
-        <div class="threshold-label">Repeated failure</div>
-        <div class="threshold-bar-wrap">
-          <div class="threshold-bar" style="width:50%;background:linear-gradient(90deg,var(--yellow),var(--red));"></div>
-        </div>
-        <div class="threshold-pct" style="color:var(--red);">Up to 50%</div>
-      </div>
-      <div class="threshold-row" style="border-bottom:none;">
-        <div class="threshold-label">Malicious actor</div>
-        <div class="threshold-bar-wrap">
-          <div class="threshold-bar" style="width:100%;background:var(--red);box-shadow:0 0 12px rgba(255,69,96,0.4);"></div>
-        </div>
-        <div class="threshold-pct" style="color:var(--red);">Full slash</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Leaderboard -->
-  <hr class="divider"/>
-  <div class="reveal">
-    <div class="slabel">Agent Leaderboard</div>
-    <div class="card" style="padding:0;overflow:hidden;">
-      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:13px;font-weight:700;">Top Agents by Stake</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:3px;">Live rankings from RepVault · Base Sepolia</div>
-        </div>
-        <button onclick="loadLeaderboard()" style="background:var(--blue-soft);border:1px solid var(--blue-border);color:var(--blue);padding:7px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='var(--blue)';this.style.color='#fff'" onmouseout="this.style.background='var(--blue-soft)';this.style.color='var(--blue)'">↻ Refresh</button>
-      </div>
-
-      <!-- Table header -->
-      <div class="lb-header">
-        <div class="lb-col rank">#</div>
-        <div class="lb-col agent">Agent</div>
-        <div class="lb-col stake">Staked</div>
-        <div class="lb-col badge">Badge</div>
-        <div class="lb-col score">Score</div>
-      </div>
-
-      <!-- Rows -->
-      <div id="leaderboardBody">
-        <div style="padding:32px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">
-          Loading leaderboard...
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="footer">
-    rep24 · Base Sepolia Testnet ·
-    <a href="https://twitter.com/Rep24_io" target="_blank">@Rep24_io</a> ·
-    <a href="https://github.com/abdallerhnet-web/rep24" target="_blank">GitHub</a>
-  </div>
-
-</div><!-- /wrap -->
+</div>
 
 <script>
-// ── STARS ──────────────────────────────────────────────
-const canvas = document.getElementById('stars');
-const ctx = canvas.getContext('2d');
-let W, H, stars = [];
-
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-resize();
-addEventListener('resize', () => { resize(); initStars(); });
-
-function initStars() {
-  stars = [];
-  const n = Math.min(80, Math.floor(W * H / 7000));
-  for (let i = 0; i < n; i++) {
-    stars.push({
-      x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 0.8 + 0.1,
-      o: Math.random() * 0.5 + 0.1,
-      sp: Math.random() * 0.015 + 0.004,
-      ph: Math.random() * Math.PI * 2,
-    });
-  }
-}
-initStars();
-
-function drawStars(t) {
-  ctx.clearRect(0, 0, W, H);
-  stars.forEach(s => {
-    const tw = s.o * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,248,235,${tw})`;
-    ctx.fill();
-  });
-  requestAnimationFrame(drawStars);
-}
-requestAnimationFrame(drawStars);
-
-// ── THEME TOGGLE ──────────────────────────────────────
+// ── THEME ──────────────────────────────────────
 function toggleTheme() {
   const html = document.documentElement;
-  const current = html.getAttribute('data-theme') || 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('rep24-theme', next);
-  document.getElementById('themeToggle').classList.toggle('light', next === 'light');
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('rep24-theme', isDark ? 'light' : 'dark');
 }
-// Load saved theme on start
+
+// Load saved theme
 (function() {
-  const saved = localStorage.getItem('rep24-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  if (saved === 'light') document.getElementById('themeToggle').classList.add('light');
+  const saved = localStorage.getItem('rep24-theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀️' : '🌙';
+  }
 })();
 
-// ── SCROLL REVEAL ──────────────────────────────────────
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); }});
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-// ── CONTRACTS ──────────────────────────────────────────
-const BASE_SEPOLIA_CHAIN_ID = 84532;
+// ── CONSTANTS ──────────────────────────────────
+const BASE_SEPOLIA_ID = 84532;
 const CONTRACTS = {
+  MockUSDC:         '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
+  RepVault:         '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
   RepBadge:         '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
   RepScore:         '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
-  RepVault:         '0x31229262DE71e12B1eC1CE1BEf62d815b565573F',
-  SlashingGovernor: '0x78ee408d6174FB4836550340a012996136bC8c77',
-  MockUSDC:         '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
 };
 
 const ERC20_ABI = [
   'function balanceOf(address) view returns (uint256)',
   'function decimals() view returns (uint8)',
-  'function approve(address spender, uint256 amount) returns (bool)',
-  'function mint(address to, uint256 amount)',
+  'function approve(address, uint256) returns (bool)',
+  'function mint(address, uint256)',
+  'function faucet() payable',
 ];
-
-// FIXED ABIs
-const REPVAULT_ABI = [
+const VAULT_ABI = [
   'function stake(address agentAddress, uint256 amount)',
   'function unstake(address agentAddress, uint256 amount)',
   'function getStakeBalance(address) view returns (uint256)',
 ];
-const REPBADGE_ABI = ['function balanceOf(address) view returns (uint256)'];
-const REPSCORE_ABI = ['function getRepScore(address) view returns (uint256)'];
+const BADGE_ABI = ['function balanceOf(address) view returns (uint256)'];
+const SCORE_ABI = [
+  'function getRepScore(address) view returns (uint256)',
+];
 
 let provider, signer, userAddress;
-let usdcContract, vaultContract, badgeContract, scoreContract;
+let usdc, vault, badge, score;
 
-// ── LOG ────────────────────────────────────────────────
-function log(msg, type = 'i') {
-  const el = document.getElementById('txLog');
-  const d = document.createElement('div');
-  d.className = `le ${type}`;
-  d.textContent = `[${new Date().toLocaleTimeString('en-US',{hour12:false})}] ${msg}`;
-  el.insertBefore(d, el.firstChild);
+// ── LOG ────────────────────────────────────────
+function log(msg, type = 'info') {
+  const box = document.getElementById('txLog');
+  const t = new Date().toLocaleTimeString('en-US', {hour12:false});
+  const el = document.createElement('div');
+  el.className = `log-entry ${type}`;
+  el.textContent = `[${t}] ${msg}`;
+  box.insertBefore(el, box.firstChild);
 }
 
-// ── WALLET ─────────────────────────────────────────────
+// ── CONNECT ────────────────────────────────────
 async function connectWallet() {
-  if (!window.ethereum) { log('No wallet detected — install MetaMask', 'e'); return; }
+  if (!window.ethereum) { log('No wallet found — install MetaMask or Coinbase Wallet', 'error'); return; }
   try {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
     userAddress = await signer.getAddress();
     const net = await provider.getNetwork();
-    if (net.chainId !== BASE_SEPOLIA_CHAIN_ID) {
+
+    if (net.chainId !== BASE_SEPOLIA_ID) {
       document.getElementById('networkWarn').classList.add('show');
-      log('Wrong network — switch to Base Sepolia', 'e');
+      log('Wrong network — please switch to Base Sepolia', 'error');
     } else {
       document.getElementById('networkWarn').classList.remove('show');
     }
+
     const short = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
-    document.getElementById('walletAddr').textContent = short;
-    document.getElementById('statusBar').classList.add('show');
     const btn = document.getElementById('connectBtn');
-    btn.textContent = short; btn.classList.add('connected');
+    btn.textContent = short;
+    btn.classList.add('connected');
+    document.getElementById('connChip').style.display = 'inline-flex';
+
     initContracts();
     await loadData();
-    log(`Wallet connected: ${userAddress}`, 's');
+    log(`Connected: ${userAddress}`, 'success');
+
     window.ethereum.on('accountsChanged', () => location.reload());
-    window.ethereum.on('chainChanged', () => location.reload());
-  } catch(e) { log(`Connection failed: ${e.message}`, 'e'); }
+    window.ethereum.on('chainChanged',    () => location.reload());
+  } catch(e) { log(`Connection error: ${e.message}`, 'error'); }
 }
 
 async function switchNetwork() {
   try {
-    await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:'0x14A34'}] });
+    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{chainId:'0x14A34'}] });
   } catch(e) {
-    if (e.code === 4902) await window.ethereum.request({ method:'wallet_addEthereumChain', params:[{
-      chainId:'0x14A34', chainName:'Base Sepolia', rpcUrls:['https://sepolia.base.org'],
-      nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18}, blockExplorerUrls:['https://sepolia.basescan.org'],
-    }]});
+    if (e.code === 4902) {
+      await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+        chainId: '0x14A34',
+        chainName: 'Base Sepolia Testnet',
+        rpcUrls: ['https://sepolia.base.org'],
+        nativeCurrency: { name:'ETH', symbol:'ETH', decimals:18 },
+        blockExplorerUrls: ['https://sepolia.basescan.org'],
+      }]});
+    }
   }
 }
 
 function initContracts() {
-  usdcContract  = new ethers.Contract(CONTRACTS.MockUSDC,  ERC20_ABI,    signer);
-  vaultContract = new ethers.Contract(CONTRACTS.RepVault,  REPVAULT_ABI, signer);
-  badgeContract = new ethers.Contract(CONTRACTS.RepBadge,  REPBADGE_ABI, signer);
-  scoreContract = new ethers.Contract(CONTRACTS.RepScore,  REPSCORE_ABI, signer);
+  usdc  = new ethers.Contract(CONTRACTS.MockUSDC,  ERC20_ABI,  signer);
+  vault = new ethers.Contract(CONTRACTS.RepVault,  VAULT_ABI,  signer);
+  badge = new ethers.Contract(CONTRACTS.RepBadge,  BADGE_ABI,  signer);
+  score = new ethers.Contract(CONTRACTS.RepScore,  SCORE_ABI,  signer);
 }
 
+// ── LOAD DATA ──────────────────────────────────
 async function loadData() {
-  if (!userAddress) return;
-  log('Loading data...', 'i');
+  log('Loading data...', 'info');
   try {
-    let usdcBal = '0.00';
+    // USDC balance
+    let bal = '—';
     try {
-      const dec = await usdcContract.decimals();
-      const raw = await usdcContract.balanceOf(userAddress);
-      usdcBal = parseFloat(ethers.utils.formatUnits(raw, dec)).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      const dec = await usdc.decimals();
+      bal = parseFloat(ethers.utils.formatUnits(await usdc.balanceOf(userAddress), dec)).toFixed(2);
     } catch {}
-    document.getElementById('usdcBalVal').textContent = usdcBal;
+    document.getElementById('usdcBalVal').textContent = bal;
 
-    let staked = '0.00';
+    // Staked
+    let staked = '—';
     try {
-      const raw = await vaultContract.getStakeBalance(userAddress);
+      const raw = await vault.getStakeBalance(userAddress);
       staked = parseFloat(ethers.utils.formatUnits(raw, 6)).toFixed(2);
     } catch {}
     document.getElementById('stakedVal').textContent = staked;
 
-    let score = 0;
+    // RepScore
+    let s = 0;
     try {
-      const raw = await scoreContract.getRepScore(userAddress);
-      score = raw.toNumber ? raw.toNumber() : parseInt(raw.toString());
+      const raw = await score.getRepScore(userAddress);
+      s = parseInt(raw.toString());
     } catch {}
-    document.getElementById('repScoreVal').textContent = score;
-    const pct = Math.min(score, 100);
-    document.getElementById('scoreBarFill').style.width = pct + '%';
-    document.getElementById('scoreBarPct').textContent = `${score} / 100`;
-    document.getElementById('scoreBarWrap').style.display = 'block';
+    document.getElementById('repScoreVal').textContent = s;
+    const pct = Math.min(s, 100);
+    document.getElementById('barFill').style.width = pct + '%';
+    document.getElementById('scorePct').textContent = `${s} / 100`;
 
+    // Badge
     let hasBadge = false;
-    try { hasBadge = (await badgeContract.balanceOf(userAddress)).toNumber() > 0; } catch {}
-    const bc = document.getElementById('badgeContent');
+    try { hasBadge = (await badge.balanceOf(userAddress)).toNumber() > 0; } catch {}
+    document.getElementById('badgeContent').innerHTML = hasBadge
+      ? `<div class="badge-display">
+           <div class="badge-icon-wrap">🏅</div>
+           <div>
+             <div class="badge-info-name">RepBadge Active</div>
+             <div class="badge-info-sub">On-chain reputation bond · Base Sepolia</div>
+           </div>
+           <div style="margin-left:auto;color:var(--green);font-family:'DM Mono',monospace;font-size:12px;font-weight:500">✓ LIVE</div>
+         </div>`
+      : `<div class="badge-empty">No RepBadge found — stake USDC below to mint yours</div>`;
 
-    if (hasBadge) {
-      // Determine tier from stake amount
-      const stakedNum = parseFloat(staked);
-      let tier, tierClass, tierIcon, tierLabel;
-      if (stakedNum >= 500) {
-        tier = 'Diamond'; tierClass = 'diamond'; tierIcon = '💎'; tierLabel = 'diamond';
-      } else if (stakedNum >= 100) {
-        tier = 'Gold'; tierClass = 'gold'; tierIcon = '🥇'; tierLabel = 'gold';
-      } else {
-        tier = 'Silver'; tierClass = 'silver'; tierIcon = '🥈'; tierLabel = 'silver';
-      }
-
-      bc.innerHTML = `
-        <div class="badge-card ${tierClass} badge-glow">
-          <div class="badge-top">
-            <div class="badge-shimmer"></div>
-            <div class="badge-icon-wrap">${tierIcon}</div>
-            <div class="badge-info">
-              <div class="badge-eyebrow">Soulbound RepBadge</div>
-              <div class="badge-tier-name">${tier} Tier</div>
-              <div class="badge-network">On-chain · Verified ✓</div>
-            </div>
-            <div class="badge-network-pill">Base Sepolia</div>
-          </div>
-          <div class="badge-stats">
-            <div class="bstat">
-              <div class="bstat-v">$${staked}</div>
-              <div class="bstat-l">Staked USDC</div>
-            </div>
-            <div class="bstat">
-              <div class="bstat-v blue">${score}</div>
-              <div class="bstat-l">Rep Score</div>
-            </div>
-            <div class="bstat">
-              <div class="bstat-v green">Active</div>
-              <div class="bstat-l">Status</div>
-            </div>
-          </div>
-          <div class="badge-share-row">
-            <div class="badge-share-text">Flex your reputation on X</div>
-            <button class="share-btn" onclick="shareBadge('${tier}','${staked}','${score}')">
-              <span>𝕏</span> Share Badge
-            </button>
-          </div>
-        </div>`;
-    } else {
-      bc.innerHTML = `
-        <div class="no-badge-wrap">
-          <div class="no-badge-tiers">
-            <div class="tier-preview">
-              <div class="tier-dot s">🥈</div>
-              <div class="tier-label">Silver</div>
-              <div class="tier-label" style="color:var(--text3);font-size:8px">10+ USDC</div>
-            </div>
-            <div class="tier-preview">
-              <div class="tier-dot g">🥇</div>
-              <div class="tier-label">Gold</div>
-              <div class="tier-label" style="color:var(--text3);font-size:8px">100+ USDC</div>
-            </div>
-            <div class="tier-preview">
-              <div class="tier-dot d">💎</div>
-              <div class="tier-label">Diamond</div>
-              <div class="tier-label" style="color:var(--text3);font-size:8px">500+ USDC</div>
-            </div>
-          </div>
-          <div class="no-badge-text">No RepBadge found — stake USDC below to mint yours</div>
-          <div class="no-badge-sub">Silver · Gold · Diamond tiers based on stake amount</div>
-        </div>`;
-    }
-    log('Data loaded', 's');
-  } catch(e) { log(`Data error: ${e.message}`, 'e'); }
+    log('Data loaded', 'success');
+  } catch(e) { log(`Load error: ${e.message}`, 'error'); }
 }
 
-// ── LOAD PROTOCOL STATS ON PAGE OPEN ─────────────────
-const PUBLIC_RPC = 'https://sepolia.base.org';
-
-async function loadProtocolStats() {
-  try {
-    const readProvider = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
-
-    const usdcRead = new ethers.Contract(CONTRACTS.MockUSDC, ERC20_ABI, readProvider);
-    const badgeRead = new ethers.Contract(CONTRACTS.RepBadge, REPBADGE_ABI, readProvider);
-    const vaultRead = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, readProvider);
-
-    // ── Total USDC locked in RepVault ──
-    try {
-      const raw = await usdcRead.balanceOf(CONTRACTS.RepVault);
-      const total = parseFloat(ethers.utils.formatUnits(raw, 6));
-      const el = document.getElementById('totalStaked');
-      el.textContent = total >= 1000
-        ? `$${(total/1000).toFixed(1)}K`
-        : `$${total.toFixed(0)}`;
-      el.classList.add('loaded');
-    } catch { document.getElementById('totalStaked').textContent = '$0'; }
-
-    // ── Total unique agents who staked ──
-    try {
-      // Count unique addresses from Staked events
-      const filter = vaultRead.filters.Staked();
-      const events = await vaultRead.queryFilter(filter, 0, 'latest');
-      const unique = new Set(events.map(e => e.args[0].toLowerCase()));
-      const el = document.getElementById('totalAgents');
-      el.textContent = unique.size;
-      el.classList.add('loaded');
-    } catch {
-      // Fallback: try totalSupply on RepBadge
-      try {
-        const supplyContract = new ethers.Contract(
-          CONTRACTS.RepBadge,
-          ['function totalSupply() view returns (uint256)'],
-          readProvider
-        );
-        const s = await supplyContract.totalSupply();
-        const el = document.getElementById('totalAgents');
-        el.textContent = s.toNumber ? s.toNumber() : parseInt(s.toString());
-        el.classList.add('loaded');
-      } catch { document.getElementById('totalAgents').textContent = '0'; }
-    }
-  } catch(e) {
-    document.getElementById('totalStaked').textContent = '$0';
-    document.getElementById('totalAgents').textContent = '0';
-  }
-}
-
-// ── SHARE BADGE ───────────────────────────────────────
-function shareBadge(tier, staked, score) {
-  const icons = { Silver: '🥈', Gold: '🥇', Diamond: '💎' };
-  const icon = icons[tier] || '🏅';
-  const text = `Just earned my ${icon} ${tier} RepBadge on @Rep24_io\n\nStaked $${staked} USDC on Base · Rep Score: ${score}\n\nx402 pays · ERC-8004 identifies · rep24 verifies\n\nThe trust layer for AI agents 🤖⛓️`;
-  const url = `https://abdallerhnet-web.github.io/rep24/`;
-  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-  window.open(tweetUrl, '_blank');
-}
-
-// ── LEADERBOARD ───────────────────────────────────────
-async function loadLeaderboard() {
-  const body = document.getElementById('leaderboardBody');
-  body.innerHTML = `<div class="lb-empty">Fetching on-chain data...</div>`;
-
-  try {
-    const readProvider = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
-    const vaultRead = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, readProvider);
-    const scoreRead = new ethers.Contract(CONTRACTS.RepScore, REPSCORE_ABI, readProvider);
-    const usdcRead  = new ethers.Contract(CONTRACTS.MockUSDC, ERC20_ABI, readProvider);
-
-    // Get all unique stakers from Staked events
-    const filter = vaultRead.filters.Staked();
-    const events = await vaultRead.queryFilter(filter, 0, 'latest');
-
-    if (events.length === 0) {
-      body.innerHTML = `<div class="lb-empty">No agents staked yet — be the first! 🚀</div>`;
-      return;
-    }
-
-    // Get unique addresses
-    const uniqueAddrs = [...new Set(events.map(e => e.args[0].toLowerCase()))];
-
-    // Fetch stake balance for each
-    const rows = await Promise.all(uniqueAddrs.map(async (addr) => {
-      let stake = 0, score = 0;
-      try {
-        const s = await vaultRead.getStakeBalance(addr);
-        stake = parseFloat(ethers.utils.formatUnits(s, 6));
-      } catch {}
-      try {
-        const sc = await scoreRead.getRepScore(addr);
-        score = sc.toNumber ? sc.toNumber() : parseInt(sc.toString());
-      } catch {}
-      return { addr, stake, score };
-    }));
-
-    // Filter out zero stakers, sort by stake desc
-    const sorted = rows
-      .filter(r => r.stake > 0)
-      .sort((a, b) => b.stake - a.stake)
-      .slice(0, 10);
-
-    if (sorted.length === 0) {
-      body.innerHTML = `<div class="lb-empty">No active stakes found yet.</div>`;
-      return;
-    }
-
-    const rankIcons = ['🥇', '🥈', '🥉'];
-
-    body.innerHTML = sorted.map((r, i) => {
-      const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
-      const rank = rankIcons[i] || `${i + 1}`;
-      const short = r.addr.slice(0, 6) + '...' + r.addr.slice(-4);
-      const isMe = userAddress && r.addr === userAddress.toLowerCase();
-
-      // Badge tier
-      let badgeTier = 'silver', badgeLabel = '🥈 Silver';
-      if (r.stake >= 500) { badgeTier = 'diamond'; badgeLabel = '💎 Diamond'; }
-      else if (r.stake >= 100) { badgeTier = 'gold'; badgeLabel = '🥇 Gold'; }
-
-      return `
-        <div class="lb-row ${isMe ? 'me' : ''}">
-          <div class="lb-rank ${rankClass}">${rank}</div>
-          <div class="lb-agent">
-            <div class="lb-agent-addr">${short}</div>
-            ${isMe ? '<div class="lb-agent-you">← YOU</div>' : ''}
-          </div>
-          <div class="lb-stake">$${r.stake.toFixed(0)}</div>
-          <div><span class="lb-badge-pill ${badgeTier}">${badgeLabel}</span></div>
-          <div class="lb-score">${r.score}</div>
-        </div>`;
-    }).join('');
-
-  } catch(e) {
-    body.innerHTML = `<div class="lb-empty">Could not load leaderboard — ${e.message}</div>`;
-  }
-}
-
-// Load leaderboard on page open
-loadLeaderboard();
-
+// ── STAKE ──────────────────────────────────────
 async function stakeUSDC() {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
+  if (!signer) { log('Connect wallet first', 'error'); return; }
   const amt = document.getElementById('stakeAmount').value;
-  if (!amt || parseFloat(amt) < 10) { log('Minimum stake is 10 USDC', 'e'); return; }
+  if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'error'); return; }
   try {
-    const dec = await usdcContract.decimals();
+    const dec = await usdc.decimals();
     const amount = ethers.utils.parseUnits(amt.toString(), dec);
-    log(`Approving ${amt} USDC...`, 'p');
-    const a = await usdcContract.approve(CONTRACTS.RepVault, amount);
+    log(`Approving ${amt} USDC...`, 'pending');
+    const a = await usdc.approve(CONTRACTS.RepVault, amount);
     await a.wait();
-    log('Approved ✓', 's');
-    log(`Staking ${amt} USDC...`, 'p');
-    const tx = await vaultContract.stake(userAddress, amount);
+    log(`Approved ✓`, 'success');
+    log(`Staking ${amt} USDC...`, 'pending');
+    const tx = await vault.stake(userAddress, amount);
     await tx.wait();
-    log(`Staked ✓ — basescan.org/tx/${tx.hash.slice(0,14)}...`, 's');
+    log(`Staked ✓ · basescan.org/tx/${tx.hash.slice(0,12)}...`, 'success');
     await loadData();
-  } catch(e) { log(`Stake failed: ${e.reason || e.message}`, 'e'); }
+  } catch(e) { log(`Stake failed: ${e.reason || e.message}`, 'error'); }
 }
 
+// ── UNSTAKE ────────────────────────────────────
 async function unstake() {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
+  if (!signer) { log('Connect wallet first', 'error'); return; }
   try {
-    const cur = await vaultContract.getStakeBalance(userAddress);
-    if (cur.isZero()) { log('No staked balance', 'e'); return; }
-    log('Unstaking...', 'p');
-    const tx = await vaultContract.unstake(userAddress, cur);
+    log('Unstaking...', 'pending');
+    const currentStake = await vault.getStakeBalance(userAddress);
+    const tx = await vault.unstake(userAddress, currentStake);
     await tx.wait();
-    log('Unstaked ✓', 's');
+    log(`Unstaked ✓ · ${tx.hash.slice(0,12)}...`, 'success');
     await loadData();
-  } catch(e) { log(`Unstake failed: ${e.reason || e.message}`, 'e'); }
+  } catch(e) { log(`Unstake failed: ${e.reason || e.message}`, 'error'); }
 }
 
+// ── FAUCET ─────────────────────────────────────
 async function getMockUSDC() {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
+  if (!signer) { log('Connect wallet first', 'error'); return; }
   try {
-    log('Minting 1000 mock USDC...', 'p');
-    const tx = await usdcContract.mint(userAddress, ethers.utils.parseUnits('1000', 6));
+    log('Requesting mock USDC...', 'pending');
+    let tx;
+    try { tx = await usdc.mint(userAddress, ethers.utils.parseUnits('1000', 6)); }
+    catch { tx = await usdc.faucet({ value: 0 }); }
     await tx.wait();
-    log('Got 1000 mock USDC ✓', 's');
+    log('Got 1000 mock USDC ✓', 'success');
     await loadData();
-  } catch(e) { log(`Mint failed: ${e.reason || e.message}`, 'e'); }
+  } catch(e) { log(`Faucet failed: ${e.reason || e.message} — try Basescan directly`, 'error'); }
 }
 
-function copy(addr) {
-  navigator.clipboard.writeText(addr).then(() => log(`Copied: ${addr}`, 'i'));
+// ── COPY ───────────────────────────────────────
+function copyAddr(addr) {
+  navigator.clipboard.writeText(addr).then(() => log(`Copied ${addr.slice(0,10)}...`, 'info'));
 }
 </script>
 </body>
