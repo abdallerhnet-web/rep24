@@ -1,783 +1,1440 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>rep24 — Testnet</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<title>rep24 — On-Chain Reputation Layer</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
 <style>
-:root {
-  --accent: #0052FF;
-  --accent-hover: #003FCC;
-  --accent-soft: rgba(0,82,255,0.08);
-  --green: #00915A;
-  --green-soft: rgba(0,145,90,0.08);
-  --red: #D93636;
-  --red-soft: rgba(217,54,54,0.08);
-  --yellow: #C27C00;
-  --yellow-soft: rgba(194,124,0,0.08);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-  --bg: #F5F6FA;
-  --surface: #FFFFFF;
-  --surface2: #F0F1F7;
-  --border: #E2E4EE;
-  --text: #111827;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
-  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,0.09);
-  --radius: 14px;
-  --radius-sm: 8px;
+:root, [data-theme="dark"] {
+  --glow-warm:    rgba(255, 130, 60, 0.3);
+  --glow-purple:  rgba(160, 70, 255, 0.18);
+  --glow-blue:    rgba(0, 82, 255, 0.2);
+  --blue:         #4B8BFF;
+  --blue-dim:     #2F6FE8;
+  --blue-soft:    rgba(75,139,255,0.1);
+  --blue-border:  rgba(75,139,255,0.2);
+  --green:        #00E87A;
+  --green-soft:   rgba(0,232,122,0.08);
+  --green-border: rgba(0,232,122,0.2);
+  --red:          #FF4560;
+  --yellow:       #FFB830;
+  --yellow-soft:  rgba(255,184,48,0.08);
+  --yellow-border:rgba(255,184,48,0.25);
+  --text:         #F0EDE8;
+  --text2:        rgba(240,237,232,0.55);
+  --text3:        rgba(240,237,232,0.28);
+  --surface:      rgba(255,255,255,0.04);
+  --surface2:     rgba(255,255,255,0.07);
+  --border:       rgba(255,255,255,0.08);
+  --border2:      rgba(255,255,255,0.14);
+  --bg:           #09060D;
+  --shadow:       0 8px 40px rgba(0,0,0,0.7);
+  --rule-bg:      rgba(255,255,255,0.03);
 }
 
-[data-theme="dark"] {
-  --bg: #0C0F17;
-  --surface: #141720;
-  --surface2: #1A1E2E;
-  --border: #252A3D;
-  --text: #F1F3F9;
-  --text-secondary: #8B93A7;
-  --text-muted: #555E75;
-  --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
-  --shadow-lg: 0 4px 24px rgba(0,0,0,0.5);
-  --accent-soft: rgba(0,82,255,0.12);
-  --green-soft: rgba(0,145,90,0.12);
-  --red-soft: rgba(217,54,54,0.12);
-  --yellow-soft: rgba(194,124,0,0.12);
+[data-theme="light"] {
+  --glow-warm:    rgba(255, 130, 60, 0.12);
+  --glow-purple:  rgba(160, 70, 255, 0.07);
+  --glow-blue:    rgba(0, 82, 255, 0.08);
+  --blue:         #2563EB;
+  --blue-dim:     #1D4ED8;
+  --blue-soft:    rgba(37,99,235,0.08);
+  --blue-border:  rgba(37,99,235,0.18);
+  --green:        #059669;
+  --green-soft:   rgba(5,150,105,0.07);
+  --green-border: rgba(5,150,105,0.2);
+  --red:          #DC2626;
+  --yellow:       #D97706;
+  --yellow-soft:  rgba(217,119,6,0.07);
+  --yellow-border:rgba(217,119,6,0.2);
+  --text:         #0D0A14;
+  --text2:        rgba(13,10,20,0.55);
+  --text3:        rgba(13,10,20,0.35);
+  --surface:      rgba(255,255,255,0.85);
+  --surface2:     rgba(240,236,255,0.7);
+  --border:       rgba(0,0,0,0.08);
+  --border2:      rgba(0,0,0,0.13);
+  --bg:           #F0EDFF;
+  --shadow:       0 8px 40px rgba(37,99,235,0.08);
+  --rule-bg:      rgba(0,0,0,0.02);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+[data-theme="light"] body { background: var(--bg); }
+[data-theme="light"] .atmo::before {
+  background: radial-gradient(ellipse, rgba(200,180,255,0.25) 0%, rgba(150,100,255,0.1) 40%, transparent 70%);
+}
+[data-theme="light"] .atmo::after {
+  background: radial-gradient(ellipse, rgba(100,150,255,0.15) 0%, transparent 60%);
+}
+[data-theme="light"] #stars { opacity: 0.1; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
   min-height: 100vh;
-  transition: background 0.25s, color 0.25s;
+  overflow-x: hidden;
 }
+
+.atmo { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.atmo::before {
+  content: '';
+  position: absolute;
+  top: -10%; left: 50%; transform: translateX(-50%);
+  width: 1000px; height: 700px;
+  background: radial-gradient(ellipse, var(--glow-warm) 0%, rgba(200,70,130,0.15) 28%, var(--glow-purple) 55%, transparent 72%);
+  filter: blur(70px);
+  animation: breathe 9s ease-in-out infinite alternate;
+}
+.atmo::after {
+  content: '';
+  position: absolute;
+  bottom: -15%; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 500px;
+  background: radial-gradient(ellipse, var(--glow-blue) 0%, rgba(80,40,200,0.1) 50%, transparent 72%);
+  filter: blur(90px);
+  animation: breathe 12s ease-in-out infinite alternate-reverse;
+}
+@keyframes breathe {
+  from { opacity: 0.65; transform: translateX(-50%) scale(1); }
+  to   { opacity: 1;    transform: translateX(-50%) scale(1.1); }
+}
+
+#stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+.wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 0 20px 80px; }
 
 /* ── HEADER ── */
-.topbar {
-  background: var(--surface);
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28px 0 32px;
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(12px);
-  transition: background 0.25s, border-color 0.25s;
+  margin-bottom: 48px;
 }
-
-.topbar-inner {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 20px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-text { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+.logo-text b { color: var(--blue); }
+.net-pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--yellow);
+  background: var(--yellow-soft); border: 1px solid var(--yellow-border); padding: 4px 10px; border-radius: 20px;
 }
+.hdr-right { display: flex; align-items: center; gap: 10px; }
 
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  text-decoration: none;
-  flex: 1;
+.faucet-btn {
+  background: var(--surface); border: 1px solid var(--border2); color: var(--text2);
+  padding: 9px 16px; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
 }
+.faucet-btn:hover { border-color: var(--blue); color: var(--blue); }
 
-.logo-mark {
-  width: 30px; height: 30px;
-  background: var(--accent);
-  border-radius: 7px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  font-weight: 500;
-  color: white;
-  letter-spacing: -0.5px;
-  flex-shrink: 0;
+.toggle {
+  position: relative; width: 46px; height: 26px;
+  background: var(--surface2); border: 1px solid var(--border2); border-radius: 13px; cursor: pointer; flex-shrink: 0;
 }
-
-.logo-text {
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.4px;
+.toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--blue); transition: transform 0.3s; box-shadow: 0 0 10px var(--blue-soft);
 }
+.toggle.light::after { transform: translateX(20px); }
+.ti { position: absolute; font-size: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.ti.m { left: 5px; } .ti.s { right: 5px; }
 
-.logo-text em { color: var(--accent); font-style: normal; }
-
-.chip {
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.4px;
-  padding: 3px 9px;
-  border-radius: 20px;
-  border: 1px solid;
-}
-.chip-yellow { color: var(--yellow); border-color: rgba(194,124,0,0.35); background: var(--yellow-soft); }
-.chip-green  { color: var(--green);  border-color: rgba(0,145,90,0.3);  background: var(--green-soft); }
-
-/* Theme toggle & Utilities */
-.theme-toggle, .utility-btn {
-  height: 36px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 600;
-  color: var(--text);
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-.theme-toggle { width: 36px; }
-.utility-btn { padding: 0 14px; }
-.theme-toggle:hover, .utility-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-/* Connect button */
 #connectBtn {
-  height: 36px;
-  padding: 0 18px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  white-space: nowrap;
-  flex-shrink: 0;
+  background: var(--blue); color: #fff; border: none; padding: 10px 20px; border-radius: 10px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s; box-shadow: 0 4px 20px rgba(75,139,255,0.3); white-space: nowrap;
 }
-#connectBtn:hover { background: var(--accent-hover); }
+#connectBtn:hover { background: var(--blue-dim); transform: translateY(-1px); }
 #connectBtn.connected {
-  background: var(--green-soft);
-  color: var(--green);
-  border: 1px solid rgba(0,145,90,0.25);
-  font-family: 'DM Mono', monospace;
-  font-size: 12px;
+  background: var(--green-soft); border: 1px solid var(--green-border); color: var(--green);
+  box-shadow: none; font-family: 'JetBrains Mono', monospace; font-size: 11px;
 }
 
-/* ── MAIN ── */
-.main {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 28px 20px 80px;
+/* ── STATUS / WARN ── */
+#statusBar {
+  display: none; align-items: center; gap: 10px;
+  background: var(--green-soft); border: 1px solid var(--green-border); border-radius: 12px;
+  padding: 11px 18px; margin-bottom: 24px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
 }
-
-/* ── ALERTS ── */
-.alert {
-  display: none;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-family: 'DM Mono', monospace;
-  margin-bottom: 20px;
-  border: 1px solid;
+#statusBar.show { display: flex; }
+.pulse {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0;
+  animation: ping 2s infinite; box-shadow: 0 0 0 0 rgba(0,232,122,0.4);
 }
-.alert.show { display: flex; }
-.alert-warn { background: var(--yellow-soft); border-color: rgba(194,124,0,0.3); color: var(--yellow); }
-.alert-btn {
-  margin-left: auto;
-  padding: 5px 12px;
-  border-radius: 6px;
-  border: 1px solid currentColor;
-  background: transparent;
-  color: inherit;
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  cursor: pointer;
+@keyframes ping {
+  0%   { box-shadow: 0 0 0 0 rgba(0,232,122,0.4); }
+  70%  { box-shadow: 0 0 0 7px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
+#networkWarn {
+  display: none; background: var(--yellow-soft); border: 1px solid var(--yellow-border);
+  border-radius: 12px; padding: 13px 18px; font-size: 12px; color: var(--yellow);
+  margin-bottom: 20px; font-family: 'JetBrains Mono', monospace;
+}
+#networkWarn.show { display: flex; align-items: center; gap: 10px; }
 
 /* ── HERO ── */
-.hero {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+.hero { text-align: center; padding: 20px 0 56px; }
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--blue);
+  background: var(--blue-soft); border: 1px solid var(--blue-border);
+  padding: 6px 14px; border-radius: 20px; margin-bottom: 28px;
+  animation: fadeIn 0.8s ease forwards;
 }
-.hero-text h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
-.hero-text p { font-size: 14px; color: var(--text-secondary); max-width: 360px; line-height: 1.55; }
-.hero-visual {
-  flex-shrink: 0; width: 72px; height: 72px; border-radius: 16px;
-  background: var(--accent-soft); border: 1px solid rgba(0,82,255,0.15);
-  display: flex; align-items: center; justify-content: center; font-size: 32px;
+.hero-tag::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--blue); box-shadow: 0 0 6px var(--blue); animation: ping 2s infinite;
+}
+.hero-h1 {
+  font-family: 'Instrument Serif', serif; font-size: clamp(38px, 8vw, 70px);
+  font-weight: 400; line-height: 1.02; letter-spacing: -1.5px; color: var(--text);
+  margin-bottom: 16px; animation: fadeUp 0.8s ease forwards 0.1s; opacity: 0;
+}
+.hero-h1 em {
+  font-style: italic; color: transparent;
+  background: linear-gradient(135deg, #FF9F5A 0%, #E060A0 40%, #8060FF 70%, #4B8BFF 100%);
+  -webkit-background-clip: text; background-clip: text;
+}
+.hero-sub {
+  font-size: 15px; color: var(--text2); line-height: 1.7; max-width: 480px;
+  margin: 0 auto 20px; font-weight: 300; animation: fadeUp 0.8s ease forwards 0.2s; opacity: 0;
+}
+.hero-stack {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3);
+  letter-spacing: 0.5px; margin-bottom: 40px; animation: fadeUp 0.8s ease forwards 0.3s; opacity: 0;
+}
+.hero-stack b { color: var(--blue); }
+
+.steps {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  animation: fadeUp 0.8s ease forwards 0.4s; opacity: 0;
+}
+.step {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 20px 16px; text-align: left; position: relative; overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s; backdrop-filter: blur(10px);
+}
+.step::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+}
+.step:hover { border-color: var(--border2); transform: translateY(-3px); }
+.step-n { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2px; color: var(--blue); text-transform: uppercase; margin-bottom: 10px; }
+.step-t { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.2px; }
+.step-d { font-size: 11px; color: var(--text2); line-height: 1.6; font-family: 'JetBrains Mono', monospace; }
+
+/* ── SECTION LABEL ── */
+.slabel {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
+  letter-spacing: 2.5px; color: var(--text3); text-transform: uppercase;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+}
+.slabel::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── STAT CARDS ── */
+.stats3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.scard {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 20px; backdrop-filter: blur(10px); transition: border-color 0.2s, transform 0.2s;
+  position: relative; overflow: hidden;
+}
+.scard::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+.scard:hover { border-color: var(--border2); transform: translateY(-2px); }
+.scard-l { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+.scard-v { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
+.blue  { color: var(--blue); }
+.green { color: var(--green); }
+.dim   { color: var(--text2); font-size: 18px; }
+
+/* Score bar */
+.sbar-wrap { margin-bottom: 28px; display: none; }
+.sbar-meta { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); margin-bottom: 8px; }
+.sbar-track { height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.sbar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--blue), #00C2FF);
+  border-radius: 2px; transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 10px rgba(75,139,255,0.4);
 }
 
-/* ── STATS ── */
-.stats-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;
-}
-.stat-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 20px; box-shadow: var(--shadow); transition: border-color 0.2s, transform 0.15s;
-}
-.stat-card:hover { border-color: rgba(0,82,255,0.25); transform: translateY(-1px); }
-.stat-label {
-  font-size: 11px; font-weight: 500; letter-spacing: 0.6px; text-transform: uppercase;
-  color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 10px;
-}
-.stat-value { font-size: 26px; font-weight: 700; letter-spacing: -0.8px; line-height: 1; }
-.stat-value.blue  { color: var(--accent); }
-.stat-value.green { color: var(--green); }
-.stat-value.gray  { color: var(--text-secondary); font-size: 20px; }
-
-/* ── SCORE BAR ── */
-.score-section {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 20px 24px; margin-bottom: 16px; box-shadow: var(--shadow);
-}
-.score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.score-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
-.score-pct { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--accent); font-weight: 500; }
-.bar-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-.bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #4D9BFF); border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); width: 0%; }
-
-/* ── CARDS ── */
+/* ── CARD ── */
 .card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 24px; margin-bottom: 16px; box-shadow: var(--shadow); transition: border-color 0.2s;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
+  padding: 24px; margin-bottom: 16px; backdrop-filter: blur(12px);
+  position: relative; overflow: hidden; transition: border-color 0.2s;
 }
-.card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+.card:hover { border-color: var(--border2); }
+.card-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .card-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
-.card-icon {
-  width: 38px; height: 38px; background: var(--surface2); border: 1px solid var(--border);
-  border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px;
-}
-
-/* ── TABS ── */
-.tabs {
-  display: flex; gap: 8px; margin-bottom: 20px;
-  background: var(--surface2); padding: 4px; border-radius: 10px; border: 1px solid var(--border);
-}
-.tab-btn {
-  flex: 1; padding: 10px; text-align: center; font-weight: 600; font-size: 13px;
-  color: var(--text-secondary); cursor: pointer; border-radius: 8px; transition: all 0.2s;
-}
-.tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-.tab-pane { display: none; }
-.tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
-
-/* ── INPUTS WITH MAX BUTTON ── */
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 14px;
-}
-.input-wrapper input {
-  width: 100%;
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 70px 14px 16px; /* Right padding makes room for MAX */
-  color: var(--text);
-  font-family: 'DM Mono', monospace;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.15s;
-  -webkit-appearance: none;
-}
-.input-wrapper input:focus { border-color: var(--accent); }
-.input-wrapper input::placeholder { color: var(--text-muted); }
-
-.max-btn {
-  position: absolute;
-  right: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--accent);
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.max-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
-
-.help { font-size: 12px; color: var(--text-secondary); font-family: 'DM Mono', monospace; line-height: 1.6; }
-
-/* ── BUTTONS ── */
-.btn {
-  display: flex; align-items: center; justify-content: center; width: 100%;
-  padding: 14px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
-  font-size: 15px; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s;
-}
-.btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-1px); }
-.btn-danger { background: var(--red); color: white; }
-.btn-danger:hover:not(:disabled) { background: #b82d2d; transform: translateY(-1px); }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+.card-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; }
 
 /* ── BADGE ── */
-.badge-display { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; }
-.badge-icon-wrap { width: 48px; height: 48px; background: linear-gradient(135deg, #0052FF, #00A3FF); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
-.badge-info-name { font-weight: 700; font-size: 15px; }
-.badge-info-sub { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-.badge-empty { padding: 22px; text-align: center; font-size: 13px; color: var(--text-muted); font-family: 'DM Mono', monospace; background: var(--surface2); border-radius: 10px; }
+.badge-none { color: var(--text3); font-family: 'JetBrains Mono', monospace; font-size: 12px; text-align: center; padding: 28px; }
+.badge-card { border-radius: 18px; overflow: hidden; position: relative; }
+.badge-card.silver .badge-top { background: linear-gradient(135deg, #6B7A99 0%, #8E9BB8 40%, #B0BDD4 70%, #7A8AAA 100%); }
+.badge-card.silver .badge-glow { box-shadow: 0 0 40px rgba(140,160,200,0.3), 0 0 80px rgba(140,160,200,0.1); }
+.badge-card.silver .badge-shimmer { background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%); }
+.badge-card.gold .badge-top { background: linear-gradient(135deg, #F5A623 0%, #FFD060 40%, #FFA500 70%, #E8900A 100%); }
+.badge-card.gold .badge-glow { box-shadow: 0 0 40px rgba(245,166,35,0.35), 0 0 80px rgba(245,166,35,0.15); }
+.badge-card.gold .badge-shimmer { background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%); }
+.badge-card.diamond .badge-top { background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 35%, #8B5CF6 60%, #06B6D4 100%); }
+.badge-card.diamond .badge-glow { box-shadow: 0 0 40px rgba(99,102,241,0.4), 0 0 80px rgba(99,102,241,0.2); }
+.badge-card.diamond .badge-shimmer { background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%); }
+.badge-top {
+  padding: 28px 24px; display: flex; align-items: center; gap: 18px;
+  position: relative; overflow: hidden; min-height: 110px;
+}
+.badge-top::before { content: ''; position: absolute; top: -30px; right: -30px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
+.badge-top::after  { content: ''; position: absolute; bottom: -40px; right: 60px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.05); pointer-events: none; }
+.badge-shimmer { position: absolute; inset: 0; animation: shimmer 3s ease-in-out infinite; pointer-events: none; }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 50% { transform: translateX(100%); } 100% { transform: translateX(100%); } }
+.badge-icon-wrap {
+  width: 60px; height: 60px; border-radius: 16px; background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0; backdrop-filter: blur(8px); position: relative; z-index: 1;
+  animation: badgePulse 3s ease-in-out infinite;
+}
+@keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+.badge-info { flex: 1; position: relative; z-index: 1; }
+.badge-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 4px; }
+.badge-tier-name { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; color: #fff; letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px; }
+.badge-network { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.5); }
+.badge-network-pill { position: absolute; top: 0; right: 0; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 5px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; z-index: 1; }
+.badge-stats { display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(255,255,255,0.03); border-top: 1px solid var(--border); }
+.bstat { padding: 16px 12px; text-align: center; border-right: 1px solid var(--border); transition: background 0.2s; }
+.bstat:last-child { border-right: none; }
+.bstat:hover { background: rgba(255,255,255,0.04); }
+.bstat-v { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 3px; letter-spacing: -0.3px; }
+.bstat-v.blue  { color: var(--blue); }
+.bstat-v.green { color: var(--green); }
+.bstat-l { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; }
 
-/* ── LOG & CONTRACTS ── */
-.log-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-family: 'DM Mono', monospace; font-size: 12px; max-height: 140px; overflow-y: auto; line-height: 1.7; }
-.log-entry { color: var(--text-muted); }
-.log-entry.success { color: var(--green); }
-.log-entry.error   { color: var(--red); }
-.log-entry.info    { color: var(--accent); }
-.log-entry.pending { color: var(--yellow); }
+.no-badge-wrap { padding: 32px 24px; text-align: center; }
+.no-badge-tiers { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
+.tier-preview { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0.5; transition: opacity 0.2s; }
+.tier-preview:hover { opacity: 0.8; }
+.tier-dot { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 1px solid var(--border); }
+.tier-dot.s { background: linear-gradient(135deg, #6B7A99, #B0BDD4); }
+.tier-dot.g { background: linear-gradient(135deg, #F5A623, #FFD060); }
+.tier-dot.d { background: linear-gradient(135deg, #0EA5E9, #8B5CF6); }
+.tier-label { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+.no-badge-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); line-height: 1.6; }
+.no-badge-sub  { font-size: 10px; color: var(--text3); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
 
-.contract-list { display: grid; gap: 8px; }
-.contract-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; font-family: 'DM Mono', monospace; font-size: 12px; transition: border-color 0.15s; }
-.contract-row:hover { border-color: rgba(0,82,255,0.25); }
-.c-name { color: var(--text-muted); font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; width: 120px; flex-shrink: 0; }
-.c-addr { color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; }
-.copy-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 5px; font-size: 13px; transition: color 0.15s, background 0.15s; }
-.copy-btn:hover { color: var(--accent); background: var(--accent-soft); }
+/* ── TABS ── */
+.tabs { display: flex; gap: 8px; margin-bottom: 20px; background: var(--surface2); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+.tab-btn { flex: 1; padding: 10px; text-align: center; font-weight: 600; font-size: 13px; color: var(--text2); cursor: pointer; border-radius: 9px; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+.tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeUp 0.25s ease; }
 
-.section-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin: 24px 0 12px; }
-.footer { text-align: center; margin-top: 40px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+/* ── INPUTS WITH MAX ── */
+.input-wrap { position: relative; margin-bottom: 10px; }
+.input-wrap input {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px;
+  padding: 13px 72px 13px 16px; color: var(--text);
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+.input-wrap input::placeholder { color: var(--text3); }
+.max-btn {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  background: var(--surface); border: 1px solid var(--border2); color: var(--blue);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+  padding: 5px 11px; border-radius: 6px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px;
+}
+.max-btn:hover { background: var(--blue-soft); border-color: var(--blue); }
 
-@media (max-width: 520px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; }
-  .hero { flex-direction: column; align-items: flex-start; }
-  .hero-visual { display: none; }
+.help-t { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; line-height: 1.6; margin-top: 8px; }
+
+/* Buttons */
+.btn-primary {
+  background: var(--blue); color: #fff; border: none; padding: 13px 22px; border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: all 0.15s; box-shadow: 0 4px 20px rgba(75,139,255,0.3); width: 100%; display: block;
+}
+.btn-primary:hover:not(:disabled) { background: var(--blue-dim); transform: translateY(-1px); }
+.btn-danger {
+  background: transparent; border: 1px solid rgba(255,69,96,0.3); color: var(--red);
+  padding: 13px 22px; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; display: block;
+}
+.btn-danger:hover:not(:disabled) { background: rgba(255,69,96,0.06); transform: translateY(-1px); }
+.btn-primary:disabled, .btn-danger:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* TX Log */
+.txlog {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  max-height: 150px; overflow-y: auto; color: var(--text3); backdrop-filter: blur(10px);
+  scrollbar-width: thin; scrollbar-color: var(--border2) transparent;
+}
+.txlog::-webkit-scrollbar { width: 3px; }
+.txlog::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.le { margin-bottom: 5px; line-height: 1.6; }
+.le.s { color: var(--green); } .le.e { color: var(--red); } .le.i { color: var(--blue); } .le.p { color: var(--yellow); }
+
+/* Contracts */
+.contracts { display: grid; gap: 8px; }
+.crow {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  backdrop-filter: blur(8px); transition: border-color 0.15s;
+}
+.crow:hover { border-color: var(--border2); }
+.cname { color: var(--text3); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; min-width: 120px; }
+.caddr { color: var(--text); flex: 1; }
+.cbtn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; padding: 2px 6px; border-radius: 6px; transition: color 0.15s; }
+.cbtn:hover { color: var(--blue); }
+
+/* ── PROTOCOL STRIP ── */
+.protocol-strip {
+  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 20px 24px; margin-bottom: 32px; backdrop-filter: blur(12px);
+  position: relative; overflow: hidden;
+}
+.protocol-strip::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+.pstat { text-align: center; }
+.pstat-l { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.pstat-v { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; color: var(--text); line-height: 1; margin-bottom: 4px; letter-spacing: -0.5px; min-height: 32px; }
+.pstat-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 0.3px; }
+.pstat-divider { width: 1px; height: 48px; background: var(--border2); margin: 0 8px; }
+
+/* ── SHARE ── */
+.badge-share-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+.badge-share-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.3px; }
+.share-btn { display: flex; align-items: center; gap: 7px; background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 9px 18px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.share-btn:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+[data-theme="light"] .share-btn { background: #0f0f0f; }
+
+.share-public-btn { display: inline-flex; align-items: center; gap: 8px; background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 11px 24px; border-radius: 24px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 32px; }
+.share-public-btn:hover { background: #1a1a1a; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+[data-theme="light"] .share-public-btn { background: #0f0f0f; }
+
+/* Rules */
+.rules-grid { display: grid; }
+.rule-row { display: flex; align-items: flex-start; gap: 14px; padding: 16px 24px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.rule-row:hover { background: var(--rule-bg); }
+.rule-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.rule-body { flex: 1; }
+.rule-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.rule-desc  { font-size: 11px; color: var(--text2); line-height: 1.6; font-family: 'JetBrains Mono', monospace; }
+.rule-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 1px; padding: 4px 10px; border-radius: 20px; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+.rule-badge.green  { background: var(--green-soft);  color: var(--green);  border: 1px solid var(--green-border); }
+.rule-badge.red    { background: rgba(255,69,96,0.08); color: var(--red);   border: 1px solid rgba(255,69,96,0.2); }
+.rule-badge.yellow { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-border); }
+.rule-badge.blue   { background: var(--blue-soft);   color: var(--blue);   border: 1px solid var(--blue-border); }
+
+/* Thresholds */
+.threshold-row { display: flex; align-items: center; gap: 14px; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+.threshold-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text2); min-width: 120px; letter-spacing: 0.3px; }
+.threshold-bar-wrap { flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.threshold-bar { height: 100%; border-radius: 2px; }
+.threshold-pct { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; min-width: 70px; text-align: right; }
+
+/* Leaderboard */
+.lb-header { display: grid; grid-template-columns: 36px 1fr 90px 80px 70px; padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--rule-bg); }
+.lb-col { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); }
+.lb-col.stake, .lb-col.badge, .lb-col.score { text-align: right; }
+.lb-row { display: grid; grid-template-columns: 36px 1fr 90px 80px 70px; padding: 13px 20px; border-bottom: 1px solid var(--border); align-items: center; transition: background 0.15s; }
+.lb-row:last-child { border-bottom: none; }
+.lb-row:hover { background: var(--rule-bg); }
+.lb-row.me { background: var(--blue-soft); border-left: 2px solid var(--blue); }
+.lb-rank { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--text3); }
+.lb-rank.top1 { color: #FFD700; } .lb-rank.top2 { color: #C0C0C0; } .lb-rank.top3 { color: #CD7F32; }
+.lb-agent { display: flex; flex-direction: column; gap: 2px; }
+.lb-agent-addr { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); font-weight: 500; }
+.lb-agent-you  { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--blue); letter-spacing: 1px; }
+.lb-stake { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--green); text-align: right; font-weight: 600; }
+.lb-badge-pill { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 20px; text-align: center; float: right; }
+.lb-badge-pill.silver  { background: rgba(140,160,200,0.12); color: #9AAAC8; border: 1px solid rgba(140,160,200,0.2); }
+.lb-badge-pill.gold    { background: rgba(245,166,35,0.12);  color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.lb-badge-pill.diamond { background: rgba(99,102,241,0.12);  color: #818CF8; border: 1px solid rgba(99,102,241,0.2); }
+.lb-score { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); text-align: right; font-weight: 600; }
+.lb-empty { padding: 32px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); }
+
+/* Footer */
+.footer { text-align: center; padding-top: 32px; border-top: 1px solid var(--border); margin-top: 48px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.5px; }
+.footer a { color: var(--blue); text-decoration: none; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.reveal.vis { opacity: 1; transform: none; }
+
+@media (max-width: 560px) {
+  .stats3, .steps { grid-template-columns: 1fr 1fr; }
+  .faucet-btn span { display: none; }
+}
+@media (max-width: 380px) { .steps { grid-template-columns: 1fr; } }
+
+/* ── ACTIVITY FEED ── */
+.feed-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 20px; border-bottom: 1px solid var(--border);
+  transition: background 0.15s; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+.feed-row:hover { background: var(--rule-bg); }
+.feed-row:last-child { border-bottom: none; }
+.feed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: ping 2s infinite; }
+.feed-addr { color: var(--text); flex: 1; font-weight: 500; }
+.feed-amt  { color: var(--green); font-weight: 600; }
+.feed-time { color: var(--text3); font-size: 10px; min-width: 60px; text-align: right; }
+.feed-link { color: var(--blue); text-decoration: none; font-size: 10px; margin-left: 6px; opacity: 0.7; transition: opacity 0.15s; }
+.feed-link:hover { opacity: 1; }
+.feed-empty { padding: 24px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); }
+
+/* ── AGENT PROFILE ── */
+.profile-search-wrap { display: flex; gap: 10px; margin-bottom: 20px; }
+.profile-search-input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px;
+  padding: 13px 16px; color: var(--text); font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.profile-search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+.profile-search-input::placeholder { color: var(--text3); }
+.profile-search-btn {
+  background: var(--blue); color: #fff; border: none; padding: 0 20px;
+  border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(75,139,255,0.3);
+}
+.profile-search-btn:hover { background: var(--blue-dim); transform: translateY(-1px); }
+
+.profile-card {
+  border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--border); background: var(--surface); backdrop-filter: blur(12px);
+}
+.profile-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 16px;
+}
+.profile-avatar {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff;
+}
+.profile-avatar.silver  { background: linear-gradient(135deg, #6B7A99, #B0BDD4); }
+.profile-avatar.gold    { background: linear-gradient(135deg, #F5A623, #FFD060); }
+.profile-avatar.diamond { background: linear-gradient(135deg, #0EA5E9, #8B5CF6); }
+.profile-avatar.none    { background: var(--surface2); color: var(--text3); font-size: 18px; }
+.profile-addr-full { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); font-weight: 500; word-break: break-all; }
+.profile-tier-pill {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px; margin-top: 4px; display: inline-block;
+}
+.profile-tier-pill.silver  { background: rgba(140,160,200,0.12); color: #9AAAC8; border: 1px solid rgba(140,160,200,0.2); }
+.profile-tier-pill.gold    { background: rgba(245,166,35,0.12);  color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.profile-tier-pill.diamond { background: rgba(99,102,241,0.12);  color: #818CF8; border: 1px solid rgba(99,102,241,0.2); }
+.profile-tier-pill.none    { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+
+.profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
+.profile-stat  { padding: 18px 16px; text-align: center; border-right: 1px solid var(--border); }
+.profile-stat:last-child { border-right: none; }
+.profile-stat-v { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+.profile-stat-l { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; }
+
+.profile-actions { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: rgba(255,255,255,0.02); flex-wrap: wrap; gap: 10px; }
+.profile-url { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); word-break: break-all; flex: 1; }
+.profile-action-btns { display: flex; gap: 8px; flex-shrink: 0; }
+.profile-copy-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface2); border: 1px solid var(--border2); color: var(--text2);
+  padding: 8px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+}
+.profile-copy-btn:hover { border-color: var(--blue); color: var(--blue); }
+.profile-share-x {
+  display: flex; align-items: center; gap: 6px;
+  background: #000; border: 1px solid rgba(255,255,255,0.15); color: #fff;
+  padding: 8px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
+}
+.profile-share-x:hover { background: #1a1a1a; }
+[data-theme="light"] .profile-share-x { background: #0f0f0f; }
+
+.profile-empty {
+  padding: 32px; text-align: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); line-height: 1.8;
 }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+/* ── TX LOG LINKS ── */
+.le a { color: inherit; text-decoration: underline; opacity: 0.75; }
+.le a:hover { opacity: 1; }
+
+/* ── SHARE CARD BUTTON ── */
+.copy-card-btn {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--surface2); border: 1px solid var(--border2); color: var(--text2);
+  padding: 9px 16px; border-radius: 20px; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.copy-card-btn:hover { border-color: var(--blue); color: var(--blue); }
+
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-inner">
-    <a class="logo" href="#">
-      <div class="logo-mark">r24</div>
-      <div class="logo-text">rep<em>24</em></div>
-    </a>
-    <div class="chip chip-yellow">TESTNET</div>
-    <div style="flex:1"></div>
-    <button class="utility-btn" onclick="getMockUSDC()" title="Get Test USDC">🚰 Faucet</button>
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="themeBtn">🌙</button>
-    <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+<div class="atmo"></div>
+<canvas id="stars"></canvas>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <img src="data:image/jpeg;base64,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AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP/9k=" alt="rep24" id="logoImg" style="height:44px;width:auto;display:block;"/>
+      <div class="net-pill">Testnet</div>
+    </div>
+    <div class="hdr-right">
+      <button class="toggle" id="themeToggle" onclick="toggleTheme()">
+        <span class="ti m">🌙</span><span class="ti s">☀️</span>
+      </button>
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+    </div>
+  </header>
+
+  <div id="networkWarn">
+    ⚠ &nbsp;Switch to Base Sepolia (84532) to continue.
+    <button style="margin-left:auto;background:transparent;border:1px solid var(--yellow);color:var(--yellow);padding:6px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;" onclick="switchNetwork()">Switch</button>
   </div>
-</div>
-
-<div class="main">
-
-  <div id="networkWarn" class="alert alert-warn">
-    ⚠ Switch to Base Sepolia (Chain ID: 84532)
-    <button class="alert-btn" onclick="switchNetwork()">Switch Network</button>
+  <div id="statusBar">
+    <div class="pulse"></div>
+    <span id="walletAddr">—</span>
+    <span style="color:var(--text3);margin-left:auto;font-size:10px">Base Sepolia · Live</span>
   </div>
 
-  <div class="hero">
-    <div class="hero-text">
-      <h1>rep24 Testnet</h1>
-      <p>Stake USDC to earn your RepBadge. Test the on-chain reputation layer for the agent economy.</p>
-      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-        <span class="chip chip-yellow">Base Sepolia</span>
-        <span id="connChip" style="display:none" class="chip chip-green">● Connected</span>
+  <section class="hero">
+    <div class="hero-tag">Live on Base · Testnet</div>
+    <h1 class="hero-h1">The trust layer<br/>for <em>AI agents</em></h1>
+    <p class="hero-sub">rep24 is on-chain reputation and economic accountability built on Base. Stake real value — bad work gets slashed, good work grows your score.</p>
+    <div class="hero-stack"><b>x402</b> pays &nbsp;·&nbsp; <b>ERC-8004</b> identifies &nbsp;·&nbsp; <b>rep24</b> verifies</div>
+    <div id="heroShareWrap" style="animation:fadeUp 0.8s ease forwards 0.35s;opacity:0;display:none;">
+      <button onclick="sharePublic()" class="share-public-btn"><span>𝕏</span> Share rep24 with your network</button>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-n">Step 01</div><div class="step-t">Stake USDC</div><div class="step-d">Deposit min. 10 USDC into RepVault as your reputation bond.</div></div>
+      <div class="step"><div class="step-n">Step 02</div><div class="step-t">Earn RepBadge</div><div class="step-d">A soulbound NFT is minted on-chain as proof of your active stake.</div></div>
+      <div class="step"><div class="step-n">Step 03</div><div class="step-t">Build Rep</div><div class="step-d">Good work grows your score. Bad work gets your stake slashed.</div></div>
+    </div>
+  </section>
+
+  <div class="protocol-strip reveal">
+    <div class="pstat">
+      <div class="pstat-l">Agents Staked</div>
+      <div class="pstat-v" id="totalAgents">—</div>
+      <div class="pstat-sub">unique wallets staked</div>
+    </div>
+    <div class="pstat-divider"></div>
+    <div class="pstat">
+      <div class="pstat-l">Total USDC Staked</div>
+      <div class="pstat-v" id="totalStaked">—</div>
+      <div class="pstat-sub">locked in RepVault</div>
+    </div>
+    <div class="pstat-divider"></div>
+    <div class="pstat">
+      <div class="pstat-l">Network</div>
+      <div class="pstat-v" style="color:var(--green);font-size:14px;">● Live</div>
+      <div class="pstat-sub">Base Sepolia</div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <div class="slabel">Your Overview</div>
+    <div class="stats3">
+      <div class="scard"><div class="scard-l">Rep Score</div><div class="scard-v blue" id="repScoreVal">—</div></div>
+      <div class="scard"><div class="scard-l">Staked USDC</div><div class="scard-v green" id="stakedVal">—</div></div>
+      <div class="scard"><div class="scard-l">USDC Balance</div><div class="scard-v dim" id="usdcBalVal">—</div></div>
+    </div>
+    <div class="sbar-wrap" id="scoreBarWrap">
+      <div class="sbar-meta"><span>Reputation Progress</span><span id="scoreBarPct">0 / 100</span></div>
+      <div class="sbar-track"><div class="sbar-fill" id="scoreBarFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <div class="slabel">Rep Badge</div>
+    <div class="card">
+      <div id="badgeContent" class="badge-none">Connect wallet to view your RepBadge</div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <div class="slabel">Manage Liquidity</div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Stake & Earn Reputation</div><div class="card-icon">🔒</div></div>
+      <div class="tabs">
+        <div class="tab-btn active" onclick="switchTab('Stake')" id="tabStake">Stake</div>
+        <div class="tab-btn" onclick="switchTab('Unstake')" id="tabUnstake">Unstake</div>
+      </div>
+      <div class="tab-pane active" id="paneStake">
+        <div class="input-wrap">
+          <input type="number" id="stakeAmount" placeholder="Amount (min. 10 USDC)" min="1" step="1"/>
+          <button class="max-btn" onclick="setMax('stake')">MAX</button>
+        </div>
+        <button class="btn-primary" id="btnStake" onclick="stakeUSDC()">Stake USDC</button>
+        <div class="help-t" style="margin-top:10px">Staking mints your RepBadge NFT. Min 10 USDC · Bad work = slashed · Good work = rep grows.</div>
+      </div>
+      <div class="tab-pane" id="paneUnstake">
+        <div class="input-wrap">
+          <input type="number" id="unstakeAmount" placeholder="Amount to unstake (USDC)" min="1" step="1"/>
+          <button class="max-btn" onclick="setMax('unstake')">MAX</button>
+        </div>
+        <button class="btn-danger" id="btnUnstake" onclick="unstake()">Unstake USDC</button>
+        <div class="help-t" style="margin-top:10px">Withdrawing your full stake will pause RepScore growth and deactivate your active status.</div>
+      </div>
+      <div style="border-top:1px solid var(--border);margin-top:20px;padding-top:18px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);">Need test USDC?</div>
+        <button class="faucet-btn" onclick="getMockUSDC()">🚰 Get 1000 Mock USDC</button>
       </div>
     </div>
-    <div class="hero-visual">🔵</div>
   </div>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Rep Score</div>
-      <div class="stat-value blue" id="repScoreVal">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Staked USDC</div>
-      <div class="stat-value green" id="stakedVal">—</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">USDC Balance</div>
-      <div class="stat-value gray" id="usdcBalVal">—</div>
-    </div>
+  <div class="reveal">
+    <div class="slabel">Transaction Log</div>
+    <div class="txlog" id="txLog"><div class="le">Waiting for wallet connection...</div></div>
   </div>
 
-  <div class="score-section">
-    <div class="score-header">
-      <span class="score-title">Reputation Progress</span>
-      <span class="score-pct" id="scorePct">0 / 100</span>
-    </div>
-    <div class="bar-track">
-      <div class="bar-fill" id="barFill"></div>
+  <hr class="divider"/>
+  <div class="reveal">
+    <div class="slabel">Contract Addresses · Base Sepolia</div>
+    <div class="contracts">
+      <div class="crow"><span class="cname">RepBadge</span><span class="caddr">0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3</span><button class="cbtn" onclick="copy('0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3')">⎘</button></div>
+      <div class="crow"><span class="cname">RepScore</span><span class="caddr">0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3</span><button class="cbtn" onclick="copy('0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3')">⎘</button></div>
+      <div class="crow"><span class="cname">RepVault</span><span class="caddr">0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5</span><button class="cbtn" onclick="copy('0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5')">⎘</button></div>
+      <div class="crow"><span class="cname">MockUSDC</span><span class="caddr">0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de</span><button class="cbtn" onclick="copy('0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de')">⎘</button></div>
+      <div class="crow"><span class="cname">SlashingGovernor</span><span class="caddr">0x78ee408d6174FB4836550340a012996136bC8c77</span><button class="cbtn" onclick="copy('0x78ee408d6174FB4836550340a012996136bC8c77')">⎘</button></div>
     </div>
   </div>
 
-  <div class="section-label">Rep Badge</div>
-  <div class="card" style="margin-bottom:24px;">
-    <div class="card-head">
-      <div class="card-title">Your Badge</div>
-      <div class="card-icon">🏅</div>
-    </div>
-    <div id="badgeContent">
-      <div class="badge-empty">Connect your wallet to view your RepBadge</div>
-    </div>
-  </div>
-
-  <div class="section-label">Manage Liquidity</div>
-  <div class="card">
-    <div class="tabs">
-      <div class="tab-btn active" onclick="switchTab('stake')" id="tabStake">Stake</div>
-      <div class="tab-btn" onclick="switchTab('unstake')" id="tabUnstake">Unstake</div>
-    </div>
-
-    <div class="tab-pane active" id="paneStake">
-      <div class="input-wrapper">
-        <input type="number" id="stakeAmount" placeholder="Amount to Stake (USDC)" min="1" step="1"/>
-        <button class="max-btn" onclick="setMax('stake')">MAX</button>
+  <hr class="divider"/>
+  <div class="reveal">
+    <div class="slabel">Reputation Rules</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">How RepScore is Calculated</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);line-height:1.6;">Your score is based on stake size, stake duration, and job outcomes.</div>
       </div>
-      <button class="btn btn-primary" id="btnStake" onclick="stakeUSDC()">Stake USDC</button>
-      <p class="help" style="margin-top:12px">Staking USDC mints your RepBadge. Bad performance = stake slashed. Good work = reputation grows.</p>
-    </div>
-
-    <div class="tab-pane" id="paneUnstake">
-      <div class="input-wrapper">
-        <input type="number" id="unstakeAmount" placeholder="Amount to Unstake (USDC)" min="1" step="1"/>
-        <button class="max-btn" onclick="setMax('unstake')">MAX</button>
+      <div class="rules-grid">
+        <div class="rule-row"><div class="rule-icon" style="background:var(--blue-soft);color:var(--blue);">🔒</div><div class="rule-body"><div class="rule-title">Stake Size</div><div class="rule-desc">More USDC staked = higher base score. Silver (10+), Gold (100+), Diamond (500+).</div></div><div class="rule-badge green">+Score</div></div>
+        <div class="rule-row"><div class="rule-icon" style="background:var(--green-soft);color:var(--green);">⏱️</div><div class="rule-body"><div class="rule-title">Stake Duration</div><div class="rule-desc">The longer your stake stays active, the faster your reputation grows.</div></div><div class="rule-badge green">+Score</div></div>
+        <div class="rule-row"><div class="rule-icon" style="background:var(--green-soft);color:var(--green);">✅</div><div class="rule-body"><div class="rule-title">Completed Jobs</div><div class="rule-desc">Every successfully completed job earns rep points and increases trust rating.</div></div><div class="rule-badge green">+Score</div></div>
+        <div class="rule-row"><div class="rule-icon" style="background:rgba(255,69,96,0.08);color:var(--red);">⚠️</div><div class="rule-body"><div class="rule-title">Failed Jobs</div><div class="rule-desc">Incomplete or disputed jobs are reviewed. Repeated failures trigger governance review.</div></div><div class="rule-badge yellow">Review</div></div>
+        <div class="rule-row"><div class="rule-icon" style="background:rgba(255,69,96,0.08);color:var(--red);">⚡</div><div class="rule-body"><div class="rule-title">Slashing</div><div class="rule-desc">Malicious or negligent behaviour results in a portion of your stake being slashed by governance vote.</div></div><div class="rule-badge red">-Stake</div></div>
+        <div class="rule-row" style="border-bottom:none;"><div class="rule-icon" style="background:var(--blue-soft);color:var(--blue);">🗳️</div><div class="rule-body"><div class="rule-title">Governance Participation</div><div class="rule-desc">Voting on proposals signals good standing and contributes to protocol health.</div></div><div class="rule-badge blue">+Trust</div></div>
       </div>
-      <button class="btn btn-danger" id="btnUnstake" onclick="unstake()">Unstake USDC</button>
-      <p class="help" style="margin-top:12px">Withdrawing your entire stake will pause your RepScore growth and deactivate your active status.</p>
     </div>
   </div>
 
-  <div class="section-label">Transaction Log</div>
-  <div class="log-box" id="txLog">
-    <div class="log-entry">Waiting for wallet connection...</div>
+  <div class="reveal">
+    <div class="slabel">Slash Thresholds</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="threshold-row"><div class="threshold-label">Minor offence</div><div class="threshold-bar-wrap"><div class="threshold-bar" style="width:20%;background:var(--yellow);"></div></div><div class="threshold-pct" style="color:var(--yellow);">Up to 20%</div></div>
+      <div class="threshold-row"><div class="threshold-label">Repeated failure</div><div class="threshold-bar-wrap"><div class="threshold-bar" style="width:50%;background:linear-gradient(90deg,var(--yellow),var(--red));"></div></div><div class="threshold-pct" style="color:var(--red);">Up to 50%</div></div>
+      <div class="threshold-row" style="border-bottom:none;"><div class="threshold-label">Malicious actor</div><div class="threshold-bar-wrap"><div class="threshold-bar" style="width:100%;background:var(--red);box-shadow:0 0 12px rgba(255,69,96,0.4);"></div></div><div class="threshold-pct" style="color:var(--red);">Full slash</div></div>
+    </div>
   </div>
 
-  <div class="section-label">Contract Addresses</div>
-  <div class="contract-list">
-    <div class="contract-row">
-      <span class="c-name">RepBadge</span>
-      <span class="c-addr">0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3</span>
-      <button class="copy-btn" onclick="copyAddr('0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3')">⎘</button>
+  <hr class="divider"/>
+  <div class="reveal">
+    <div class="slabel">Agent Leaderboard</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:13px;font-weight:700;">Top Agents by Stake</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:3px;">Live rankings from RepVault · Base Sepolia</div>
+        </div>
+        <button onclick="loadLeaderboard()" style="background:var(--blue-soft);border:1px solid var(--blue-border);color:var(--blue);padding:7px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;" onmouseover="this.style.background='var(--blue)';this.style.color='#fff'" onmouseout="this.style.background='var(--blue-soft)';this.style.color='var(--blue)'">↻ Refresh</button>
+      </div>
+      <div class="lb-header">
+        <div class="lb-col">#</div><div class="lb-col">Agent</div><div class="lb-col stake">Staked</div><div class="lb-col badge">Badge</div><div class="lb-col score">Score</div>
+      </div>
+      <div id="leaderboardBody"><div style="padding:32px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">Loading leaderboard...</div></div>
     </div>
-    <div class="contract-row">
-      <span class="c-name">RepScore</span>
-      <span class="c-addr">0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3</span>
-      <button class="copy-btn" onclick="copyAddr('0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3')">⎘</button>
+  </div>
+
+
+  <!-- Activity Feed -->
+  <hr class="divider"/>
+  <div class="reveal">
+    <div class="slabel">Live Activity</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:13px;font-weight:700;">Recent Stakes</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:2px;">On-chain events · updates every 30s</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);">
+          <div class="pulse" style="flex-shrink:0"></div> Live
+        </div>
+      </div>
+      <div id="activityFeed">
+        <div class="feed-empty">Loading activity...</div>
+      </div>
     </div>
-    <div class="contract-row">
-      <span class="c-name">RepVault</span>
-      <span class="c-addr">0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5</span>
-      <button class="copy-btn" onclick="copyAddr('0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5')">⎘</button>
-    </div>
-    <div class="contract-row">
-      <span class="c-name">MockUSDC</span>
-      <span class="c-addr">0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de</span>
-      <button class="copy-btn" onclick="copyAddr('0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de')">⎘</button>
+  </div>
+
+  <!-- Agent Profile -->
+  <hr class="divider"/>
+  <div class="reveal">
+    <div class="slabel">Agent Profile</div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">Lookup Any Agent</div>
+        <div class="card-icon">🔎</div>
+      </div>
+      <div class="profile-search-wrap">
+        <input type="text" id="profileInput" class="profile-search-input" placeholder="0x address or paste any agent address..."/>
+        <button class="profile-search-btn" onclick="lookupProfile()">Lookup</button>
+      </div>
+      <div id="profileResult">
+        <div class="profile-empty">
+          Enter any wallet address to view their on-chain reputation profile.<br/>
+          <span style="color:var(--blue)">Shareable link auto-generates — perfect for demos.</span>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="footer">
-    rep24 testnet · Base Sepolia · <a href="https://twitter.com/Rep24_io" style="color:var(--accent);text-decoration:none">@Rep24_io</a>
+    rep24 · Base Sepolia Testnet ·
+    <a href="https://twitter.com/Rep24_io" target="_blank">@Rep24_io</a> ·
+    <a href="https://github.com/abdallerhnet-web/rep24" target="_blank">GitHub</a>
   </div>
 
 </div>
 
 <script>
-// ── THEME ──────────────────────────────────────
+// ── STARS ──────────────────────────────────────────────
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [];
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize();
+addEventListener('resize', () => { resize(); initStars(); });
+function initStars() {
+  stars = [];
+  const n = Math.min(80, Math.floor(W * H / 7000));
+  for (let i = 0; i < n; i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*0.8+0.1, o:Math.random()*0.5+0.1, sp:Math.random()*0.015+0.004, ph:Math.random()*Math.PI*2 });
+}
+initStars();
+function drawStars(t) {
+  ctx.clearRect(0,0,W,H);
+  stars.forEach(s => {
+    const tw = s.o*(0.5+0.5*Math.sin(t*s.sp+s.ph));
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,248,235,${tw})`; ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+requestAnimationFrame(drawStars);
+
+// ── THEME ──────────────────────────────────────────────
 function toggleTheme() {
   const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
-  localStorage.setItem('rep24-theme', isDark ? 'light' : 'dark');
+  const next = (html.getAttribute('data-theme')||'dark') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('rep24-theme', next);
+  document.getElementById('themeToggle').classList.toggle('light', next === 'light');
 }
-
 (function() {
-  const saved = localStorage.getItem('rep24-theme');
-  if (saved) {
-    document.documentElement.setAttribute('data-theme', saved);
-    document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀️' : '🌙';
-  }
+  const saved = localStorage.getItem('rep24-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  if (saved === 'light') document.getElementById('themeToggle').classList.add('light');
 })();
 
-// ── UI TABS & MAX BUTTONS ──────────────────────
-function switchTab(tab) {
-  document.getElementById('tabStake').classList.remove('active');
-  document.getElementById('tabUnstake').classList.remove('active');
-  document.getElementById('paneStake').classList.remove('active');
-  document.getElementById('paneUnstake').classList.remove('active');
+// ── SCROLL REVEAL ──────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); }});
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-  if(tab === 'stake') {
-    document.getElementById('tabStake').classList.add('active');
-    document.getElementById('paneStake').classList.add('active');
-  } else {
-    document.getElementById('tabUnstake').classList.add('active');
-    document.getElementById('paneUnstake').classList.add('active');
-  }
+// ── TABS ───────────────────────────────────────────────
+function switchTab(tab) {
+  ['Stake','Unstake'].forEach(t => {
+    document.getElementById('tab'+t).classList.remove('active');
+    document.getElementById('pane'+t).classList.remove('active');
+  });
+  document.getElementById('tab'+tab).classList.add('active');
+  document.getElementById('pane'+tab).classList.add('active');
 }
 
-// Global variables to store unformatted balances for the MAX buttons
-let rawUsdcBalance = '0';
-let rawStakedBalance = '0';
-let currentUsdcDecimals = 6;
+// ── GLOBALS ────────────────────────────────────────────
+let rawUsdcBalance = '0', rawStakedBalance = '0', currentUsdcDecimals = 6;
 
 function setMax(type) {
   if (type === 'stake') {
-    const formatted = ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals);
-    document.getElementById('stakeAmount').value = Math.floor(formatted); // Floor to prevent fractional dust errors
-  } else if (type === 'unstake') {
-    const formatted = ethers.utils.formatUnits(rawStakedBalance, 6);
-    document.getElementById('unstakeAmount').value = formatted;
+    document.getElementById('stakeAmount').value = Math.floor(parseFloat(ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals)));
+  } else {
+    document.getElementById('unstakeAmount').value = parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6)).toFixed(2);
   }
 }
 
-function updateBtnState(btnId, isLoading, text) {
-  const btn = document.getElementById(btnId);
-  btn.disabled = isLoading;
-  btn.textContent = text;
+function setBtnState(id, disabled, text) {
+  const btn = document.getElementById(id);
+  btn.disabled = disabled; btn.textContent = text;
 }
 
-// ── CONSTANTS & ABIS ───────────────────────────
-const BASE_SEPOLIA_ID = 84532;
+// ── CONSTANTS ──────────────────────────────────────────
+const BASE_SEPOLIA_CHAIN_ID = 84532;
+const PUBLIC_RPC = 'https://sepolia.base.org';
 const CONTRACTS = {
-  MockUSDC: '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
-  RepVault: '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
-  RepBadge: '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
-  RepScore: '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
+  RepBadge:         '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
+  RepScore:         '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
+  RepVault:         '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
+  SlashingGovernor: '0x78ee408d6174FB4836550340a012996136bC8c77',
+  MockUSDC:         '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
 };
-
 const ERC20_ABI = [
   'function balanceOf(address) view returns (uint256)',
   'function decimals() view returns (uint8)',
-  'function allowance(address owner, address spender) view returns (uint256)',
+  'function allowance(address, address) view returns (uint256)',
   'function approve(address, uint256) returns (bool)',
   'function mint(address, uint256)',
   'function faucet() payable',
 ];
-const VAULT_ABI = [
+const REPVAULT_ABI = [
   'function stake(address agentAddress, uint256 amount)',
   'function unstake(address agentAddress, uint256 amount)',
   'function getStakeBalance(address) view returns (uint256)',
+  'event Staked(address indexed agent, uint256 amount)',
 ];
-const BADGE_ABI = ['function balanceOf(address) view returns (uint256)'];
-const SCORE_ABI = [
+const REPBADGE_ABI = ['function balanceOf(address) view returns (uint256)'];
+const REPSCORE_ABI = [
   'function getRepScore(address) view returns (uint256)',
-  'function scores(address) view returns (uint256)', 
-  'function scoreOf(address) view returns (uint256)', 
+  'function scores(address) view returns (uint256)',
+  'function scoreOf(address) view returns (uint256)',
 ];
 
 let provider, signer, userAddress;
-let usdc, vault, badge, score;
+let usdcContract, vaultContract, badgeContract, scoreContract;
 
-function log(msg, type = 'info') {
-  const box = document.getElementById('txLog');
-  const t = new Date().toLocaleTimeString('en-US', {hour12:false});
-  const el = document.createElement('div');
-  el.className = `log-entry ${type}`;
-  el.textContent = `[${t}] ${msg}`;
-  box.insertBefore(el, box.firstChild);
+// ── LOG ────────────────────────────────────────────────
+function log(msg, type = 'i') {
+  const el = document.getElementById('txLog');
+  const d = document.createElement('div');
+  d.className = `le ${type}`;
+  d.textContent = `[${new Date().toLocaleTimeString('en-US',{hour12:false})}] ${msg}`;
+  el.insertBefore(d, el.firstChild);
 }
 
-// ── CONNECT ────────────────────────────────────
+// ── CONNECT ────────────────────────────────────────────
 async function connectWallet() {
-  if (!window.ethereum) { log('No wallet found — install MetaMask', 'error'); return; }
+  if (!window.ethereum) { log('No wallet detected — install MetaMask', 'e'); return; }
   try {
     await window.ethereum.request({ method: 'eth_requestAccounts' });
     provider = new ethers.providers.Web3Provider(window.ethereum);
     signer = provider.getSigner();
     userAddress = await signer.getAddress();
     const net = await provider.getNetwork();
-
-    if (net.chainId !== BASE_SEPOLIA_ID) {
+    if (net.chainId !== BASE_SEPOLIA_CHAIN_ID) {
       document.getElementById('networkWarn').classList.add('show');
+      log('Wrong network — switch to Base Sepolia', 'e');
     } else {
       document.getElementById('networkWarn').classList.remove('show');
     }
-
-    const short = userAddress.slice(0,6) + '...' + userAddress.slice(-4);
+    const short = userAddress.slice(0,6)+'...'+userAddress.slice(-4);
+    document.getElementById('walletAddr').textContent = short;
+    document.getElementById('statusBar').classList.add('show');
     const btn = document.getElementById('connectBtn');
-    btn.textContent = short;
-    btn.classList.add('connected');
-    document.getElementById('connChip').style.display = 'inline-flex';
-
+    btn.textContent = short; btn.classList.add('connected');
     initContracts();
     await loadData();
-    log(`Connected: ${userAddress}`, 'success');
-
+    log(`Wallet connected: ${userAddress}`, 's');
     window.ethereum.on('accountsChanged', () => location.reload());
     window.ethereum.on('chainChanged',    () => location.reload());
-  } catch(e) { log(`Connection error: ${e.message}`, 'error'); }
+  } catch(e) { log(`Connection failed: ${e.message}`, 'e'); }
 }
 
 async function switchNetwork() {
   try {
-    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{chainId:'0x14A34'}] });
+    await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:'0x14A34'}] });
   } catch(e) {
-    if (e.code === 4902) {
-      await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
-        chainId: '0x14A34', chainName: 'Base Sepolia Testnet',
-        rpcUrls: ['https://sepolia.base.org'],
-        nativeCurrency: { name:'ETH', symbol:'ETH', decimals:18 },
-        blockExplorerUrls: ['https://sepolia.basescan.org'],
-      }]});
-    }
+    if (e.code === 4902) await window.ethereum.request({ method:'wallet_addEthereumChain', params:[{
+      chainId:'0x14A34', chainName:'Base Sepolia', rpcUrls:['https://sepolia.base.org'],
+      nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18}, blockExplorerUrls:['https://sepolia.basescan.org'],
+    }]});
   }
 }
 
 function initContracts() {
-  usdc  = new ethers.Contract(CONTRACTS.MockUSDC,  ERC20_ABI,  signer);
-  vault = new ethers.Contract(CONTRACTS.RepVault,  VAULT_ABI,  signer);
-  badge = new ethers.Contract(CONTRACTS.RepBadge,  BADGE_ABI,  signer);
-  score = new ethers.Contract(CONTRACTS.RepScore,  SCORE_ABI,  signer);
+  usdcContract  = new ethers.Contract(CONTRACTS.MockUSDC,  ERC20_ABI,    signer);
+  vaultContract = new ethers.Contract(CONTRACTS.RepVault,  REPVAULT_ABI, signer);
+  badgeContract = new ethers.Contract(CONTRACTS.RepBadge,  REPBADGE_ABI, signer);
+  scoreContract = new ethers.Contract(CONTRACTS.RepScore,  REPSCORE_ABI, signer);
 }
 
-// ── LOAD DATA ──────────────────────────────────
+// ── LOAD DATA ──────────────────────────────────────────
 async function loadData() {
-  log('Fetching latest blockchain data...', 'info');
-  
+  if (!userAddress) return;
+  log('Loading data...', 'i');
   try {
-    currentUsdcDecimals = await usdc.decimals();
-    rawUsdcBalance = await usdc.balanceOf(userAddress);
-    document.getElementById('usdcBalVal').textContent = parseFloat(ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals)).toFixed(2);
-  } catch (err) { console.error("USDC Load Error:", err); }
+    // USDC balance
+    try {
+      currentUsdcDecimals = await usdcContract.decimals();
+      rawUsdcBalance = await usdcContract.balanceOf(userAddress);
+      document.getElementById('usdcBalVal').textContent =
+        parseFloat(ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals))
+          .toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    } catch {}
 
-  try {
-    rawStakedBalance = await vault.getStakeBalance(userAddress);
-    document.getElementById('stakedVal').textContent = parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6)).toFixed(2);
-  } catch (err) { console.error("Vault Load Error:", err); }
+    // Staked balance
+    try {
+      rawStakedBalance = await vaultContract.getStakeBalance(userAddress);
+      document.getElementById('stakedVal').textContent =
+        parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6)).toFixed(2);
+    } catch {}
 
-  try {
-    let rawScore;
-    try { rawScore = await score.getRepScore(userAddress); }
-    catch {
-      try { rawScore = await score.scores(userAddress); }
-      catch { rawScore = await score.scoreOf(userAddress); }
+    // Score — try multiple signatures
+    let score = 0;
+    try {
+      let raw;
+      try       { raw = await scoreContract.getRepScore(userAddress); }
+      catch     { try { raw = await scoreContract.scores(userAddress); }
+      catch     { raw = await scoreContract.scoreOf(userAddress); } }
+      score = raw.toNumber ? raw.toNumber() : parseInt(raw.toString());
+    } catch {}
+    document.getElementById('repScoreVal').textContent = score;
+    const pct = Math.min(score, 100);
+    document.getElementById('scoreBarFill').style.width = pct + '%';
+    document.getElementById('scoreBarPct').textContent  = `${score} / 100`;
+    document.getElementById('scoreBarWrap').style.display = 'block';
+
+    // Badge
+    let hasBadge = false;
+    try { hasBadge = (await badgeContract.balanceOf(userAddress)).toNumber() > 0; } catch {}
+    const stakedNum = parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6));
+    const bc = document.getElementById('badgeContent');
+
+    // Show/hide hero share button based on badge status
+    const heroShare = document.getElementById('heroShareWrap');
+    if (heroShare) heroShare.style.display = hasBadge ? 'block' : 'none';
+
+    if (hasBadge) {
+      let tier, tierClass, tierIcon;
+      if      (stakedNum >= 500) { tier='Diamond'; tierClass='diamond'; tierIcon='💎'; }
+      else if (stakedNum >= 100) { tier='Gold';    tierClass='gold';    tierIcon='🥇'; }
+      else                       { tier='Silver';  tierClass='silver';  tierIcon='🥈'; }
+
+      bc.innerHTML = `
+        <div class="badge-card ${tierClass} badge-glow">
+          <div class="badge-top">
+            <div class="badge-shimmer"></div>
+            <div class="badge-icon-wrap">${tierIcon}</div>
+            <div class="badge-info">
+              <div class="badge-eyebrow">Soulbound RepBadge</div>
+              <div class="badge-tier-name">${tier} Tier</div>
+              <div class="badge-network">On-chain · Verified ✓</div>
+            </div>
+            <div class="badge-network-pill">Base Sepolia</div>
+          </div>
+          <div class="badge-stats">
+            <div class="bstat"><div class="bstat-v">$${stakedNum.toFixed(2)}</div><div class="bstat-l">Staked USDC</div></div>
+            <div class="bstat"><div class="bstat-v blue">${score}</div><div class="bstat-l">Rep Score</div></div>
+            <div class="bstat"><div class="bstat-v green">Active</div><div class="bstat-l">Status</div></div>
+          </div>
+          <div class="badge-share-row">
+            <div class="badge-share-text">Flex your reputation on X</div>
+            <button class="share-btn" onclick="shareBadge('${tier}','${stakedNum.toFixed(2)}','${score}')"><span>𝕏</span> Share Badge</button>
+          </div>
+        </div>`;
+    } else {
+      bc.innerHTML = `
+        <div class="no-badge-wrap">
+          <div class="no-badge-tiers">
+            <div class="tier-preview"><div class="tier-dot s">🥈</div><div class="tier-label">Silver</div><div class="tier-label" style="font-size:8px">10+ USDC</div></div>
+            <div class="tier-preview"><div class="tier-dot g">🥇</div><div class="tier-label">Gold</div><div class="tier-label" style="font-size:8px">100+ USDC</div></div>
+            <div class="tier-preview"><div class="tier-dot d">💎</div><div class="tier-label">Diamond</div><div class="tier-label" style="font-size:8px">500+ USDC</div></div>
+          </div>
+          <div class="no-badge-text">No RepBadge found — stake USDC below to mint yours</div>
+          <div class="no-badge-sub">Silver · Gold · Diamond tiers based on stake amount</div>
+        </div>`;
     }
-    const s = parseInt(rawScore.toString());
-    document.getElementById('repScoreVal').textContent = s;
-    const pct = Math.min(s, 100);
-    document.getElementById('barFill').style.width = pct + '%';
-    document.getElementById('scorePct').textContent = `${s} / 100`;
-  } catch (err) { console.error("Score Load Error:", err); }
-
-  try {
-    const hasBadge = (await badge.balanceOf(userAddress)).toNumber() > 0;
-    document.getElementById('badgeContent').innerHTML = hasBadge
-      ? `<div class="badge-display">
-           <div class="badge-icon-wrap">🏅</div>
-           <div>
-             <div class="badge-info-name">RepBadge Active</div>
-             <div class="badge-info-sub">On-chain reputation bond · Base Sepolia</div>
-           </div>
-           <div style="margin-left:auto;color:var(--green);font-family:'DM Mono',monospace;font-size:12px;font-weight:500">✓ LIVE</div>
-         </div>`
-      : `<div class="badge-empty">No RepBadge found — stake USDC below to mint yours</div>`;
-  } catch (err) { console.error("Badge Load Error:", err); }
+    log('Data loaded', 's');
+  } catch(e) { log(`Data error: ${e.message}`, 'e'); }
 }
 
-// ── STAKE ──────────────────────────────────────
+// ── PROTOCOL STATS ─────────────────────────────────────
+async function loadProtocolStats() {
+  try {
+    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
+    const usdcR  = new ethers.Contract(CONTRACTS.MockUSDC, ERC20_ABI, rp);
+    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
+
+    try {
+      const raw = await usdcR.balanceOf(CONTRACTS.RepVault);
+      const total = parseFloat(ethers.utils.formatUnits(raw, 6));
+      document.getElementById('totalStaked').textContent = total >= 1000 ? `$${(total/1000).toFixed(1)}K` : `$${total.toFixed(0)}`;
+    } catch { document.getElementById('totalStaked').textContent = '$0'; }
+
+    try {
+      const events = await vaultR.queryFilter(vaultR.filters.Staked(), 0, 'latest');
+      document.getElementById('totalAgents').textContent = new Set(events.map(e => e.args[0].toLowerCase())).size;
+    } catch {
+      try {
+        const badgeR = new ethers.Contract(CONTRACTS.RepBadge, ['function totalSupply() view returns (uint256)'], rp);
+        const s = await badgeR.totalSupply();
+        document.getElementById('totalAgents').textContent = s.toNumber ? s.toNumber() : parseInt(s.toString());
+      } catch { document.getElementById('totalAgents').textContent = '0'; }
+    }
+  } catch {
+    document.getElementById('totalStaked').textContent = '$0';
+    document.getElementById('totalAgents').textContent = '0';
+  }
+}
+
+// ── STAKE ──────────────────────────────────────────────
 async function stakeUSDC() {
-  if (!signer) { log('Connect wallet first', 'error'); return; }
+  if (!signer) { log('Connect wallet first', 'e'); return; }
   const amt = document.getElementById('stakeAmount').value;
-  if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'error'); return; }
-  
-  updateBtnState('btnStake', true, 'Processing...');
-  
+  if (!amt || isNaN(amt) || +amt < 10) { log('Minimum stake is 10 USDC', 'e'); return; }
+  setBtnState('btnStake', true, 'Processing...');
   try {
     const amount = ethers.utils.parseUnits(amt.toString(), currentUsdcDecimals);
-    const currentAllowance = await usdc.allowance(userAddress, CONTRACTS.RepVault);
-    
-    if (currentAllowance.lt(amount)) {
-        updateBtnState('btnStake', true, 'Approving USDC...');
-        log(`Approving ${amt} USDC...`, 'pending');
-        const a = await usdc.approve(CONTRACTS.RepVault, amount);
-        await a.wait();
-        log(`Approved ✓ Waiting for network...`, 'pending');
-        await new Promise(resolve => setTimeout(resolve, 3000));
+    const allowance = await usdcContract.allowance(userAddress, CONTRACTS.RepVault);
+    if (allowance.lt(amount)) {
+      setBtnState('btnStake', true, 'Approving USDC...');
+      log(`Approving ${amt} USDC...`, 'p');
+      const a = await usdcContract.approve(CONTRACTS.RepVault, amount);
+      await a.wait();
+      log('Approved ✓ — waiting for network...', 'p');
+      await new Promise(r => setTimeout(r, 3000));
+    }
+    setBtnState('btnStake', true, 'Staking...');
+    log(`Staking ${amt} USDC...`, 'p');
+    const tx = await vaultContract.stake(userAddress, amount);
+    await tx.wait();
+    setBtnState('btnStake', true, '✓ Staked');
+    logTx('Staked ✓', 's', tx.hash);
+    document.getElementById('stakeAmount').value = '';
+    await new Promise(r => setTimeout(r, 4000));
+    await loadData(); loadProtocolStats();
+  } catch(e) { log(`Stake failed: ${e.reason || e.message}`, 'e'); }
+  setBtnState('btnStake', false, 'Stake USDC');
+}
+
+// ── UNSTAKE ────────────────────────────────────────────
+async function unstake() {
+  if (!signer) { log('Connect wallet first', 'e'); return; }
+  const amt = document.getElementById('unstakeAmount').value;
+  if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'e'); return; }
+  setBtnState('btnUnstake', true, 'Processing...');
+  try {
+    const amount = ethers.utils.parseUnits(amt.toString(), 6); // Vault always expects 6 decimals
+    log(`Unstaking ${amt} USDC...`, 'p');
+    const tx = await vaultContract.unstake(userAddress, amount);
+    await tx.wait();
+    setBtnState('btnUnstake', true, '✓ Unstaked');
+    logTx('Unstaked ✓', 's', tx.hash);
+    document.getElementById('unstakeAmount').value = '';
+    await new Promise(r => setTimeout(r, 4000));
+    await loadData(); loadProtocolStats();
+  } catch(e) { log(`Unstake failed: ${e.reason || e.message}`, 'e'); }
+  setBtnState('btnUnstake', false, 'Unstake USDC');
+}
+
+// ── FAUCET ─────────────────────────────────────────────
+async function getMockUSDC() {
+  if (!signer) { log('Connect wallet first', 'e'); return; }
+  try {
+    log('Minting 1000 mock USDC...', 'p');
+    let tx;
+    try { tx = await usdcContract.mint(userAddress, ethers.utils.parseUnits('1000', currentUsdcDecimals)); }
+    catch { tx = await usdcContract.faucet({ value: 0 }); }
+    await tx.wait();
+    log('Got 1000 mock USDC ✓', 's');
+    await new Promise(r => setTimeout(r, 3000));
+    await loadData();
+  } catch(e) { log(`Faucet failed: ${e.reason || e.message}`, 'e'); }
+}
+
+// ── SHARE ──────────────────────────────────────────────
+function sharePublic() {
+  const text = `rep24 is building the trust layer for AI agents on Base 🤖⛓️\n\nAgents stake USDC → earn a RepBadge → build on-chain reputation\nBad work gets slashed. Good work grows your score.\n\nx402 pays · ERC-8004 identifies · rep24 verifies\n\n@Rep24_io`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://abdallerhnet-web.github.io/rep24/')}`, '_blank');
+}
+function shareBadge(tier, staked, score) {
+  const icons = { Silver:'🥈', Gold:'🥇', Diamond:'💎' };
+  const text = `Just earned my ${icons[tier]||'🏅'} ${tier} RepBadge on @Rep24_io\n\nStaked $${staked} USDC on Base · Rep Score: ${score}\n\nx402 pays · ERC-8004 identifies · rep24 verifies\n\nThe trust layer for AI agents 🤖⛓️`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://abdallerhnet-web.github.io/rep24/')}`, '_blank');
+}
+
+// ── LEADERBOARD ────────────────────────────────────────
+async function loadLeaderboard() {
+  const body = document.getElementById('leaderboardBody');
+  body.innerHTML = `<div class="lb-empty">Fetching on-chain data...</div>`;
+  try {
+    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
+    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
+    const scoreR = new ethers.Contract(CONTRACTS.RepScore, REPSCORE_ABI, rp);
+
+    const events = await vaultR.queryFilter(vaultR.filters.Staked(), 0, 'latest');
+    if (events.length === 0) { body.innerHTML = `<div class="lb-empty">No agents staked yet — be the first! 🚀</div>`; return; }
+
+    const uniqueAddrs = [...new Set(events.map(e => e.args[0].toLowerCase()))];
+    const rows = await Promise.all(uniqueAddrs.map(async addr => {
+      let stake = 0, score = 0;
+      try { stake = parseFloat(ethers.utils.formatUnits(await vaultR.getStakeBalance(addr), 6)); } catch {}
+      try {
+        let raw;
+        try       { raw = await scoreR.getRepScore(addr); }
+        catch     { try { raw = await scoreR.scores(addr); }
+        catch     { raw = await scoreR.scoreOf(addr); } }
+        score = raw.toNumber ? raw.toNumber() : parseInt(raw.toString());
+      } catch {}
+      return { addr, stake, score };
+    }));
+
+    const sorted = rows.filter(r => r.stake > 0).sort((a,b) => b.stake - a.stake).slice(0, 10);
+    if (sorted.length === 0) { body.innerHTML = `<div class="lb-empty">No active stakes found yet.</div>`; return; }
+
+    const rankIcons = ['🥇','🥈','🥉'];
+    body.innerHTML = sorted.map((r, i) => {
+      const isMe = userAddress && r.addr === userAddress.toLowerCase();
+      let badgeTier = 'silver', badgeLabel = '🥈 Silver';
+      if (r.stake >= 500) { badgeTier = 'diamond'; badgeLabel = '💎 Diamond'; }
+      else if (r.stake >= 100) { badgeTier = 'gold'; badgeLabel = '🥇 Gold'; }
+      return `
+        <div class="lb-row ${isMe?'me':''}">
+          <div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${rankIcons[i]||i+1}</div>
+          <div class="lb-agent">
+            <div class="lb-agent-addr">${r.addr.slice(0,6)+'...'+r.addr.slice(-4)}</div>
+            ${isMe?'<div class="lb-agent-you">← YOU</div>':''}
+          </div>
+          <div class="lb-stake">$${r.stake.toFixed(0)}</div>
+          <div><span class="lb-badge-pill ${badgeTier}">${badgeLabel}</span></div>
+          <div class="lb-score">${r.score}</div>
+        </div>`;
+    }).join('');
+  } catch(e) { body.innerHTML = `<div class="lb-empty">Could not load — ${e.message}</div>`; }
+}
+
+function copy(addr) {
+  navigator.clipboard.writeText(addr).then(() => log(`Copied: ${addr}`, 'i'));
+}
+
+
+// Logo theme handling
+function updateLogoTheme() {
+  const img = document.getElementById('logoImg');
+  if (!img) return;
+  const isDark = (document.documentElement.getAttribute('data-theme')||'dark') === 'dark';
+  img.style.filter = isDark ? 'invert(1) brightness(2)' : 'none';
+}
+updateLogoTheme();
+const _origToggle = toggleTheme;
+toggleTheme = function() { _origToggle(); updateLogoTheme(); };
+
+
+// ── CLICKABLE TX LOG ───────────────────────────────────────────────────────────
+function logTx(msg, type, hash) {
+  const el = document.getElementById('txLog');
+  const d = document.createElement('div');
+  d.className = `le ${type}`;
+  const t = new Date().toLocaleTimeString('en-US', {hour12: false});
+  if (hash) {
+    d.innerHTML = `[${t}] ${msg} <a href="https://sepolia.basescan.org/tx/${hash}" target="_blank" rel="noopener">↗ Basescan</a>`;
+  } else {
+    d.textContent = `[${t}] ${msg}`;
+  }
+  el.insertBefore(d, el.firstChild);
+}
+
+// ── ACTIVITY FEED ──────────────────────────────────────────────────────────────
+async function loadActivityFeed() {
+  const feed = document.getElementById('activityFeed');
+  try {
+    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
+    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
+    const events = await vaultR.queryFilter(vaultR.filters.Staked(), 0, 'latest');
+    if (!events.length) { feed.innerHTML = '<div class="feed-empty">No activity yet — be the first to stake 🚀</div>'; return; }
+
+    // Get block timestamps for the most recent 8 events
+    const recent = [...events].reverse().slice(0, 8);
+    const now = Math.floor(Date.now() / 1000);
+
+    const rows = await Promise.all(recent.map(async (e) => {
+      let ts = now;
+      try {
+        const block = await rp.getBlock(e.blockNumber);
+        ts = block.timestamp;
+      } catch {}
+      const ago = now - ts;
+      let timeStr;
+      if (ago < 60)       timeStr = `${ago}s ago`;
+      else if (ago < 3600) timeStr = `${Math.floor(ago/60)}m ago`;
+      else if (ago < 86400) timeStr = `${Math.floor(ago/3600)}h ago`;
+      else                  timeStr = `${Math.floor(ago/86400)}d ago`;
+
+      const addr  = e.args[0];
+      const amt   = parseFloat(ethers.utils.formatUnits(e.args[1], 6)).toFixed(0);
+      const short = addr.slice(0,6)+'...'+addr.slice(-4);
+      const txHash = e.transactionHash;
+      const isMe  = userAddress && addr.toLowerCase() === userAddress.toLowerCase();
+      return `<div class="feed-row">
+        <div class="feed-dot"></div>
+        <div class="feed-addr">${short}${isMe ? ' <span style="color:var(--blue);font-size:9px">YOU</span>' : ''}</div>
+        <div class="feed-amt">+$${amt} USDC</div>
+        <div class="feed-time">${timeStr}</div>
+        <a class="feed-link" href="https://sepolia.basescan.org/tx/${txHash}" target="_blank" rel="noopener">↗</a>
+      </div>`;
+    }));
+    feed.innerHTML = rows.join('');
+  } catch(e) {
+    feed.innerHTML = `<div class="feed-empty">Could not load activity — ${e.message}</div>`;
+  }
+}
+
+// ── AGENT PROFILE ──────────────────────────────────────────────────────────────
+async function lookupProfile(addr) {
+  const input = document.getElementById('profileInput');
+  const target = addr || input.value.trim();
+  if (!target || !/^0x[0-9a-fA-F]{40}$/.test(target)) {
+    document.getElementById('profileResult').innerHTML =
+      '<div class="profile-empty" style="color:var(--red)">Enter a valid 0x wallet address.</div>';
+    return;
+  }
+  if (input) input.value = target;
+
+  // Update URL hash for shareability
+  history.replaceState(null, '', '#' + target);
+
+  const result = document.getElementById('profileResult');
+  result.innerHTML = '<div class="profile-empty">Loading profile...</div>';
+
+  try {
+    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
+    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
+    const scoreR = new ethers.Contract(CONTRACTS.RepScore, REPSCORE_ABI, rp);
+    const badgeR = new ethers.Contract(CONTRACTS.RepBadge, REPBADGE_ABI, rp);
+
+    let stake = 0, score = 0, hasBadge = false;
+    try { stake = parseFloat(ethers.utils.formatUnits(await vaultR.getStakeBalance(target), 6)); } catch {}
+    try {
+      let raw;
+      try       { raw = await scoreR.getRepScore(target); }
+      catch     { try { raw = await scoreR.scores(target); }
+      catch     { raw = await scoreR.scoreOf(target); } }
+      score = raw.toNumber ? raw.toNumber() : parseInt(raw.toString());
+    } catch {}
+    try { hasBadge = (await badgeR.balanceOf(target)).toNumber() > 0; } catch {}
+
+    let tier = 'none', tierIcon = '—', tierLabel = 'No Badge';
+    if (hasBadge) {
+      if      (stake >= 500) { tier='diamond'; tierIcon='💎'; tierLabel='Diamond'; }
+      else if (stake >= 100) { tier='gold';    tierIcon='🥇'; tierLabel='Gold'; }
+      else                   { tier='silver';  tierIcon='🥈'; tierLabel='Silver'; }
     }
 
-    updateBtnState('btnStake', true, 'Confirming Stake...');
-    log(`Staking ${amt} USDC...`, 'pending');
-    const tx = await vault.stake(userAddress, amount);
-    await tx.wait();
-    
-    updateBtnState('btnStake', true, 'Success ✓');
-    log(`Staked ✓ · basescan.org/tx/${tx.hash.slice(0,12)}...`, 'success');
-    
-    document.getElementById('stakeAmount').value = '';
-    await new Promise(resolve => setTimeout(resolve, 4000));
-    await loadData();
-    
-  } catch(e) { 
-    log(`Stake failed: ${e.reason || e.message}`, 'error'); 
+    const shortAddr = target.slice(0,8)+'...'+target.slice(-6);
+    const profileUrl = window.location.origin + window.location.pathname + '#' + target;
+
+    result.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="profile-avatar ${tier}">${tierIcon}</div>
+          <div>
+            <div class="profile-addr-full">${target}</div>
+            <div class="profile-tier-pill ${tier}">${tierLabel} ${hasBadge ? '· Verified ✓' : '· No Badge'}</div>
+          </div>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-v blue">$${stake.toFixed(0)}</div>
+            <div class="profile-stat-l">Staked</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-v" style="color:var(--blue)">${score}</div>
+            <div class="profile-stat-l">Rep Score</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-v" style="color:${hasBadge ? 'var(--green)' : 'var(--text3)'}">
+              ${hasBadge ? 'Active' : 'None'}
+            </div>
+            <div class="profile-stat-l">Status</div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <div class="profile-url">${profileUrl}</div>
+          <div class="profile-action-btns">
+            <button class="profile-copy-btn" onclick="copyProfileLink('${profileUrl}')">⎘ Copy Link</button>
+            <button class="copy-card-btn" onclick="copyShareCard('${shortAddr}','${tierIcon}','${tierLabel}','${stake.toFixed(0)}','${score}')">📋 Copy Card</button>
+            <button class="profile-share-x" onclick="shareProfile('${target}','${tierIcon}','${tierLabel}','${stake.toFixed(0)}','${score}')"><span>𝕏</span> Share</button>
+          </div>
+        </div>
+      </div>`;
+  } catch(e) {
+    result.innerHTML = `<div class="profile-empty" style="color:var(--red)">Error loading profile: ${e.message}</div>`;
   }
-  
-  updateBtnState('btnStake', false, 'Stake USDC');
 }
 
-// ── UNSTAKE ────────────────────────────────────
-async function unstake() {
-  if (!signer) { log('Connect wallet first', 'error'); return; }
-  const amt = document.getElementById('unstakeAmount').value;
-  if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'error'); return; }
+function copyProfileLink(url) {
+  navigator.clipboard.writeText(url).then(() => log('Profile link copied ✓', 's'));
+}
 
-  updateBtnState('btnUnstake', true, 'Processing...');
-  
-  try {
-    // Vault always expects 6 decimals for staking logic per the contract
-    const amount = ethers.utils.parseUnits(amt.toString(), 6);
-    
-    updateBtnState('btnUnstake', true, 'Confirming Unstake...');
-    log(`Unstaking ${amt} USDC...`, 'pending');
-    
-    const tx = await vault.unstake(userAddress, amount);
-    await tx.wait();
-    
-    updateBtnState('btnUnstake', true, 'Success ✓');
-    log(`Unstaked ✓ · ${tx.hash.slice(0,12)}...`, 'success');
-    
-    document.getElementById('unstakeAmount').value = '';
-    await new Promise(resolve => setTimeout(resolve, 4000));
-    await loadData();
-    
-  } catch(e) { 
-    log(`Unstake failed: ${e.reason || e.message}`, 'error'); 
+function shareProfile(addr, icon, tier, stake, score) {
+  const short = addr.slice(0,6)+'...'+addr.slice(-4);
+  const url   = window.location.origin + window.location.pathname + '#' + addr;
+  const text  = `${icon} ${short} — ${tier} rep24 Agent\n\nStaked $${stake} USDC · Rep Score: ${score}\n\nVerified on-chain · Base Sepolia\n\n@Rep24_io`;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+}
+
+// ── SHARE CARD (copy to clipboard as text card) ────────────────────────────────
+function copyShareCard(addr, icon, tier, stake, score) {
+  const card =
+`┌─────────────────────────────┐
+│  rep24 · Agent Profile      │
+│                             │
+│  ${icon} ${(tier + ' Tier').padEnd(24)}│
+│  ${addr.padEnd(28)}│
+│                             │
+│  Staked   $${stake.toString().padEnd(18)}│
+│  Rep Score ${score.toString().padEnd(18)}│
+│  Status   Active ✓          │
+│                             │
+│  Base Sepolia · rep24.xyz   │
+└─────────────────────────────┘`;
+  navigator.clipboard.writeText(card).then(() => log('Share card copied to clipboard ✓', 's'));
+}
+
+// ── CHECK URL HASH FOR PROFILE ─────────────────────────────────────────────────
+function checkUrlHash() {
+  const hash = window.location.hash.slice(1);
+  if (/^0x[0-9a-fA-F]{40}$/.test(hash)) {
+    const input = document.getElementById('profileInput');
+    if (input) input.value = hash;
+    setTimeout(() => lookupProfile(hash), 800);
   }
-  
-  updateBtnState('btnUnstake', false, 'Unstake USDC');
 }
 
-// ── FAUCET ─────────────────────────────────────
-async function getMockUSDC() {
-  if (!signer) { log('Connect wallet first', 'error'); return; }
-  try {
-    log('Requesting Mock USDC...', 'pending');
-    let tx;
-    try { tx = await usdc.mint(userAddress, ethers.utils.parseUnits('1000', currentUsdcDecimals)); }
-    catch { tx = await usdc.faucet({ value: 0 }); }
-    await tx.wait();
-    log('Got Mock USDC ✓', 'success');
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    await loadData();
-  } catch(e) { log(`Faucet failed: ${e.reason || e.message} — try Basescan directly`, 'error'); }
-}
-
-// ── COPY ───────────────────────────────────────
-function copyAddr(addr) {
-  navigator.clipboard.writeText(addr).then(() => log(`Copied ${addr.slice(0,10)}...`, 'info'));
-}
+// Load on page open
+loadProtocolStats();
+loadLeaderboard();
+loadActivityFeed();
+setInterval(loadActivityFeed, 30000);
+checkUrlHash();
 </script>
 </body>
 </html>
+
