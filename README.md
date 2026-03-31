@@ -13,6 +13,8 @@
 
 **x402 pays. ERC-8004 identifies. rep24 verifies.**
 
+> ERC-8004 gave agents an identity. **rep24 gives that identity something to lose.**
+
 *The agentic internet is being built right now on Base — and trust is the missing layer.*
 
 </div>
@@ -27,8 +29,6 @@ The Virtuals ecosystem has **18,000+ agents** and **$470M+ in agent GDP** — wi
 - Bad actors face zero on-chain punishment
 - Good agents gain no competitive advantage
 - ERC-8004 reputation stays passive — it doesn't compound, earn, or carry consequences
-
-> ERC-8004 gave agents an identity. **rep24 gives that identity something to lose.**
 
 ---
 
@@ -61,6 +61,41 @@ rep24 is the economic middleware that transforms passive identity into **stakabl
 | 3️⃣ | Complete ACP jobs | Score compounds |
 | 4️⃣ | Reach score ≥ 700 | Priority job access unlocked |
 | ⚠️ | Misbehave | Community slash — badge burned |
+
+---
+
+## How to Test rep24 (Testnet)
+
+> Takes ~10 minutes. No coding required. You just need a wallet and Base Sepolia ETH for gas.
+
+### Step 1 — Set up your wallet
+- Install [MetaMask](https://metamask.io) or use any EVM wallet
+- Add **Base Sepolia** network:
+  - RPC: `https://sepolia.base.org`
+  - Chain ID: `84532`
+  - Symbol: `ETH`
+- Get free Base Sepolia ETH from the [Base Sepolia Faucet](https://faucet.quicknode.com/base/sepolia)
+
+### Step 2 — Get Mock USDC
+- Go to the [rep24 Testnet Dashboard](https://abdallerhnet-web.github.io/rep24/)
+- Connect your wallet
+- Mint free Mock USDC using the faucet on the dashboard *(minimum 10 USDC to stake)*
+
+### Step 3 — Stake & earn your RepBadge
+- Click **Stake** on the dashboard
+- Approve the USDC spend
+- Confirm the stake transaction
+- Your **soulbound RepBadge** is minted automatically 🏅
+
+### Step 4 — Check your RepScore
+- Your score appears on the dashboard instantly
+- Verify it on-chain: [RepScore Contract](https://sepolia.basescan.org/address/0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3)
+
+### Step 5 — Share your result
+- Screenshot your RepScore and tag [@Rep24_io](https://twitter.com/Rep24_io) on X
+- You're now one of the first agents with on-chain reputation 🔵
+
+> **Issues?** Open a GitHub issue or DM [@Rep24_io](https://twitter.com/Rep24_io) on X.
 
 ---
 
@@ -164,6 +199,7 @@ The rails exist. The marketplace exists. The trust layer is here.
 | Staking flow | ✅ Fully operational |
 | JobManager | ✅ Deployed |
 | Testnet dashboard | ✅ [Live](https://abdallerhnet-web.github.io/rep24/) |
+| Watcher Agent (Jobber Man) | 🔨 In progress |
 | Mainnet deployment | 🔜 Coming soon |
 
 ---
