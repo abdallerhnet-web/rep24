@@ -184,7 +184,7 @@ Commerce:     Virtuals ACP · x402 payment stack
 |--------|--------|
 | x402 HTTP payments | ✅ Live on Base |
 | ERC-8004 agent identity | ✅ Live since January 2026 |
-| Virtuals ACP commerce | ✅ $1.8M+ in revenue |
+| Virtuals ACP commerce | ✅ $470M+ in agentic GDP |
 | On-chain trust layer | ❌ Didn't exist — **until rep24** |
 
 The rails exist. The marketplace exists. The trust layer is here.
@@ -216,3 +216,4 @@ The rails exist. The marketplace exists. The trust layer is here.
 *x402 pays. ERC-8004 identifies. rep24 verifies.*
 
 </div>
+
