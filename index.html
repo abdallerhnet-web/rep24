@@ -9,471 +9,203 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-
 :root, [data-theme="dark"] {
-  --glow-warm:    rgba(255, 130, 60, 0.3);
-  --glow-purple:  rgba(160, 70, 255, 0.18);
-  --glow-blue:    rgba(0, 82, 255, 0.2);
-  --blue:         #4B8BFF;
-  --blue-dim:     #2F6FE8;
-  --blue-soft:    rgba(75,139,255,0.1);
-  --blue-border:  rgba(75,139,255,0.2);
-  --green:        #00E87A;
-  --green-soft:   rgba(0,232,122,0.08);
-  --green-border: rgba(0,232,122,0.2);
-  --red:          #FF4560;
-  --red-soft:     rgba(255,69,96,0.08);
-  --red-border:   rgba(255,69,96,0.2);
-  --yellow:       #FFB830;
-  --yellow-soft:  rgba(255,184,48,0.08);
-  --yellow-border:rgba(255,184,48,0.25);
-  --text:         #F0EDE8;
-  --text2:        rgba(240,237,232,0.55);
-  --text3:        rgba(240,237,232,0.28);
-  --surface:      rgba(255,255,255,0.04);
-  --surface2:     rgba(255,255,255,0.07);
-  --border:       rgba(255,255,255,0.08);
-  --border2:      rgba(255,255,255,0.14);
-  --bg:           #09060D;
-  --shadow:       0 8px 40px rgba(0,0,0,0.7);
-  --rule-bg:      rgba(255,255,255,0.03);
+  --glow-warm: rgba(255,130,60,0.3); --glow-purple: rgba(160,70,255,0.18); --glow-blue: rgba(0,82,255,0.2);
+  --blue: #4B8BFF; --blue-dim: #2F6FE8; --blue-soft: rgba(75,139,255,0.1); --blue-border: rgba(75,139,255,0.2);
+  --green: #00E87A; --green-soft: rgba(0,232,122,0.08); --green-border: rgba(0,232,122,0.2);
+  --red: #FF4560; --red-soft: rgba(255,69,96,0.08); --red-border: rgba(255,69,96,0.2);
+  --yellow: #FFB830; --yellow-soft: rgba(255,184,48,0.08); --yellow-border: rgba(255,184,48,0.25);
+  --text: #F0EDE8; --text2: rgba(240,237,232,0.55); --text3: rgba(240,237,232,0.28);
+  --surface: rgba(255,255,255,0.04); --surface2: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+  --bg: #09060D; --shadow: 0 8px 40px rgba(0,0,0,0.7); --rule-bg: rgba(255,255,255,0.03);
 }
-
 [data-theme="light"] {
-  --glow-warm:    rgba(255, 130, 60, 0.12);
-  --glow-purple:  rgba(160, 70, 255, 0.07);
-  --glow-blue:    rgba(0, 82, 255, 0.08);
-  --blue:         #2563EB;
-  --blue-dim:     #1D4ED8;
-  --blue-soft:    rgba(37,99,235,0.08);
-  --blue-border:  rgba(37,99,235,0.18);
-  --green:        #059669;
-  --green-soft:   rgba(5,150,105,0.07);
-  --green-border: rgba(5,150,105,0.2);
-  --red:          #DC2626;
-  --red-soft:     rgba(220,38,38,0.07);
-  --red-border:   rgba(220,38,38,0.2);
-  --yellow:       #D97706;
-  --yellow-soft:  rgba(217,119,6,0.07);
-  --yellow-border:rgba(217,119,6,0.2);
-  --text:         #0D0A14;
-  --text2:        rgba(13,10,20,0.55);
-  --text3:        rgba(13,10,20,0.35);
-  --surface:      rgba(255,255,255,0.85);
-  --surface2:     rgba(240,236,255,0.7);
-  --border:       rgba(0,0,0,0.08);
-  --border2:      rgba(0,0,0,0.13);
-  --bg:           #F0EDFF;
-  --shadow:       0 8px 40px rgba(37,99,235,0.08);
-  --rule-bg:      rgba(0,0,0,0.02);
+  --glow-warm: rgba(255,130,60,0.12); --glow-purple: rgba(160,70,255,0.07); --glow-blue: rgba(0,82,255,0.08);
+  --blue: #2563EB; --blue-dim: #1D4ED8; --blue-soft: rgba(37,99,235,0.08); --blue-border: rgba(37,99,235,0.18);
+  --green: #059669; --green-soft: rgba(5,150,105,0.07); --green-border: rgba(5,150,105,0.2);
+  --red: #DC2626; --red-soft: rgba(220,38,38,0.07); --red-border: rgba(220,38,38,0.2);
+  --yellow: #D97706; --yellow-soft: rgba(217,119,6,0.07); --yellow-border: rgba(217,119,6,0.2);
+  --text: #0D0A14; --text2: rgba(13,10,20,0.55); --text3: rgba(13,10,20,0.35);
+  --surface: rgba(255,255,255,0.85); --surface2: rgba(240,236,255,0.7);
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.13);
+  --bg: #F0EDFF; --shadow: 0 8px 40px rgba(37,99,235,0.08); --rule-bg: rgba(0,0,0,0.02);
 }
-
 [data-theme="light"] body { background: var(--bg); }
-[data-theme="light"] .atmo::before {
-  background: radial-gradient(ellipse, rgba(200,180,255,0.25) 0%, rgba(150,100,255,0.1) 40%, transparent 70%);
-}
-[data-theme="light"] .atmo::after {
-  background: radial-gradient(ellipse, rgba(100,150,255,0.15) 0%, transparent 60%);
-}
+[data-theme="light"] .atmo::before { background: radial-gradient(ellipse, rgba(200,180,255,0.25) 0%, rgba(150,100,255,0.1) 40%, transparent 70%); }
+[data-theme="light"] .atmo::after  { background: radial-gradient(ellipse, rgba(100,150,255,0.15) 0%, transparent 60%); }
 [data-theme="light"] #stars { opacity: 0.1; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
+body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
 .atmo { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .atmo::before {
-  content: '';
-  position: absolute;
-  top: -10%; left: 50%; transform: translateX(-50%);
+  content: ''; position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
   width: 1000px; height: 700px;
   background: radial-gradient(ellipse, var(--glow-warm) 0%, rgba(200,70,130,0.15) 28%, var(--glow-purple) 55%, transparent 72%);
-  filter: blur(70px);
-  animation: breathe 9s ease-in-out infinite alternate;
+  filter: blur(70px); animation: breathe 9s ease-in-out infinite alternate;
 }
 .atmo::after {
-  content: '';
-  position: absolute;
-  bottom: -15%; left: 50%; transform: translateX(-50%);
+  content: ''; position: absolute; bottom: -15%; left: 50%; transform: translateX(-50%);
   width: 800px; height: 500px;
   background: radial-gradient(ellipse, var(--glow-blue) 0%, rgba(80,40,200,0.1) 50%, transparent 72%);
-  filter: blur(90px);
-  animation: breathe 12s ease-in-out infinite alternate-reverse;
+  filter: blur(90px); animation: breathe 12s ease-in-out infinite alternate-reverse;
 }
-@keyframes breathe {
-  from { opacity: 0.65; transform: translateX(-50%) scale(1); }
-  to   { opacity: 1;    transform: translateX(-50%) scale(1.1); }
-}
-
+@keyframes breathe { from { opacity:.65; transform:translateX(-50%) scale(1); } to { opacity:1; transform:translateX(-50%) scale(1.1); } }
 #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
 .wrap { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 0 20px 80px; }
-
-/* ── HEADER ── */
-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 32px 0 36px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 56px;
-}
+header { display: flex; align-items: center; justify-content: space-between; padding: 32px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
 .logo { display: flex; align-items: center; }
-.net-pill {
-  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
-  letter-spacing: 2px; text-transform: uppercase; color: var(--green);
-  background: var(--green-soft); border: 1px solid var(--green-border);
-  padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px;
-}
-.net-pill::before {
-  content: ''; width: 5px; height: 5px; border-radius: 50%;
-  background: var(--green); box-shadow: 0 0 6px var(--green);
-  animation: ping 2s infinite;
-}
+.logo-text { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; color: var(--text); letter-spacing: -0.5px; }
+.net-pill { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--green); background: var(--green-soft); border: 1px solid var(--green-border); padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+.net-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: ping 2s infinite; }
 .hdr-right { display: flex; align-items: center; gap: 14px; }
-
-.faucet-btn {
-  background: var(--surface); border: 1px solid var(--border2); color: var(--text2);
-  padding: 9px 16px; border-radius: 10px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
-  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
-}
+.faucet-btn { background: var(--surface); border: 1px solid var(--border2); color: var(--text2); padding: 9px 16px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
 .faucet-btn:hover { border-color: var(--blue); color: var(--blue); }
-
-.toggle {
-  position: relative; width: 46px; height: 26px;
-  background: var(--surface2); border: 1px solid var(--border2); border-radius: 13px; cursor: pointer; flex-shrink: 0;
-}
-.toggle::after {
-  content: ''; position: absolute; top: 3px; left: 3px;
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--blue); transition: transform 0.3s; box-shadow: 0 0 10px var(--blue-soft);
-}
+.toggle { position: relative; width: 46px; height: 26px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 13px; cursor: pointer; flex-shrink: 0; }
+.toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--blue); transition: transform 0.3s; box-shadow: 0 0 10px var(--blue-soft); }
 .toggle.light::after { transform: translateX(20px); }
 .ti { position: absolute; font-size: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
 .ti.m { left: 5px; } .ti.s { right: 5px; }
-
-#connectBtn {
-  background: var(--blue); color: #fff; border: none; padding: 10px 20px; border-radius: 10px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
-  transition: all 0.2s; box-shadow: 0 4px 20px rgba(75,139,255,0.3); white-space: nowrap;
-}
+#connectBtn { background: var(--blue); color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 20px rgba(75,139,255,0.3); white-space: nowrap; }
 #connectBtn:hover { background: var(--blue-dim); transform: translateY(-1px); }
-#connectBtn.connected {
-  background: var(--green-soft); border: 1px solid var(--green-border); color: var(--green);
-  box-shadow: none; font-family: 'JetBrains Mono', monospace; font-size: 11px;
-}
-
-/* ── STATUS / WARN ── */
-#statusBar {
-  display: none; align-items: center; gap: 10px;
-  background: var(--green-soft); border: 1px solid var(--green-border); border-radius: 12px;
-  padding: 11px 18px; margin-bottom: 24px;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px;
-}
+#connectBtn.connected { background: var(--green-soft); border: 1px solid var(--green-border); color: var(--green); box-shadow: none; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+#statusBar { display: none; align-items: center; gap: 10px; background: var(--green-soft); border: 1px solid var(--green-border); border-radius: 12px; padding: 11px 18px; margin-bottom: 24px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
 #statusBar.show { display: flex; }
-.pulse {
-  width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0;
-  animation: ping 2s infinite; box-shadow: 0 0 0 0 rgba(0,232,122,0.4);
-}
-@keyframes ping {
-  0%   { box-shadow: 0 0 0 0 rgba(0,232,122,0.4); }
-  70%  { box-shadow: 0 0 0 7px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
-}
-#networkWarn {
-  display: none; background: var(--yellow-soft); border: 1px solid var(--yellow-border);
-  border-radius: 12px; padding: 13px 18px; font-size: 12px; color: var(--yellow);
-  margin-bottom: 20px; font-family: 'JetBrains Mono', monospace;
-}
+.pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: ping 2s infinite; box-shadow: 0 0 0 0 rgba(0,232,122,0.4); }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(0,232,122,0.4); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+#networkWarn { display: none; background: var(--yellow-soft); border: 1px solid var(--yellow-border); border-radius: 12px; padding: 13px 18px; font-size: 12px; color: var(--yellow); margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; }
 #networkWarn.show { display: flex; align-items: center; gap: 10px; }
-
-/* ── HERO ── */
 .hero { text-align: center; padding: 20px 0 56px; }
-.hero-tag {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500;
-  letter-spacing: 2px; text-transform: uppercase; color: var(--blue);
-  background: var(--blue-soft); border: 1px solid var(--blue-border);
-  padding: 6px 14px; border-radius: 20px; margin-bottom: 28px;
-  animation: fadeIn 0.8s ease forwards;
-}
-.hero-tag::before {
-  content: ''; width: 5px; height: 5px; border-radius: 50%;
-  background: var(--blue); box-shadow: 0 0 6px var(--blue); animation: ping 2s infinite;
-}
-.hero-h1 {
-  font-family: 'Instrument Serif', serif; font-size: clamp(38px, 8vw, 70px);
-  font-weight: 400; line-height: 1.02; letter-spacing: -1.5px; color: var(--text);
-  margin-bottom: 16px; animation: fadeUp 0.8s ease forwards 0.1s; opacity: 0;
-}
-.hero-h1 em {
-  font-style: italic; color: transparent;
-  background: linear-gradient(135deg, #FF9F5A 0%, #E060A0 40%, #8060FF 70%, #4B8BFF 100%);
-  -webkit-background-clip: text; background-clip: text;
-}
-.hero-sub {
-  font-size: 15px; color: var(--text2); line-height: 1.7; max-width: 480px;
-  margin: 0 auto 20px; font-weight: 300; animation: fadeUp 0.8s ease forwards 0.2s; opacity: 0;
-}
-.hero-stack {
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3);
-  letter-spacing: 0.5px; margin-bottom: 40px; animation: fadeUp 0.8s ease forwards 0.3s; opacity: 0;
-}
+.hero-tag { display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); background: var(--blue-soft); border: 1px solid var(--blue-border); padding: 6px 14px; border-radius: 20px; margin-bottom: 28px; animation: fadeIn 0.8s ease forwards; }
+.hero-tag::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 6px var(--blue); animation: ping 2s infinite; }
+.hero-h1 { font-family: 'Instrument Serif', serif; font-size: clamp(38px,8vw,70px); font-weight: 400; line-height: 1.02; letter-spacing: -1.5px; color: var(--text); margin-bottom: 16px; animation: fadeUp 0.8s ease forwards 0.1s; opacity: 0; }
+.hero-h1 em { font-style: italic; color: transparent; background: linear-gradient(135deg,#FF9F5A 0%,#E060A0 40%,#8060FF 70%,#4B8BFF 100%); -webkit-background-clip: text; background-clip: text; }
+.hero-sub { font-size: 15px; color: var(--text2); line-height: 1.7; max-width: 480px; margin: 0 auto 20px; font-weight: 300; animation: fadeUp 0.8s ease forwards 0.2s; opacity: 0; }
+.hero-stack { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.5px; margin-bottom: 40px; animation: fadeUp 0.8s ease forwards 0.3s; opacity: 0; }
 .hero-stack b { color: var(--blue); }
-
-.steps {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-  animation: fadeUp 0.8s ease forwards 0.4s; opacity: 0;
-}
-.step {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-  padding: 20px 16px; text-align: left; position: relative; overflow: hidden;
-  transition: border-color 0.25s, transform 0.25s; backdrop-filter: blur(10px);
-}
-.step::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-}
+.steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; animation: fadeUp 0.8s ease forwards 0.4s; opacity: 0; }
+.step { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 16px; text-align: left; position: relative; overflow: hidden; transition: border-color 0.25s, transform 0.25s; backdrop-filter: blur(10px); }
+.step::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent); }
 .step:hover { border-color: var(--border2); transform: translateY(-3px); }
 .step-n { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2px; color: var(--blue); text-transform: uppercase; margin-bottom: 10px; }
 .step-t { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.2px; }
 .step-d { font-size: 11px; color: var(--text2); line-height: 1.6; font-family: 'JetBrains Mono', monospace; }
-
-/* ── SECTION LABEL ── */
-.slabel {
-  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
-  letter-spacing: 2.5px; color: var(--text3); text-transform: uppercase;
-  margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
-}
+.slabel { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2.5px; color: var(--text3); text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
 .slabel::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-/* ── STAT CARDS ── */
-.stats3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
-.scard {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-  padding: 20px; backdrop-filter: blur(10px); transition: border-color 0.2s, transform 0.2s;
-  position: relative; overflow: hidden;
-}
-.scard::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-}
+.stats3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+.scard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; backdrop-filter: blur(10px); transition: border-color 0.2s, transform 0.2s; position: relative; overflow: hidden; }
+.scard::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); }
 .scard:hover { border-color: var(--border2); transform: translateY(-2px); }
 .scard-l { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
 .scard-v { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
-.blue  { color: var(--blue); }
-.green { color: var(--green); }
-.dim   { color: var(--text2); font-size: 18px; }
-
-/* Score bar */
+.blue { color: var(--blue); } .green { color: var(--green); } .dim { color: var(--text2); font-size: 18px; }
 .sbar-wrap { margin-bottom: 28px; display: none; }
 .sbar-meta { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); margin-bottom: 8px; }
 .sbar-track { height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-.sbar-fill {
-  height: 100%; background: linear-gradient(90deg, var(--blue), #00C2FF);
-  border-radius: 2px; transition: width 1s cubic-bezier(0.4,0,0.2,1);
-  box-shadow: 0 0 10px rgba(75,139,255,0.4);
-}
-
-/* ── CARD ── */
-.card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 18px;
-  padding: 24px; margin-bottom: 16px; backdrop-filter: blur(12px);
-  position: relative; overflow: hidden; transition: border-color 0.2s;
-}
-.card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-}
+.sbar-fill { height: 100%; background: linear-gradient(90deg,var(--blue),#00C2FF); border-radius: 2px; transition: width 1s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 10px rgba(75,139,255,0.4); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px; margin-bottom: 16px; backdrop-filter: blur(12px); position: relative; overflow: hidden; transition: border-color 0.2s; }
+.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); }
 .card:hover { border-color: var(--border2); }
 .card-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .card-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
 .card-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; }
-
-/* ── BADGE ── */
 .badge-none { color: var(--text3); font-family: 'JetBrains Mono', monospace; font-size: 12px; text-align: center; padding: 28px; }
 .badge-card { border-radius: 18px; overflow: hidden; position: relative; }
-.badge-card.silver .badge-top { background: linear-gradient(135deg, #6B7A99 0%, #8E9BB8 40%, #B0BDD4 70%, #7A8AAA 100%); }
-.badge-card.silver .badge-glow { box-shadow: 0 0 40px rgba(140,160,200,0.3), 0 0 80px rgba(140,160,200,0.1); }
-.badge-card.silver .badge-shimmer { background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%); }
-.badge-card.gold .badge-top { background: linear-gradient(135deg, #F5A623 0%, #FFD060 40%, #FFA500 70%, #E8900A 100%); }
-.badge-card.gold .badge-glow { box-shadow: 0 0 40px rgba(245,166,35,0.35), 0 0 80px rgba(245,166,35,0.15); }
-.badge-card.gold .badge-shimmer { background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.2) 50%, transparent 60%); }
-.badge-card.diamond .badge-top { background: linear-gradient(135deg, #0EA5E9 0%, #6366F1 35%, #8B5CF6 60%, #06B6D4 100%); }
-.badge-card.diamond .badge-glow { box-shadow: 0 0 40px rgba(99,102,241,0.4), 0 0 80px rgba(99,102,241,0.2); }
-.badge-card.diamond .badge-shimmer { background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.25) 50%, transparent 60%); }
-.badge-top {
-  padding: 28px 24px; display: flex; align-items: center; gap: 18px;
-  position: relative; overflow: hidden; min-height: 110px;
-}
+.badge-card.silver .badge-top { background: linear-gradient(135deg,#6B7A99 0%,#8E9BB8 40%,#B0BDD4 70%,#7A8AAA 100%); }
+.badge-card.silver .badge-glow { box-shadow: 0 0 40px rgba(140,160,200,0.3),0 0 80px rgba(140,160,200,0.1); }
+.badge-card.gold .badge-top { background: linear-gradient(135deg,#F5A623 0%,#FFD060 40%,#FFA500 70%,#E8900A 100%); }
+.badge-card.gold .badge-glow { box-shadow: 0 0 40px rgba(245,166,35,0.35),0 0 80px rgba(245,166,35,0.15); }
+.badge-card.diamond .badge-top { background: linear-gradient(135deg,#0EA5E9 0%,#6366F1 35%,#8B5CF6 60%,#06B6D4 100%); }
+.badge-card.diamond .badge-glow { box-shadow: 0 0 40px rgba(99,102,241,0.4),0 0 80px rgba(99,102,241,0.2); }
+.badge-top { padding: 28px 24px; display: flex; align-items: center; gap: 18px; position: relative; overflow: hidden; min-height: 110px; }
 .badge-top::before { content: ''; position: absolute; top: -30px; right: -30px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
-.badge-top::after  { content: ''; position: absolute; bottom: -40px; right: 60px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.05); pointer-events: none; }
-.badge-shimmer { position: absolute; inset: 0; animation: shimmer 3s ease-in-out infinite; pointer-events: none; }
+.badge-top::after { content: ''; position: absolute; bottom: -40px; right: 60px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.05); pointer-events: none; }
+.badge-shimmer { position: absolute; inset: 0; animation: shimmer 3s ease-in-out infinite; pointer-events: none; background: linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.2) 50%,transparent 60%); }
 @keyframes shimmer { 0% { transform: translateX(-100%); } 50% { transform: translateX(100%); } 100% { transform: translateX(100%); } }
-.badge-icon-wrap {
-  width: 60px; height: 60px; border-radius: 16px; background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center;
-  font-size: 26px; flex-shrink: 0; backdrop-filter: blur(8px); position: relative; z-index: 1;
-  animation: badgePulse 3s ease-in-out infinite;
-}
+.badge-icon-wrap { width: 60px; height: 60px; border-radius: 16px; background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; backdrop-filter: blur(8px); position: relative; z-index: 1; animation: badgePulse 3s ease-in-out infinite; }
 @keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 .badge-info { flex: 1; position: relative; z-index: 1; }
 .badge-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 4px; }
 .badge-tier-name { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; color: #fff; letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px; }
 .badge-network { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.5); }
 .badge-network-pill { position: absolute; top: 0; right: 0; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 5px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.7); letter-spacing: 0.5px; z-index: 1; }
-.badge-stats { display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(255,255,255,0.03); border-top: 1px solid var(--border); }
-.bstat { padding: 16px 12px; text-align: center; border-right: 1px solid var(--border); transition: background 0.2s; }
+.badge-stats { display: grid; grid-template-columns: repeat(3,1fr); background: rgba(255,255,255,0.03); border-top: 1px solid var(--border); }
+.bstat { padding: 16px 12px; text-align: center; border-right: 1px solid var(--border); }
 .bstat:last-child { border-right: none; }
-.bstat:hover { background: rgba(255,255,255,0.04); }
 .bstat-v { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 3px; letter-spacing: -0.3px; }
-.bstat-v.blue  { color: var(--blue); }
-.bstat-v.green { color: var(--green); }
+.bstat-v.blue { color: var(--blue); } .bstat-v.green { color: var(--green); }
 .bstat-l { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; }
-
 .no-badge-wrap { padding: 32px 24px; text-align: center; }
 .no-badge-tiers { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
-.tier-preview { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0.5; transition: opacity 0.2s; }
-.tier-preview:hover { opacity: 0.8; }
+.tier-preview { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0.5; }
 .tier-dot { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 1px solid var(--border); }
-.tier-dot.s { background: linear-gradient(135deg, #6B7A99, #B0BDD4); }
-.tier-dot.g { background: linear-gradient(135deg, #F5A623, #FFD060); }
-.tier-dot.d { background: linear-gradient(135deg, #0EA5E9, #8B5CF6); }
+.tier-dot.s { background: linear-gradient(135deg,#6B7A99,#B0BDD4); }
+.tier-dot.g { background: linear-gradient(135deg,#F5A623,#FFD060); }
+.tier-dot.d { background: linear-gradient(135deg,#0EA5E9,#8B5CF6); }
 .tier-label { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
 .no-badge-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); line-height: 1.6; }
-.no-badge-sub  { font-size: 10px; color: var(--text3); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
-
-/* ── TABS ── */
 .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: var(--surface2); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
-.tab-btn { flex: 1; padding: 10px; text-align: center; font-weight: 600; font-size: 13px; color: var(--text2); cursor: pointer; border-radius: 9px; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+.tab-btn { flex: 1; padding: 10px; text-align: center; font-weight: 600; font-size: 13px; color: var(--text2); cursor: pointer; border-radius: 9px; transition: all 0.2s; }
 .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; animation: fadeUp 0.25s ease; }
-
-/* ── INPUTS WITH MAX ── */
 .input-wrap { position: relative; margin-bottom: 10px; }
-.input-wrap input {
-  width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px;
-  padding: 13px 72px 13px 16px; color: var(--text);
-  font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
+.input-wrap input { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; padding: 13px 72px 13px 16px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 14px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
 .input-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
 .input-wrap input::placeholder { color: var(--text3); }
-.max-btn {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  background: var(--surface); border: 1px solid var(--border2); color: var(--blue);
-  font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
-  padding: 5px 11px; border-radius: 6px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px;
-}
-.max-btn:hover { background: var(--blue-soft); border-color: var(--blue); }
-
+.max-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: var(--surface); border: 1px solid var(--border2); color: var(--blue); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; padding: 5px 11px; border-radius: 6px; cursor: pointer; }
 .help-t { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; line-height: 1.6; margin-top: 8px; }
-
-/* Buttons */
-.btn-primary {
-  background: var(--blue); color: #fff; border: none; padding: 13px 22px; border-radius: 12px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;
-  transition: all 0.15s; box-shadow: 0 4px 20px rgba(75,139,255,0.3); width: 100%; display: block;
-}
+.btn-primary { background: var(--blue); color: #fff; border: none; padding: 13px 22px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; box-shadow: 0 4px 20px rgba(75,139,255,0.3); width: 100%; display: block; }
 .btn-primary:hover:not(:disabled) { background: var(--blue-dim); transform: translateY(-1px); }
-.btn-danger {
-  background: transparent; border: 1px solid rgba(255,69,96,0.3); color: var(--red);
-  padding: 13px 22px; border-radius: 12px; font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; display: block;
-}
+.btn-danger { background: transparent; border: 1px solid rgba(255,69,96,0.3); color: var(--red); padding: 13px 22px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; display: block; }
 .btn-danger:hover:not(:disabled) { background: rgba(255,69,96,0.06); transform: translateY(-1px); }
-.btn-success {
-  background: var(--green); color: #09060D; border: none; padding: 13px 22px; border-radius: 12px;
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer;
-  transition: all 0.15s; width: 100%; display: block;
-}
+.btn-success { background: var(--green); color: #09060D; border: none; padding: 13px 22px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; display: block; }
 .btn-success:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 .btn-primary:disabled, .btn-danger:disabled, .btn-success:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
 .btn-sm { padding: 8px 16px !important; font-size: 12px !important; border-radius: 9px !important; width: auto !important; display: inline-block !important; }
-
 .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-/* TX Log */
-.txlog {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
-  max-height: 150px; overflow-y: auto; color: var(--text3); backdrop-filter: blur(10px);
-  scrollbar-width: thin; scrollbar-color: var(--border2) transparent;
-}
-.txlog::-webkit-scrollbar { width: 3px; }
-.txlog::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.txlog { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; max-height: 150px; overflow-y: auto; color: var(--text3); }
 .le { margin-bottom: 5px; line-height: 1.6; }
 .le.s { color: var(--green); } .le.e { color: var(--red); } .le.i { color: var(--blue); } .le.p { color: var(--yellow); }
-
-/* Contracts */
+.le a { color: inherit; text-decoration: underline; opacity: 0.75; }
 .contracts { display: grid; gap: 8px; }
-.crow {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 11px 16px; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
-  backdrop-filter: blur(8px); transition: border-color 0.15s;
-}
+.crow { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
 .crow:hover { border-color: var(--border2); }
 .cname { color: var(--text3); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; min-width: 120px; }
 .caddr { color: var(--text); flex: 1; }
-.cbtn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; padding: 2px 6px; border-radius: 6px; transition: color 0.15s; }
+.cbtn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 14px; padding: 2px 6px; border-radius: 6px; }
 .cbtn:hover { color: var(--blue); }
-
-/* ── PROTOCOL STRIP ── */
-.protocol-strip {
-  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-  padding: 20px 24px; margin-bottom: 32px; backdrop-filter: blur(12px);
-  position: relative; overflow: hidden;
-}
-.protocol-strip::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+.protocol-strip { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px 24px; margin-bottom: 32px; backdrop-filter: blur(12px); position: relative; overflow: hidden; }
+.protocol-strip::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent); }
 .pstat { text-align: center; }
 .pstat-l { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
 .pstat-v { font-family: 'Instrument Serif', serif; font-size: 28px; font-weight: 400; color: var(--text); line-height: 1; margin-bottom: 4px; letter-spacing: -0.5px; min-height: 32px; }
-.pstat-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 0.3px; }
+.pstat-sub { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3); }
 .pstat-divider { width: 1px; height: 48px; background: var(--border2); margin: 0 8px; }
-
-/* ── SHARE ── */
 .badge-share-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--border); background: rgba(255,255,255,0.02); }
-.badge-share-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.3px; }
-.share-btn { display: flex; align-items: center; gap: 7px; background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 9px 18px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-.share-btn:hover { background: #1a1a1a; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
-[data-theme="light"] .share-btn { background: #0f0f0f; }
-
-.share-public-btn { display: inline-flex; align-items: center; gap: 8px; background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 11px 24px; border-radius: 24px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 32px; }
-.share-public-btn:hover { background: #1a1a1a; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
-[data-theme="light"] .share-public-btn { background: #0f0f0f; }
-
-/* Rules */
+.badge-share-text { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); }
+.share-btn { display: flex; align-items: center; gap: 7px; background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 9px 18px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
+.share-btn:hover { background: #1a1a1a; }
+.share-public-btn { display: inline-flex; align-items: center; gap: 8px; background: #000; color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 11px 24px; border-radius: 24px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 32px; }
 .rules-grid { display: grid; }
-.rule-row { display: flex; align-items: flex-start; gap: 14px; padding: 16px 24px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+.rule-row { display: flex; align-items: flex-start; gap: 14px; padding: 16px 24px; border-bottom: 1px solid var(--border); }
 .rule-row:hover { background: var(--rule-bg); }
 .rule-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; margin-top: 1px; }
 .rule-body { flex: 1; }
 .rule-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
-.rule-desc  { font-size: 11px; color: var(--text2); line-height: 1.6; font-family: 'JetBrains Mono', monospace; }
-.rule-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 1px; padding: 4px 10px; border-radius: 20px; white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
-.rule-badge.green  { background: var(--green-soft);  color: var(--green);  border: 1px solid var(--green-border); }
-.rule-badge.red    { background: rgba(255,69,96,0.08); color: var(--red);   border: 1px solid rgba(255,69,96,0.2); }
+.rule-desc { font-size: 11px; color: var(--text2); line-height: 1.6; font-family: 'JetBrains Mono', monospace; }
+.rule-badge { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: 1px; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.rule-badge.green { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-border); }
+.rule-badge.red { background: rgba(255,69,96,0.08); color: var(--red); border: 1px solid rgba(255,69,96,0.2); }
 .rule-badge.yellow { background: var(--yellow-soft); color: var(--yellow); border: 1px solid var(--yellow-border); }
-.rule-badge.blue   { background: var(--blue-soft);   color: var(--blue);   border: 1px solid var(--blue-border); }
-
-/* Thresholds */
+.rule-badge.blue { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-border); }
 .threshold-row { display: flex; align-items: center; gap: 14px; padding: 16px 24px; border-bottom: 1px solid var(--border); }
-.threshold-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text2); min-width: 120px; letter-spacing: 0.3px; }
+.threshold-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text2); min-width: 120px; }
 .threshold-bar-wrap { flex: 1; height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
 .threshold-bar { height: 100%; border-radius: 2px; }
 .threshold-pct { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; min-width: 70px; text-align: right; }
-
-/* Leaderboard */
 .lb-header { display: grid; grid-template-columns: 36px 1fr 90px 80px 70px; padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--rule-bg); }
 .lb-col { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); }
-.lb-col.stake, .lb-col.badge, .lb-col.score { text-align: right; }
-.lb-row { display: grid; grid-template-columns: 36px 1fr 90px 80px 70px; padding: 13px 20px; border-bottom: 1px solid var(--border); align-items: center; transition: background 0.15s; }
+.lb-row { display: grid; grid-template-columns: 36px 1fr 90px 80px 70px; padding: 13px 20px; border-bottom: 1px solid var(--border); align-items: center; }
 .lb-row:last-child { border-bottom: none; }
 .lb-row:hover { background: var(--rule-bg); }
 .lb-row.me { background: var(--blue-soft); border-left: 2px solid var(--blue); }
@@ -481,233 +213,104 @@ header {
 .lb-rank.top1 { color: #FFD700; } .lb-rank.top2 { color: #C0C0C0; } .lb-rank.top3 { color: #CD7F32; }
 .lb-agent { display: flex; flex-direction: column; gap: 2px; }
 .lb-agent-addr { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); font-weight: 500; }
-.lb-agent-you  { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--blue); letter-spacing: 1px; }
+.lb-agent-you { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--blue); }
 .lb-stake { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--green); text-align: right; font-weight: 600; }
-.lb-badge-pill { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 20px; text-align: center; float: right; }
-.lb-badge-pill.silver  { background: rgba(140,160,200,0.12); color: #9AAAC8; border: 1px solid rgba(140,160,200,0.2); }
-.lb-badge-pill.gold    { background: rgba(245,166,35,0.12);  color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
-.lb-badge-pill.diamond { background: rgba(99,102,241,0.12);  color: #818CF8; border: 1px solid rgba(99,102,241,0.2); }
+.lb-badge-pill { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; padding: 3px 8px; border-radius: 20px; float: right; }
+.lb-badge-pill.silver { background: rgba(140,160,200,0.12); color: #9AAAC8; border: 1px solid rgba(140,160,200,0.2); }
+.lb-badge-pill.gold { background: rgba(245,166,35,0.12); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.lb-badge-pill.diamond { background: rgba(99,102,241,0.12); color: #818CF8; border: 1px solid rgba(99,102,241,0.2); }
 .lb-score { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--blue); text-align: right; font-weight: 600; }
 .lb-empty { padding: 32px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); }
-
-/* Footer */
-.footer { text-align: center; padding-top: 32px; border-top: 1px solid var(--border); margin-top: 48px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); letter-spacing: 0.5px; }
-.footer a { color: var(--blue); text-decoration: none; }
-
-@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
-.reveal.vis { opacity: 1; transform: none; }
-
-@media (max-width: 560px) {
-  .stats3, .steps { grid-template-columns: 1fr 1fr; }
-  .faucet-btn span { display: none; }
-}
-@media (max-width: 380px) { .steps { grid-template-columns: 1fr; } }
-
-/* ── ACTIVITY FEED ── */
-.feed-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 20px; border-bottom: 1px solid var(--border);
-  transition: background 0.15s; font-family: 'JetBrains Mono', monospace; font-size: 11px;
-}
-.feed-row:hover { background: var(--rule-bg); }
+.feed-row { display: flex; align-items: center; gap: 12px; padding: 11px 20px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
 .feed-row:last-child { border-bottom: none; }
 .feed-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: ping 2s infinite; }
 .feed-addr { color: var(--text); flex: 1; font-weight: 500; }
-.feed-amt  { color: var(--green); font-weight: 600; }
+.feed-amt { color: var(--green); font-weight: 600; }
 .feed-time { color: var(--text3); font-size: 10px; min-width: 60px; text-align: right; }
-.feed-link { color: var(--blue); text-decoration: none; font-size: 10px; margin-left: 6px; opacity: 0.7; transition: opacity 0.15s; }
-.feed-link:hover { opacity: 1; }
+.feed-link { color: var(--blue); text-decoration: none; font-size: 10px; margin-left: 6px; }
 .feed-empty { padding: 24px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); }
-
-/* ── AGENT PROFILE ── */
 .profile-search-wrap { display: flex; gap: 10px; margin-bottom: 20px; }
-.profile-search-input {
-  flex: 1; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px;
-  padding: 13px 16px; color: var(--text); font-family: 'JetBrains Mono', monospace;
-  font-size: 13px; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
-}
+.profile-search-input { flex: 1; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; padding: 13px 16px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; }
 .profile-search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
 .profile-search-input::placeholder { color: var(--text3); }
-.profile-search-btn {
-  background: var(--blue); color: #fff; border: none; padding: 0 20px;
-  border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: all 0.15s; white-space: nowrap;
-  box-shadow: 0 4px 20px rgba(75,139,255,0.3);
-}
-.profile-search-btn:hover { background: var(--blue-dim); transform: translateY(-1px); }
-
-.profile-card {
-  border-radius: 16px; overflow: hidden;
-  border: 1px solid var(--border); background: var(--surface); backdrop-filter: blur(12px);
-}
-.profile-header {
-  padding: 20px 24px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 16px;
-}
-.profile-avatar {
-  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 22px;
-  font-weight: 800; font-family: 'JetBrains Mono', monospace; color: #fff;
-}
-.profile-avatar.silver  { background: linear-gradient(135deg, #6B7A99, #B0BDD4); }
-.profile-avatar.gold    { background: linear-gradient(135deg, #F5A623, #FFD060); }
-.profile-avatar.diamond { background: linear-gradient(135deg, #0EA5E9, #8B5CF6); }
-.profile-avatar.none    { background: var(--surface2); color: var(--text3); font-size: 18px; }
-.profile-addr-full { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); font-weight: 500; word-break: break-all; }
-.profile-tier-pill {
-  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600;
-  padding: 3px 10px; border-radius: 20px; margin-top: 4px; display: inline-block;
-}
-.profile-tier-pill.silver  { background: rgba(140,160,200,0.12); color: #9AAAC8; border: 1px solid rgba(140,160,200,0.2); }
-.profile-tier-pill.gold    { background: rgba(245,166,35,0.12);  color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
-.profile-tier-pill.diamond { background: rgba(99,102,241,0.12);  color: #818CF8; border: 1px solid rgba(99,102,241,0.2); }
-.profile-tier-pill.none    { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
-
-.profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
-.profile-stat  { padding: 18px 16px; text-align: center; border-right: 1px solid var(--border); }
+.profile-search-btn { background: var(--blue); color: #fff; border: none; padding: 0 20px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.profile-card { border-radius: 16px; overflow: hidden; border: 1px solid var(--border); background: var(--surface); }
+.profile-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
+.profile-avatar { width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #fff; }
+.profile-avatar.silver { background: linear-gradient(135deg,#6B7A99,#B0BDD4); }
+.profile-avatar.gold { background: linear-gradient(135deg,#F5A623,#FFD060); }
+.profile-avatar.diamond { background: linear-gradient(135deg,#0EA5E9,#8B5CF6); }
+.profile-avatar.none { background: var(--surface2); color: var(--text3); font-size: 18px; }
+.profile-addr-full { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); word-break: break-all; }
+.profile-tier-pill { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-top: 4px; display: inline-block; }
+.profile-tier-pill.silver { background: rgba(140,160,200,0.12); color: #9AAAC8; border: 1px solid rgba(140,160,200,0.2); }
+.profile-tier-pill.gold { background: rgba(245,166,35,0.12); color: #F5A623; border: 1px solid rgba(245,166,35,0.2); }
+.profile-tier-pill.diamond { background: rgba(99,102,241,0.12); color: #818CF8; border: 1px solid rgba(99,102,241,0.2); }
+.profile-tier-pill.none { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+.profile-stats { display: grid; grid-template-columns: repeat(3,1fr); border-bottom: 1px solid var(--border); }
+.profile-stat { padding: 18px 16px; text-align: center; border-right: 1px solid var(--border); }
 .profile-stat:last-child { border-right: none; }
 .profile-stat-v { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
 .profile-stat-l { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; }
-
-.profile-actions { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: rgba(255,255,255,0.02); flex-wrap: wrap; gap: 10px; }
+.profile-actions { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; flex-wrap: wrap; gap: 10px; }
 .profile-url { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); word-break: break-all; flex: 1; }
-.profile-action-btns { display: flex; gap: 8px; flex-shrink: 0; }
-.profile-copy-btn {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--surface2); border: 1px solid var(--border2); color: var(--text2);
-  padding: 8px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-}
+.profile-action-btns { display: flex; gap: 8px; }
+.profile-copy-btn { display: flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border2); color: var(--text2); padding: 8px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
 .profile-copy-btn:hover { border-color: var(--blue); color: var(--blue); }
-.profile-share-x {
-  display: flex; align-items: center; gap: 6px;
-  background: #000; border: 1px solid rgba(255,255,255,0.15); color: #fff;
-  padding: 8px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s;
-}
-.profile-share-x:hover { background: #1a1a1a; }
-[data-theme="light"] .profile-share-x { background: #0f0f0f; }
-
-.profile-empty {
-  padding: 32px; text-align: center;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); line-height: 1.8;
-}
-
-/* ── TX LOG LINKS ── */
-.le a { color: inherit; text-decoration: underline; opacity: 0.75; }
-.le a:hover { opacity: 1; }
-
-/* ── SHARE CARD BUTTON ── */
-.copy-card-btn {
-  display: flex; align-items: center; gap: 7px;
-  background: var(--surface2); border: 1px solid var(--border2); color: var(--text2);
-  padding: 9px 16px; border-radius: 20px; font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-}
-.copy-card-btn:hover { border-color: var(--blue); color: var(--blue); }
-
-/* ════════════════════════════════════
-   JOB MANAGER STYLES
-════════════════════════════════════ */
+.profile-share-x { display: flex; align-items: center; gap: 6px; background: #000; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; }
+.profile-empty { padding: 32px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); line-height: 1.8; }
+.copy-card-btn { display: flex; align-items: center; gap: 7px; background: var(--surface2); border: 1px solid var(--border2); color: var(--text2); padding: 9px 16px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
 .job-field { margin-bottom: 14px; }
-.job-field label {
-  display: block; font-size: 12px; color: var(--text2);
-  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;
-  margin-bottom: 7px; font-weight: 500;
-}
-.job-field input, .job-field textarea {
-  width: 100%; padding: 12px 16px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: 12px; color: var(--text);
-  font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.job-field input::placeholder, .job-field textarea::placeholder { color: var(--text3); }
-.job-field input:focus, .job-field textarea:focus {
-  border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft);
-}
+.job-field label { display: block; font-size: 12px; color: var(--text2); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; margin-bottom: 7px; font-weight: 500; }
+.job-field input, .job-field textarea { width: 100%; padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; }
+.job-field input:focus, .job-field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
 .job-field textarea { resize: none; height: 76px; line-height: 1.55; }
-
-.job-item {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 14px 16px; border-radius: 13px;
-  border: 1px solid var(--border); background: rgba(255,255,255,0.015);
-  margin-bottom: 10px; transition: border-color 0.2s, background 0.2s;
-  animation: slideIn 0.3s ease;
-}
-.job-item:last-child { margin-bottom: 0; }
-.job-item:hover { border-color: var(--border2); background: rgba(255,255,255,0.03); }
+.job-field input::placeholder, .job-field textarea::placeholder { color: var(--text3); }
+.job-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 13px; border: 1px solid var(--border); background: rgba(255,255,255,0.015); margin-bottom: 10px; animation: slideIn 0.3s ease; }
 @keyframes slideIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
-
-.job-num {
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
-  color: var(--blue); background: var(--blue-soft); border: 1px solid var(--blue-border);
-  padding: 3px 8px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; margin-top: 1px;
-}
+.job-item:hover { border-color: var(--border2); }
+.job-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--blue); background: var(--blue-soft); border: 1px solid var(--blue-border); padding: 3px 8px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; }
 .job-body { flex: 1; min-width: 0; }
 .job-desc { font-size: 13px; font-weight: 600; margin-bottom: 3px; line-height: 1.4; }
 .job-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .job-btns-row { display: flex; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
-
-.job-status-pill {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  padding: 3px 9px; border-radius: 6px; flex-shrink: 0; align-self: flex-start;
-  font-family: 'JetBrains Mono', monospace;
-}
-.js-pending  { background: var(--yellow-soft); border: 1px solid var(--yellow-border); color: var(--yellow); }
-.js-complete { background: var(--green-soft);  border: 1px solid var(--green-border);  color: var(--green); }
-.js-failed   { background: var(--red-soft);    border: 1px solid var(--red-border);    color: var(--red); }
-
-.jobs-empty {
-  text-align: center; padding: 40px 20px;
-  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3);
-}
+.job-status-pill { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 6px; flex-shrink: 0; align-self: flex-start; font-family: 'JetBrains Mono', monospace; }
+.js-pending { background: var(--yellow-soft); border: 1px solid var(--yellow-border); color: var(--yellow); }
+.js-complete { background: var(--green-soft); border: 1px solid var(--green-border); color: var(--green); }
+.js-failed { background: var(--red-soft); border: 1px solid var(--red-border); color: var(--red); }
+.jobs-empty { text-align: center; padding: 40px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text3); }
 .jobs-empty-icon { font-size: 28px; margin-bottom: 10px; }
-
-.job-note {
-  padding: 11px 16px; border-radius: 10px; font-size: 12px; line-height: 1.55;
-  margin-bottom: 16px; font-family: 'JetBrains Mono', monospace;
-}
-.job-note-blue   { background: var(--blue-soft);   border: 1px solid var(--blue-border);   color: var(--blue); }
+.job-note { padding: 11px 16px; border-radius: 10px; font-size: 12px; line-height: 1.55; margin-bottom: 16px; font-family: 'JetBrains Mono', monospace; }
+.job-note-blue { background: var(--blue-soft); border: 1px solid var(--blue-border); color: var(--blue); }
 .job-note-yellow { background: var(--yellow-soft); border: 1px solid var(--yellow-border); color: var(--yellow); }
-
 .job-resolve-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.job-resolve-input {
-  flex: 1; min-width: 80px; padding: 12px 16px;
-  background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px;
-  color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none;
-  transition: border-color 0.15s;
-}
+.job-resolve-input { flex: 1; min-width: 80px; padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; }
 .job-resolve-input:focus { border-color: var(--blue); }
 .job-resolve-input::placeholder { color: var(--text3); }
-
-/* Logo dark/light mode */
-[data-theme="dark"] #rep24Logo { filter: brightness(0) invert(1); }
-[data-theme="light"] #rep24Logo { filter: none; }
+.footer { text-align: center; padding-top: 32px; border-top: 1px solid var(--border); margin-top: 48px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text3); }
+.footer a { color: var(--blue); text-decoration: none; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s ease, transform 0.65s ease; }
+.reveal.vis { opacity: 1; transform: none; }
+@media (max-width:560px) { .stats3, .steps { grid-template-columns: 1fr 1fr; } }
+@media (max-width:380px) { .steps { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
-
 <div class="atmo"></div>
 <canvas id="stars"></canvas>
-
 <div class="wrap">
-
   <header>
     <div class="logo">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAAAJ1UlEQVR42u2abYwU9R3HP7+Z2dtl9/aePOBODjAIgtKTCCoiniEFgjWtoKaWGlteNFW5kDRtGtIEbe0Lm5A2bUz6hqRJLUbCU3IqpUJ68MZUJRWqSH3gSTg0vTvv1nvY4/ZuZ+bXF7Mz7D3fgVrb/n/J3O3u/Oc/M5/9/p7+s6KqGLt6swwCA9AANAANQGMGoAFoABqAxgxAA9AANACNGYAGoAFoABozAA1AA9AANGYAGoAGoAFozAA0AA3Ar7gp4Cn4U/ypkJgfFxkFXrPyAFovK/vOq37UGyhqsrJy/ptudCL3EsCSyc/pA6ow4CnPnkD/2SXUpZTfrlCqE4IW5rxmgKrKaK4uIojIuGMiqVvWhPMNn3M4HFu+APcTGPSgPSfUJqFnUPi0X7U6gaiCyDUCVNUxb2r4fhHhWucD8H0/Ah6qIJNT3mhT9YuAFv/1FSricHeNiC2Mq55wX2dOeTeDnu4C1w/Ua8vUVDwhQBEhm83S0dGh4U2JCJ7nUVtbK/F4HADX8/jk4481BFOsTMuyqKurk/DztrY2crmcWpaF7/uRQn3fp6ysTCorK4dcw4Cn/Oof6MmMRdwe6cpCoJR+F75zo+oPFon4Co41dijod5VfHkdPdwsJG+J24M5TTaljAvQ8D9/3ee/99/ShBx+ira0NEYkU5Ps+8+fP18OHD0tZWRn33XefHj9+HNu28X0/GhtuGzZs0F27dskLL7ygW7ZswXXdCHQIGSCdTuvOnTtZtWqVeL5PvKSEnActfVBeEkAZ7SYtCSC8mwlej6WiMBT0e3CpT0jHpqa4SQO0bRvbtnn5pZc5f/78qGNOnjyJ7/uazWbltddeG/dE+/fvZ9euXRw9epSenh5s28bzvBHjstksTU1NrFmzBqeglvIS4aEblFcuagBwFKWogq9CZ0546SPVuWn4WpVIzBrqtn155VIWPd4B02ylKg49eeh3BUc+B4ChwlpbW2lqatJ9+/ZRX38rS5bciuu6UfzyfZ8VK1Zw6tQpDhw4oA0NDcyZMycaY1kWmUyG5uZmPM+jtLQUgEQiEbn3smXLWLBgQaRYEaGlpYUDfz5APB7XlStX8vDDD4uqsnG+yP1zlLwfgNAilwyB/vFD1b+1Cn86LWTz8KN61W/OFQnjW9ZVnnkLPdMtxCxl+3K4IY2c7UF/8ZaiXAXBYjdTVfL5PKrK5s2bNby+Y8eO6fBxqspTTz2lgMbjcc3lcow25p577lHbtrW6ulpVlSeeeEIBTSQSevHixRHz9vT0UF9fH5377Nmzqqq4njfq/MXbKxd8vf8vqpuOqn7rVdWdH/rBsX6w/+Osr+sPqW44rPr9o772u8Hnnw34fO+Ir9/+q+qDh1U/+Cw4zvN1wnOO6cK9vb04jhOpw/M8PM+LYpxlWTQ3N2NZFslkkrNnz+mNN84Tz/OwLAtVJZfL0d3djed59PT0BCctaMdxHFQ1irXFyq6ursZxHDzPo7e3N4pdYYU7VgL/bCAYl/eDGKdREoKOftW3OqDEgtKY8o3ZEC+4t+tPPXlMKgaGgT58H/4PXbS0NIXv+3R1dXHvvQ1UVVVpCMOyLPr6+shkMqxdu5Y1a9YgIrh5N1J+8XzhFkB1o3MX148Usu0nfap7z0HOG5pZz/cIJTbELGV+Gdw1Ay678PO/q57vDXrdp5cqiyuRaY7gKYgGIUC4svmFnlivBWBYXhSXJGONsW2bTCZDJpMZMWbTpk08//zzMtFcQwvpkfWHX3Bqz4ffvAPvdQlJ50pJY0kA4pZK5adLkHQMYpbwfpfqh93B2ISl3FwRwKOoME/FwFUY9IP5ks6VzDxRN+KMdyPFcXKsoiCs3xYuXEhNTc2QIri8vJytW7eSz+fJ5/Mkk0lEBMdxouNc1x3iwlp4bdt2Ic4EX5JjBXfSllNtyUKpEyhKirqKzCAsrYaquERuKQRuawnkXOHARdUl12kE3hb4oAtiFsyYpnTk4MgncOcM1dokcl1CvrheeGBgAN/3KS8v58SJE5JMJsccG4vFUFUGBwdxXZf+/n7S6bQ4ztBLKCsvJ5/PRyVOSTwBwIVe1VcvKReyIAgLypWEfQWSq8rsUmHdbMTTogK78EI1gLT7nLDn/JVY6mkwz+9WwMwk0pmDH7+ONl2A6gT6zDJlblrGbOsmpcDhbhcqsrGxkY6OT+no6OTQoUO6aNEiPM8bEs/ChFJeXk5dXZ00NjZi2zbNzc1s2bJF6+vrcV03GtvS0sK5c+dYt24dq1at4qYFNwmq/OED4c32IMatnKlsWzr8dka+DeEOeOA4wfuEMzTmDaowPaHUJhERYcY0mD5NyatwqQ/e6VTmpoOFB3uqMTDMwsXJpDihPProo7Jx40YOHjyoDzzwALFYLHLH4fDT6TR79+7V1atXy/Lly9m3b58+8sgj7NmzZ8S5H3/8cXbs2DGEyKAf9LoK9ObhX5dVHUEQwYrqQQ1iYQHOdQlhblrkzumqJzuhpNCuSVEh6Qh05OCjXrQ2qdLaj7b3g6/KLRWwfAai46zyjAmwoqIiAhcWwcOV6LoujuNw2223AZDP58d04Uwmw9tvv83q1avp7u7mzJnTQ3rgcP5UKsX69eujsqmkpCRKEq4fBPgzPcJP3lBsQUERpMBDCjoMCu6GGmXzYpGnl4q0XlYVGSpTX1FbkGPt6M+OQVUC7cwJ352vrJgBlXEk4UwxBobq2rZtmziOo4sWLWLx4sVS3K9GBxcUOmvWLNm9e7ceOXIkqOW0UBsUAHmeR01NDY2NjfLcc8/p9u3baW9vZ8eOHdxxx+24rheNq66uZt68eaKq0bVAsOQU9rhxK8DmKiNTpQa1jggcvARr61RvqhCpTY2a/gXgrpkqO0+LduSCLL+0GsLxE2XhL31J/7HHHtMXX3yRVCpFS0uLVFVVjbnkFZYvlsDvT6k2XRhauowdvwO1zkopv74LqYxLFPeG988i0JJV3fqmYEkQKp69Q1lYIeJPYg3SGa/FCxNCsRLGW70Z78twXZd4PE4qlYrKmK6uLq2oqJCw9AnBFSs91M0Pb0ZuqVTtc4li3rirzQq3Tw9KmvFimMjQmi/8TCQosq+6kA7rtcnaZCCLCK4bdBnZbJZYLBbBGh4ehufWuC18fRZXtfA00cKqp8GWsIPuZipP5r60ZyIhoCeffJJTp07R0NDA9ddfL8WF97U+ExltyX68xifcVxlH0iWqLVlhdkqZOa1QPk7i6/q/f6wZqvBCr+rrrXB3DdyQFpnMA6X/CMDi1erJKO+rbubBevGK9iTc3gD8vGO7QWAAGoAGoAFozAA0AA1AA9CYAWgAGoAGoDED0AA0AA1AYwagAWgAGoDGDEAD0AD8n7Z/A90MO6iYRq3EAAAAAElFTkSuQmCC" alt="rep24" id="rep24Logo" style="height:52px;width:auto;display:block;"/>
+      <span class="logo-text">rep24</span>
     </div>
     <div class="hdr-right">
       <div class="net-pill">Base Sepolia</div>
-      <button class="toggle" id="themeToggle" onclick="toggleTheme()">
-        <span class="ti m">🌙</span><span class="ti s">☀️</span>
-      </button>
+      <button class="toggle" id="themeToggle" onclick="toggleTheme()"><span class="ti m">🌙</span><span class="ti s">☀️</span></button>
       <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
     </div>
   </header>
-
   <div id="networkWarn">
     ⚠ &nbsp;Switch to Base Sepolia (84532) to continue.
     <button style="margin-left:auto;background:transparent;border:1px solid var(--yellow);color:var(--yellow);padding:6px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;" onclick="switchNetwork()">Switch</button>
@@ -717,7 +320,6 @@ header {
     <span id="walletAddr">—</span>
     <span style="color:var(--text3);margin-left:auto;font-size:10px">Base Sepolia · Live</span>
   </div>
-
   <section class="hero">
     <div class="hero-tag">Live on Base · Testnet</div>
     <h1 class="hero-h1">The trust layer<br/>for <em>AI agents</em></h1>
@@ -732,27 +334,13 @@ header {
       <div class="step"><div class="step-n">Step 03</div><div class="step-t">Build Rep</div><div class="step-d">Good work grows your score. Bad work gets your stake slashed.</div></div>
     </div>
   </section>
-
   <div class="protocol-strip reveal">
-    <div class="pstat">
-      <div class="pstat-l">Agents Staked</div>
-      <div class="pstat-v" id="totalAgents">—</div>
-      <div class="pstat-sub">unique wallets staked</div>
-    </div>
+    <div class="pstat"><div class="pstat-l">Agents Staked</div><div class="pstat-v" id="totalAgents">—</div><div class="pstat-sub">unique wallets staked</div></div>
     <div class="pstat-divider"></div>
-    <div class="pstat">
-      <div class="pstat-l">Total USDC Staked</div>
-      <div class="pstat-v" id="totalStaked">—</div>
-      <div class="pstat-sub">locked in RepVault</div>
-    </div>
+    <div class="pstat"><div class="pstat-l">Total USDC Staked</div><div class="pstat-v" id="totalStaked">—</div><div class="pstat-sub">locked in RepVault</div></div>
     <div class="pstat-divider"></div>
-    <div class="pstat">
-      <div class="pstat-l">Network</div>
-      <div class="pstat-v" style="color:var(--green);font-size:14px;">● Live</div>
-      <div class="pstat-sub">Base Sepolia</div>
-    </div>
+    <div class="pstat"><div class="pstat-l">Network</div><div class="pstat-v" style="color:var(--green);font-size:14px;">● Live</div><div class="pstat-sub">Base Sepolia</div></div>
   </div>
-
   <div class="reveal">
     <div class="slabel">Your Overview</div>
     <div class="stats3">
@@ -765,35 +353,25 @@ header {
       <div class="sbar-track"><div class="sbar-fill" id="scoreBarFill" style="width:0%"></div></div>
     </div>
   </div>
-
   <div class="reveal">
     <div class="slabel">Rep Badge</div>
-    <div class="card">
-      <div id="badgeContent" class="badge-none">Connect wallet to view your RepBadge</div>
-    </div>
+    <div class="card"><div id="badgeContent" class="badge-none">Connect wallet to view your RepBadge</div></div>
   </div>
-
   <div class="reveal">
     <div class="slabel">Manage Liquidity</div>
     <div class="card">
-      <div class="card-hdr"><div class="card-title">Stake & Earn Reputation</div><div class="card-icon">🔒</div></div>
+      <div class="card-hdr"><div class="card-title">Stake &amp; Earn Reputation</div><div class="card-icon">🔒</div></div>
       <div class="tabs">
         <div class="tab-btn active" onclick="switchTab('Stake')" id="tabStake">Stake</div>
         <div class="tab-btn" onclick="switchTab('Unstake')" id="tabUnstake">Unstake</div>
       </div>
       <div class="tab-pane active" id="paneStake">
-        <div class="input-wrap">
-          <input type="number" id="stakeAmount" placeholder="Amount (min. 10 USDC)" min="1" step="1"/>
-          <button class="max-btn" onclick="setMax('stake')">MAX</button>
-        </div>
+        <div class="input-wrap"><input type="number" id="stakeAmount" placeholder="Amount (min. 10 USDC)" min="1" step="1"/><button class="max-btn" onclick="setMax('stake')">MAX</button></div>
         <button class="btn-primary" id="btnStake" onclick="stakeUSDC()">Stake USDC</button>
         <div class="help-t" style="margin-top:10px">Staking mints your RepBadge NFT. Min 10 USDC · Bad work = slashed · Good work = rep grows.</div>
       </div>
       <div class="tab-pane" id="paneUnstake">
-        <div class="input-wrap">
-          <input type="number" id="unstakeAmount" placeholder="Amount to unstake (USDC)" min="1" step="1"/>
-          <button class="max-btn" onclick="setMax('unstake')">MAX</button>
-        </div>
+        <div class="input-wrap"><input type="number" id="unstakeAmount" placeholder="Amount to unstake (USDC)" min="1" step="1"/><button class="max-btn" onclick="setMax('unstake')">MAX</button></div>
         <button class="btn-danger" id="btnUnstake" onclick="unstake()">Unstake USDC</button>
         <div class="help-t" style="margin-top:10px">Withdrawing your full stake will pause RepScore growth and deactivate your active status.</div>
       </div>
@@ -803,66 +381,31 @@ header {
       </div>
     </div>
   </div>
-
   <div class="reveal">
     <div class="slabel">Transaction Log</div>
     <div class="txlog" id="txLog"><div class="le">Waiting for wallet connection...</div></div>
   </div>
-
-  <!-- ════════════════════════════════════════════
-       JOB MANAGER SECTION
-  ════════════════════════════════════════════ -->
   <hr class="divider"/>
   <div class="reveal">
     <div class="slabel">Job Manager</div>
-
-    <!-- POST JOB -->
     <div class="card">
-      <div class="card-hdr">
-        <div class="card-title">Post a Job</div>
-        <div class="card-icon">⊕</div>
-      </div>
-      <div class="job-note job-note-blue">
-        Assign work to a staked agent. USDC escrow is locked until the job resolves. RepScore updates on-chain automatically.
-      </div>
-      <div class="job-field">
-        <label>Agent Address (Provider)</label>
-        <input id="jobAgentAddr" type="text" placeholder="0x... staked agent wallet address"/>
-      </div>
-      <div class="job-field">
-        <label>Job Description</label>
-        <textarea id="jobDescription" placeholder="Describe the task — this becomes the on-chain reference ID…"></textarea>
-      </div>
-      <div class="job-field">
-        <label>Escrow Amount (USDC)</label>
-        <input id="jobEscrow" type="number" placeholder="e.g. 10  —  held in contract until job resolves" min="0.01" step="0.01"/>
-      </div>
+      <div class="card-hdr"><div class="card-title">Post a Job</div><div class="card-icon">⊕</div></div>
+      <div class="job-note job-note-blue">Assign work to a staked agent. USDC escrow is locked until the job resolves. RepScore updates on-chain automatically.</div>
+      <div class="job-field"><label>Agent Address (Provider)</label><input id="jobAgentAddr" type="text" placeholder="0x... staked agent wallet address"/></div>
+      <div class="job-field"><label>Job Description</label><textarea id="jobDescription" placeholder="Describe the task — this becomes the on-chain reference ID…"></textarea></div>
+      <div class="job-field"><label>Escrow Amount (USDC)</label><input id="jobEscrow" type="number" placeholder="e.g. 10  —  held in contract until job resolves" min="0.01" step="0.01"/></div>
       <button class="btn-primary" id="btnPostJob" onclick="postJob()" disabled>Post Job</button>
     </div>
-
-    <!-- JOB BOARD -->
     <div class="card">
       <div class="card-hdr">
         <div class="card-title">Job Board</div>
-        <button onclick="loadJobs()" style="background:var(--blue-soft);border:1px solid var(--blue-border);color:var(--blue);padding:7px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;" onmouseover="this.style.background='var(--blue)';this.style.color='#fff'" onmouseout="this.style.background='var(--blue-soft)';this.style.color='var(--blue)'">↻ Refresh</button>
+        <button onclick="loadJobs()" style="background:var(--blue-soft);border:1px solid var(--blue-border);color:var(--blue);padding:7px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;">↻ Refresh</button>
       </div>
-      <div id="jobBoardList">
-        <div class="jobs-empty">
-          <div class="jobs-empty-icon">◌</div>
-          Connect wallet to load jobs.
-        </div>
-      </div>
+      <div id="jobBoardList"><div class="jobs-empty"><div class="jobs-empty-icon">◌</div>Connect wallet to load jobs.</div></div>
     </div>
-
-    <!-- RESOLVE BY ID -->
     <div class="card">
-      <div class="card-hdr">
-        <div class="card-title">Resolve Job by ID</div>
-        <div class="card-icon">⚡</div>
-      </div>
-      <div class="job-note job-note-yellow">
-        Use this if a job isn't showing in the board above. Enter the job ID returned after posting.
-      </div>
+      <div class="card-hdr"><div class="card-title">Resolve Job by ID</div><div class="card-icon">⚡</div></div>
+      <div class="job-note job-note-yellow">Use this if a job isn't showing in the board above. Enter the job ID returned after posting.</div>
       <div class="job-resolve-row">
         <input type="number" class="job-resolve-input" id="resolveJobId" min="1" placeholder="Job ID  e.g. 1"/>
         <button class="btn-success btn-sm" id="btnComplete" onclick="resolveJob('complete')" disabled>✓ Complete</button>
@@ -870,8 +413,6 @@ header {
       </div>
     </div>
   </div>
-  <!-- END JOB MANAGER -->
-
   <hr class="divider"/>
   <div class="reveal">
     <div class="slabel">Contract Addresses · Base Sepolia</div>
@@ -884,15 +425,11 @@ header {
       <div class="crow"><span class="cname">JobManager</span><span class="caddr">0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51</span><button class="cbtn" onclick="copy('0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51')">⎘</button></div>
     </div>
   </div>
-
   <hr class="divider"/>
   <div class="reveal">
     <div class="slabel">Reputation Rules</div>
     <div class="card" style="padding:0;overflow:hidden;">
-      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);">
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">How RepScore is Calculated</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);line-height:1.6;">Your score is based on stake size, stake duration, and job outcomes.</div>
-      </div>
+      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);"><div style="font-size:13px;font-weight:700;margin-bottom:4px;">How RepScore is Calculated</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);line-height:1.6;">Your score is based on stake size, stake duration, and job outcomes.</div></div>
       <div class="rules-grid">
         <div class="rule-row"><div class="rule-icon" style="background:var(--blue-soft);color:var(--blue);">🔒</div><div class="rule-body"><div class="rule-title">Stake Size</div><div class="rule-desc">More USDC staked = higher base score. Silver (10+), Gold (100+), Diamond (500+).</div></div><div class="rule-badge green">+Score</div></div>
         <div class="rule-row"><div class="rule-icon" style="background:var(--green-soft);color:var(--green);">⏱️</div><div class="rule-body"><div class="rule-title">Stake Duration</div><div class="rule-desc">The longer your stake stays active, the faster your reputation grows.</div></div><div class="rule-badge green">+Score</div></div>
@@ -903,856 +440,103 @@ header {
       </div>
     </div>
   </div>
-
   <div class="reveal">
     <div class="slabel">Slash Thresholds</div>
     <div class="card" style="padding:0;overflow:hidden;">
       <div class="threshold-row"><div class="threshold-label">Minor offence</div><div class="threshold-bar-wrap"><div class="threshold-bar" style="width:20%;background:var(--yellow);"></div></div><div class="threshold-pct" style="color:var(--yellow);">Up to 20%</div></div>
       <div class="threshold-row"><div class="threshold-label">Repeated failure</div><div class="threshold-bar-wrap"><div class="threshold-bar" style="width:50%;background:linear-gradient(90deg,var(--yellow),var(--red));"></div></div><div class="threshold-pct" style="color:var(--red);">Up to 50%</div></div>
-      <div class="threshold-row" style="border-bottom:none;"><div class="threshold-label">Malicious actor</div><div class="threshold-bar-wrap"><div class="threshold-bar" style="width:100%;background:var(--red);box-shadow:0 0 12px rgba(255,69,96,0.4);"></div></div><div class="threshold-pct" style="color:var(--red);">Full slash</div></div>
+      <div class="threshold-row" style="border-bottom:none;"><div class="threshold-label">Malicious actor</div><div class="threshold-bar-wrap"><div class="threshold-bar" style="width:100%;background:var(--red);"></div></div><div class="threshold-pct" style="color:var(--red);">Full slash</div></div>
     </div>
   </div>
-
   <hr class="divider"/>
   <div class="reveal">
     <div class="slabel">Agent Leaderboard</div>
     <div class="card" style="padding:0;overflow:hidden;">
       <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:13px;font-weight:700;">Top Agents by Stake</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:3px;">Live rankings from RepVault · Base Sepolia</div>
-        </div>
-        <button onclick="loadLeaderboard()" style="background:var(--blue-soft);border:1px solid var(--blue-border);color:var(--blue);padding:7px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;" onmouseover="this.style.background='var(--blue)';this.style.color='#fff'" onmouseout="this.style.background='var(--blue-soft)';this.style.color='var(--blue)'">↻ Refresh</button>
+        <div><div style="font-size:13px;font-weight:700;">Top Agents by Stake</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:3px;">Live rankings from RepVault · Base Sepolia</div></div>
+        <button onclick="loadLeaderboard()" style="background:var(--blue-soft);border:1px solid var(--blue-border);color:var(--blue);padding:7px 14px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;">↻ Refresh</button>
       </div>
-      <div class="lb-header">
-        <div class="lb-col">#</div><div class="lb-col">Agent</div><div class="lb-col stake">Staked</div><div class="lb-col badge">Badge</div><div class="lb-col score">Score</div>
-      </div>
+      <div class="lb-header"><div class="lb-col">#</div><div class="lb-col">Agent</div><div class="lb-col">Staked</div><div class="lb-col">Badge</div><div class="lb-col">Score</div></div>
       <div id="leaderboardBody"><div style="padding:32px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">Loading leaderboard...</div></div>
     </div>
   </div>
-
   <hr class="divider"/>
   <div class="reveal">
     <div class="slabel">Live Activity</div>
     <div class="card" style="padding:0;overflow:hidden;">
       <div style="padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:13px;font-weight:700;">Recent Stakes</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:2px;">On-chain events · updates every 30s</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);">
-          <div class="pulse" style="flex-shrink:0"></div> Live
-        </div>
+        <div><div style="font-size:13px;font-weight:700;">Recent Stakes</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);margin-top:2px;">On-chain events · updates every 30s</div></div>
+        <div style="display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green);"><div class="pulse" style="flex-shrink:0"></div> Live</div>
       </div>
-      <div id="activityFeed">
-        <div class="feed-empty">Loading activity...</div>
-      </div>
+      <div id="activityFeed"><div class="feed-empty">Loading activity...</div></div>
     </div>
   </div>
-
   <hr class="divider"/>
   <div class="reveal">
     <div class="slabel">Agent Profile</div>
     <div class="card">
-      <div class="card-hdr">
-        <div class="card-title">Lookup Any Agent</div>
-        <div class="card-icon">🔎</div>
-      </div>
+      <div class="card-hdr"><div class="card-title">Lookup Any Agent</div><div class="card-icon">🔎</div></div>
       <div class="profile-search-wrap">
-        <input type="text" id="profileInput" class="profile-search-input" placeholder="0x address or paste any agent address..."/>
+        <input type="text" id="profileInput" class="profile-search-input" placeholder="0x address..."/>
         <button class="profile-search-btn" onclick="lookupProfile()">Lookup</button>
       </div>
-      <div id="profileResult">
-        <div class="profile-empty">
-          Enter any wallet address to view their on-chain reputation profile.<br/>
-          <span style="color:var(--blue)">Shareable link auto-generates — perfect for demos.</span>
-        </div>
-      </div>
+      <div id="profileResult"><div class="profile-empty">Enter any wallet address to view their on-chain reputation profile.<br/><span style="color:var(--blue)">Shareable link auto-generates — perfect for demos.</span></div></div>
     </div>
   </div>
-
-  <div class="footer">
-    rep24 · Base Sepolia Testnet ·
-    <a href="https://twitter.com/Rep24_io" target="_blank">@Rep24_io</a> ·
-    <a href="https://github.com/abdallerhnet-web/rep24" target="_blank">GitHub</a>
-  </div>
-
+  <div class="footer">rep24 · Base Sepolia Testnet · <a href="https://twitter.com/Rep24_io" target="_blank">@Rep24_io</a> · <a href="https://github.com/abdallerhnet-web/rep24" target="_blank">GitHub</a></div>
 </div>
-
 <script>
-// ── STARS ──────────────────────────────────────────────
-const canvas = document.getElementById('stars');
-const ctx = canvas.getContext('2d');
-let W, H, stars = [];
-function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
-resize();
-addEventListener('resize', () => { resize(); initStars(); });
-function initStars() {
-  stars = [];
-  const n = Math.min(80, Math.floor(W * H / 7000));
-  for (let i = 0; i < n; i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*0.8+0.1, o:Math.random()*0.5+0.1, sp:Math.random()*0.015+0.004, ph:Math.random()*Math.PI*2 });
-}
+const canvas=document.getElementById('stars'),ctx=canvas.getContext('2d');
+let W,H,stars=[];
+function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;}
+resize();addEventListener('resize',()=>{resize();initStars();});
+function initStars(){stars=[];const n=Math.min(80,Math.floor(W*H/7000));for(let i=0;i<n;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*0.8+0.1,o:Math.random()*0.5+0.1,sp:Math.random()*0.015+0.004,ph:Math.random()*Math.PI*2});}
 initStars();
-function drawStars(t) {
-  ctx.clearRect(0,0,W,H);
-  stars.forEach(s => {
-    const tw = s.o*(0.5+0.5*Math.sin(t*s.sp+s.ph));
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    ctx.fillStyle = `rgba(255,248,235,${tw})`; ctx.fill();
-  });
-  requestAnimationFrame(drawStars);
-}
+function drawStars(t){ctx.clearRect(0,0,W,H);stars.forEach(s=>{const tw=s.o*(0.5+0.5*Math.sin(t*s.sp+s.ph));ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,248,235,${tw})`;ctx.fill();});requestAnimationFrame(drawStars);}
 requestAnimationFrame(drawStars);
-
-// ── THEME ──────────────────────────────────────────────
-function toggleTheme() {
-  const html = document.documentElement;
-  const next = (html.getAttribute('data-theme')||'dark') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('rep24-theme', next);
-  document.getElementById('themeToggle').classList.toggle('light', next === 'light');
-}
-(function() {
-  const saved = localStorage.getItem('rep24-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  if (saved === 'light') document.getElementById('themeToggle').classList.add('light');
-})();
-
-// ── SCROLL REVEAL ──────────────────────────────────────
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); obs.unobserve(e.target); }});
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-// ── TABS ───────────────────────────────────────────────
-function switchTab(tab) {
-  ['Stake','Unstake'].forEach(t => {
-    document.getElementById('tab'+t).classList.remove('active');
-    document.getElementById('pane'+t).classList.remove('active');
-  });
-  document.getElementById('tab'+tab).classList.add('active');
-  document.getElementById('pane'+tab).classList.add('active');
-}
-
-// ── GLOBALS ────────────────────────────────────────────
-let rawUsdcBalance = '0', rawStakedBalance = '0', currentUsdcDecimals = 6;
-
-function setMax(type) {
-  if (type === 'stake') {
-    document.getElementById('stakeAmount').value = Math.floor(parseFloat(ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals)));
-  } else {
-    document.getElementById('unstakeAmount').value = parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6)).toFixed(2);
-  }
-}
-
-function setBtnState(id, disabled, text) {
-  const btn = document.getElementById(id);
-  if (!btn) return;
-  btn.disabled = disabled; btn.textContent = text;
-}
-
-// ── CONSTANTS ──────────────────────────────────────────
-const BASE_SEPOLIA_CHAIN_ID = 84532;
-const PUBLIC_RPC = 'https://sepolia.base.org';
-const CONTRACTS = {
-  RepBadge:         '0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',
-  RepScore:         '0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',
-  RepVault:         '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
-  SlashingGovernor: '0x78ee408d6174FB4836550340a012996136bC8c77',
-  MockUSDC:         '0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',
-  JobManager:       '0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51',
-};
-const ERC20_ABI = [
-  'function balanceOf(address) view returns (uint256)',
-  'function decimals() view returns (uint8)',
-  'function allowance(address, address) view returns (uint256)',
-  'function approve(address, uint256) returns (bool)',
-  'function mint(address, uint256)',
-  'function faucet() payable',
-];
-const REPVAULT_ABI = [
-  'function stake(address agentAddress, uint256 amount)',
-  'function unstake(address agentAddress, uint256 amount)',
-  'function getStakeBalance(address) view returns (uint256)',
-  'event Staked(address indexed agent, uint256 amount)',
-];
-const REPBADGE_ABI = ['function balanceOf(address) view returns (uint256)'];
-const REPSCORE_ABI = [
-  'function getRepScore(address) view returns (uint256)',
-  'function scores(address) view returns (uint256)',
-  'function scoreOf(address) view returns (uint256)',
-];
-
-// ── FIXED: Correct JobManager ABI matching Miami's deployed contract ──
-const JOBMANAGER_ABI = [
-  'function createJob(address provider, bytes32 referenceId, uint256 escrowAmount) external returns (uint256)',
-  'function completeJob(uint256 jobId, bool success) external',
-  'function failJob(uint256 jobId) external',
-  'function jobs(uint256 jobId) external view returns (address client, address provider, bytes32 referenceId, uint256 escrowAmount, uint8 status, uint256 createdAt)',
-  'function jobCounter() external view returns (uint256)',
-];
-
-let provider, signer, userAddress;
-let usdcContract, vaultContract, badgeContract, scoreContract, jobManagerContract;
-let localJobs = [];
-
-// ── LOG ────────────────────────────────────────────────
-function log(msg, type = 'i') {
-  const el = document.getElementById('txLog');
-  const d = document.createElement('div');
-  d.className = `le ${type}`;
-  d.textContent = `[${new Date().toLocaleTimeString('en-US',{hour12:false})}] ${msg}`;
-  el.insertBefore(d, el.firstChild);
-}
-
-function logTx(msg, type, hash) {
-  const el = document.getElementById('txLog');
-  const d = document.createElement('div');
-  d.className = `le ${type}`;
-  const t = new Date().toLocaleTimeString('en-US', {hour12: false});
-  if (hash) {
-    d.innerHTML = `[${t}] ${msg} <a href="https://sepolia.basescan.org/tx/${hash}" target="_blank" rel="noopener">↗ Basescan</a>`;
-  } else {
-    d.textContent = `[${t}] ${msg}`;
-  }
-  el.insertBefore(d, el.firstChild);
-}
-
-// ── CONNECT ────────────────────────────────────────────
-async function connectWallet() {
-  if (!window.ethereum) { log('No wallet detected — install MetaMask', 'e'); return; }
-  try {
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
-    provider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = provider.getSigner();
-    userAddress = await signer.getAddress();
-    const net = await provider.getNetwork();
-    if (net.chainId !== BASE_SEPOLIA_CHAIN_ID) {
-      document.getElementById('networkWarn').classList.add('show');
-      log('Wrong network — switch to Base Sepolia', 'e');
-    } else {
-      document.getElementById('networkWarn').classList.remove('show');
-    }
-    const short = userAddress.slice(0,6)+'...'+userAddress.slice(-4);
-    document.getElementById('walletAddr').textContent = short;
-    document.getElementById('statusBar').classList.add('show');
-    const btn = document.getElementById('connectBtn');
-    btn.textContent = short; btn.classList.add('connected');
-    initContracts();
-    await loadData();
-    await loadJobs();
-    log(`Wallet connected: ${userAddress}`, 's');
-    window.ethereum.on('accountsChanged', () => location.reload());
-    window.ethereum.on('chainChanged',    () => location.reload());
-  } catch(e) { log(`Connection failed: ${e.message}`, 'e'); }
-}
-
-async function switchNetwork() {
-  try {
-    await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:'0x14A34'}] });
-  } catch(e) {
-    if (e.code === 4902) await window.ethereum.request({ method:'wallet_addEthereumChain', params:[{
-      chainId:'0x14A34', chainName:'Base Sepolia', rpcUrls:['https://sepolia.base.org'],
-      nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18}, blockExplorerUrls:['https://sepolia.basescan.org'],
-    }]});
-  }
-}
-
-function initContracts() {
-  usdcContract       = new ethers.Contract(CONTRACTS.MockUSDC,    ERC20_ABI,       signer);
-  vaultContract      = new ethers.Contract(CONTRACTS.RepVault,    REPVAULT_ABI,    signer);
-  badgeContract      = new ethers.Contract(CONTRACTS.RepBadge,    REPBADGE_ABI,    signer);
-  scoreContract      = new ethers.Contract(CONTRACTS.RepScore,    REPSCORE_ABI,    signer);
-  jobManagerContract = new ethers.Contract(CONTRACTS.JobManager,  JOBMANAGER_ABI,  signer);
-
-  // Enable job buttons now wallet is connected
-  document.getElementById('btnPostJob').disabled = false;
-  document.getElementById('btnComplete').disabled = false;
-  document.getElementById('btnFail').disabled = false;
-}
-
-// ── LOAD DATA ──────────────────────────────────────────
-async function loadData() {
-  if (!userAddress) return;
-  log('Loading data...', 'i');
-  try {
-    try {
-      currentUsdcDecimals = await usdcContract.decimals();
-      rawUsdcBalance = await usdcContract.balanceOf(userAddress);
-      document.getElementById('usdcBalVal').textContent =
-        parseFloat(ethers.utils.formatUnits(rawUsdcBalance, currentUsdcDecimals))
-          .toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-    } catch {}
-
-    try {
-      rawStakedBalance = await vaultContract.getStakeBalance(userAddress);
-      document.getElementById('stakedVal').textContent =
-        parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6)).toFixed(2);
-    } catch {}
-
-    let score = 0;
-    try {
-      let raw;
-      try       { raw = await scoreContract.getRepScore(userAddress); }
-      catch     { try { raw = await scoreContract.scores(userAddress); }
-      catch     { raw = await scoreContract.scoreOf(userAddress); } }
-      score = raw.toNumber ? raw.toNumber() : parseInt(raw.toString());
-    } catch {}
-    document.getElementById('repScoreVal').textContent = score;
-    const pct = Math.min(score / 10, 100);
-    document.getElementById('scoreBarFill').style.width = pct + '%';
-    document.getElementById('scoreBarPct').textContent  = `${score} / 1000`;
-    document.getElementById('scoreBarWrap').style.display = 'block';
-
-    let hasBadge = false;
-    try { hasBadge = (await badgeContract.balanceOf(userAddress)).toNumber() > 0; } catch {}
-    const stakedNum = parseFloat(ethers.utils.formatUnits(rawStakedBalance, 6));
-    const bc = document.getElementById('badgeContent');
-
-    const heroShare = document.getElementById('heroShareWrap');
-    if (heroShare) heroShare.style.display = hasBadge ? 'block' : 'none';
-
-    if (hasBadge) {
-      let tier, tierClass, tierIcon;
-      if      (stakedNum >= 500) { tier='Diamond'; tierClass='diamond'; tierIcon='💎'; }
-      else if (stakedNum >= 100) { tier='Gold';    tierClass='gold';    tierIcon='🥇'; }
-      else                       { tier='Silver';  tierClass='silver';  tierIcon='🥈'; }
-
-      bc.innerHTML = `
-        <div class="badge-card ${tierClass} badge-glow">
-          <div class="badge-top">
-            <div class="badge-shimmer"></div>
-            <div class="badge-icon-wrap">${tierIcon}</div>
-            <div class="badge-info">
-              <div class="badge-eyebrow">Soulbound RepBadge</div>
-              <div class="badge-tier-name">${tier} Tier</div>
-              <div class="badge-network">On-chain · Verified ✓</div>
-            </div>
-            <div class="badge-network-pill">Base Sepolia</div>
-          </div>
-          <div class="badge-stats">
-            <div class="bstat"><div class="bstat-v">$${stakedNum.toFixed(2)}</div><div class="bstat-l">Staked USDC</div></div>
-            <div class="bstat"><div class="bstat-v blue">${score}</div><div class="bstat-l">Rep Score</div></div>
-            <div class="bstat"><div class="bstat-v green">Active</div><div class="bstat-l">Status</div></div>
-          </div>
-          <div class="badge-share-row">
-            <div class="badge-share-text">Flex your reputation on X</div>
-            <button class="share-btn" onclick="shareBadge('${tier}','${stakedNum.toFixed(2)}','${score}')"><span>𝕏</span> Share Badge</button>
-          </div>
-        </div>`;
-    } else {
-      bc.innerHTML = `
-        <div class="no-badge-wrap">
-          <div class="no-badge-tiers">
-            <div class="tier-preview"><div class="tier-dot s">🥈</div><div class="tier-label">Silver</div><div class="tier-label" style="font-size:8px">10+ USDC</div></div>
-            <div class="tier-preview"><div class="tier-dot g">🥇</div><div class="tier-label">Gold</div><div class="tier-label" style="font-size:8px">100+ USDC</div></div>
-            <div class="tier-preview"><div class="tier-dot d">💎</div><div class="tier-label">Diamond</div><div class="tier-label" style="font-size:8px">500+ USDC</div></div>
-          </div>
-          <div class="no-badge-text">No RepBadge found — stake USDC below to mint yours</div>
-          <div class="no-badge-sub">Silver · Gold · Diamond tiers based on stake amount</div>
-        </div>`;
-    }
-    log('Data loaded', 's');
-  } catch(e) { log(`Data error: ${e.message}`, 'e'); }
-}
-
-// ── PROTOCOL STATS ─────────────────────────────────────
-async function loadProtocolStats() {
-  try {
-    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
-    const usdcR  = new ethers.Contract(CONTRACTS.MockUSDC, ERC20_ABI, rp);
-    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
-
-    try {
-      const raw = await usdcR.balanceOf(CONTRACTS.RepVault);
-      const total = parseFloat(ethers.utils.formatUnits(raw, 6));
-      document.getElementById('totalStaked').textContent = total >= 1000 ? `$${(total/1000).toFixed(1)}K` : `$${total.toFixed(0)}`;
-    } catch { document.getElementById('totalStaked').textContent = '$0'; }
-
-    try {
-      const events = await vaultR.queryFilter(vaultR.filters.Staked(), 0, 'latest');
-      document.getElementById('totalAgents').textContent = new Set(events.map(e => e.args[0].toLowerCase())).size;
-    } catch {
-      try {
-        const badgeR = new ethers.Contract(CONTRACTS.RepBadge, ['function totalSupply() view returns (uint256)'], rp);
-        const s = await badgeR.totalSupply();
-        document.getElementById('totalAgents').textContent = s.toNumber ? s.toNumber() : parseInt(s.toString());
-      } catch { document.getElementById('totalAgents').textContent = '0'; }
-    }
-  } catch {
-    document.getElementById('totalStaked').textContent = '$0';
-    document.getElementById('totalAgents').textContent = '0';
-  }
-}
-
-// ── STAKE ──────────────────────────────────────────────
-async function stakeUSDC() {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
-  const amt = document.getElementById('stakeAmount').value;
-  if (!amt || isNaN(amt) || +amt < 10) { log('Minimum stake is 10 USDC', 'e'); return; }
-  setBtnState('btnStake', true, 'Processing...');
-  try {
-    const amount = ethers.utils.parseUnits(amt.toString(), currentUsdcDecimals);
-    const allowance = await usdcContract.allowance(userAddress, CONTRACTS.RepVault);
-    if (allowance.lt(amount)) {
-      setBtnState('btnStake', true, 'Approving USDC...');
-      log(`Approving ${amt} USDC...`, 'p');
-      const a = await usdcContract.approve(CONTRACTS.RepVault, amount);
-      await a.wait();
-      log('Approved ✓ — waiting for network...', 'p');
-      await new Promise(r => setTimeout(r, 3000));
-    }
-    setBtnState('btnStake', true, 'Staking...');
-    log(`Staking ${amt} USDC...`, 'p');
-    const tx = await vaultContract.stake(userAddress, amount);
-    await tx.wait();
-    setBtnState('btnStake', true, '✓ Staked');
-    logTx('Staked ✓', 's', tx.hash);
-    document.getElementById('stakeAmount').value = '';
-    await new Promise(r => setTimeout(r, 4000));
-    await loadData(); loadProtocolStats();
-  } catch(e) { log(`Stake failed: ${e.reason || e.message}`, 'e'); }
-  setBtnState('btnStake', false, 'Stake USDC');
-}
-
-// ── UNSTAKE ────────────────────────────────────────────
-async function unstake() {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
-  const amt = document.getElementById('unstakeAmount').value;
-  if (!amt || isNaN(amt) || +amt <= 0) { log('Enter a valid amount', 'e'); return; }
-  setBtnState('btnUnstake', true, 'Processing...');
-  try {
-    const amount = ethers.utils.parseUnits(amt.toString(), 6);
-    log(`Unstaking ${amt} USDC...`, 'p');
-    const tx = await vaultContract.unstake(userAddress, amount);
-    await tx.wait();
-    setBtnState('btnUnstake', true, '✓ Unstaked');
-    logTx('Unstaked ✓', 's', tx.hash);
-    document.getElementById('unstakeAmount').value = '';
-    await new Promise(r => setTimeout(r, 4000));
-    await loadData(); loadProtocolStats();
-  } catch(e) { log(`Unstake failed: ${e.reason || e.message}`, 'e'); }
-  setBtnState('btnUnstake', false, 'Unstake USDC');
-}
-
-// ── FAUCET ─────────────────────────────────────────────
-async function getMockUSDC() {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
-  try {
-    log('Minting 1000 mock USDC...', 'p');
-    let tx;
-    try { tx = await usdcContract.mint(userAddress, ethers.utils.parseUnits('1000', currentUsdcDecimals)); }
-    catch { tx = await usdcContract.faucet({ value: 0 }); }
-    await tx.wait();
-    log('Got 1000 mock USDC ✓', 's');
-    await new Promise(r => setTimeout(r, 3000));
-    await loadData();
-  } catch(e) { log(`Faucet failed: ${e.reason || e.message}`, 'e'); }
-}
-
-// ══════════════════════════════════════════════════════
-// JOB MANAGER — FIXED FUNCTIONS
-// ══════════════════════════════════════════════════════
-
-// ── POST JOB: uses createJob(provider, bytes32, escrowAmount) ──
-async function postJob() {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
-  const agent  = document.getElementById('jobAgentAddr').value.trim();
-  const desc   = document.getElementById('jobDescription').value.trim();
-  const escrow = document.getElementById('jobEscrow').value.trim();
-
-  if (!ethers.utils.isAddress(agent)) { log('Job: enter a valid agent address', 'e'); return; }
-  if (!desc)   { log('Job: add a description', 'e'); return; }
-  if (!escrow || isNaN(escrow) || +escrow <= 0) { log('Job: enter escrow amount in USDC', 'e'); return; }
-
-  setBtnState('btnPostJob', true, 'Approving USDC...');
-  try {
-    // Convert escrow to 6-decimal USDC units
-    const escrowAmount = ethers.utils.parseUnits(escrow.toString(), 6);
-
-    // Convert description → bytes32 referenceId via keccak256
-    const referenceId = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(desc));
-
-    // Step 1: Approve USDC spend by JobManager
-    log(`Approving ${escrow} USDC for JobManager...`, 'p');
-    const approveTx = await usdcContract.approve(CONTRACTS.JobManager, escrowAmount);
-    await approveTx.wait();
-    log('USDC approved ✓', 'p');
-
-    // Step 2: Call createJob
-    setBtnState('btnPostJob', true, 'Creating job...');
-    log('Posting job on-chain...', 'p');
-    const tx = await jobManagerContract.createJob(agent, referenceId, escrowAmount);
-    const receipt = await tx.wait();
-
-    // Try to extract jobId from receipt logs
-    let jobId = localJobs.length + 1;
-    try {
-      if (receipt.logs && receipt.logs.length > 0) {
-        // jobCounter increments on each job — use it as fallback
-        const counter = await jobManagerContract.jobCounter();
-        jobId = counter.toNumber();
-      }
-    } catch {}
-
-    localJobs.push({ id: jobId, agent, desc, escrow: parseFloat(escrow), status: 0 });
-    document.getElementById('jobAgentAddr').value = '';
-    document.getElementById('jobDescription').value = '';
-    document.getElementById('jobEscrow').value = '';
-    renderJobs();
-    logTx(`Job #${jobId} posted ✓  (${escrow} USDC escrowed)`, 's', tx.hash);
-  } catch(e) {
-    log(`Post job failed: ${e.reason || e.message}`, 'e');
-  }
-  setBtnState('btnPostJob', false, 'Post Job');
-}
-
-// ── LOAD JOBS: uses jobCounter() and jobs(id), indexed from 1 ──
-async function loadJobs() {
-  if (!jobManagerContract) return;
-  log('Loading jobs...', 'i');
-  try {
-    const count = await jobManagerContract.jobCounter();
-    const n = count.toNumber();
-    localJobs = [];
-
-    for (let i = 1; i <= n; i++) {   // jobs are indexed from 1
-      try {
-        const job = await jobManagerContract.jobs(i);
-        // job = (client, provider, referenceId, escrowAmount, status, createdAt)
-        let descLabel = `Job #${i}`;
-        try {
-          // referenceId is a bytes32 keccak hash — we can't reverse it, show truncated hex
-          descLabel = 'Ref: ' + job.referenceId.slice(0, 10) + '…';
-        } catch {}
-
-        localJobs.push({
-          id:     i,
-          agent:  job.provider,
-          desc:   descLabel,
-          escrow: parseFloat(ethers.utils.formatUnits(job.escrowAmount, 6)),
-          status: Number(job.status),
-        });
-      } catch {}
-    }
-    renderJobs();
-    log(`Loaded ${n} job(s)`, 's');
-  } catch(e) {
-    log(`Jobs load error: ${e.message}`, 'e');
-    renderJobs();
-  }
-}
-
-// ── RESOLVE JOB: completeJob(id, bool) or failJob(id) ──
-async function resolveJob(action) {
-  if (!signer) { log('Connect wallet first', 'e'); return; }
-  const idVal = document.getElementById('resolveJobId').value;
-  if (idVal === '' || idVal === null) { log('Enter a job ID', 'e'); return; }
-  const jobId      = parseInt(idVal);
-  const isComplete = action === 'complete';
-  const btnId      = isComplete ? 'btnComplete' : 'btnFail';
-
-  setBtnState(btnId, true, '...');
-  try {
-    log(`${isComplete ? 'Completing' : 'Failing'} job #${jobId}...`, 'p');
-    let tx;
-    if (isComplete) {
-      // completeJob(uint256 jobId, bool success)
-      tx = await jobManagerContract.completeJob(jobId, true);
-    } else {
-      // failJob(uint256 jobId)
-      tx = await jobManagerContract.failJob(jobId);
-    }
-    await tx.wait();
-
-    const job = localJobs.find(j => j.id === jobId);
-    if (job) job.status = isComplete ? 1 : 2;
-    renderJobs();
-    logTx(`Job #${jobId} ${isComplete ? 'completed ✓' : 'failed ✕'}`, isComplete ? 's' : 'e', tx.hash);
-    await loadData(); // refresh rep score
-  } catch(e) {
-    log(`Resolve failed: ${e.reason || e.message}`, 'e');
-  }
-  setBtnState(btnId, false, isComplete ? '✓ Complete' : '✕ Fail');
-}
-
-async function quickResolve(jobId, action) {
-  document.getElementById('resolveJobId').value = jobId;
-  await resolveJob(action);
-}
-
-// ── RENDER JOBS ────────────────────────────────────────
-function renderJobs() {
-  const el = document.getElementById('jobBoardList');
-  if (!localJobs.length) {
-    el.innerHTML = `<div class="jobs-empty"><div class="jobs-empty-icon">◌</div>No jobs yet — post the first job above.</div>`;
-    return;
-  }
-  const sMap = {
-    0: ['js-pending',  'Pending'],
-    1: ['js-complete', 'Complete'],
-    2: ['js-failed',   'Failed']
-  };
-  el.innerHTML = [...localJobs].reverse().map(job => {
-    const [cls, label] = sMap[job.status] || ['js-pending', 'Unknown'];
-    const short = job.agent.slice(0,8) + '…' + job.agent.slice(-6);
-    const canResolve = job.status === 0;
-    return `
-    <div class="job-item">
-      <div class="job-num">#${job.id}</div>
-      <div class="job-body">
-        <div class="job-desc">${escHtml(job.desc)}</div>
-        <div class="job-meta">Provider: ${short}</div>
-        <div class="job-meta" style="color:var(--yellow)">Escrow: $${(job.escrow || 0).toFixed(2)} USDC</div>
-        ${canResolve ? `
-        <div class="job-btns-row">
-          <button class="btn-success btn-sm" onclick="quickResolve(${job.id},'complete')">✓ Complete</button>
-          <button class="btn-danger  btn-sm" onclick="quickResolve(${job.id},'fail')">✕ Fail</button>
-        </div>` : ''}
-      </div>
-      <div class="job-status-pill ${cls}">${label}</div>
-    </div>`;
-  }).join('');
-}
-
-function escHtml(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ── SHARE ──────────────────────────────────────────────
-function sharePublic() {
-  const text = `rep24 is building the trust layer for AI agents on Base 🤖⛓️\n\nAgents stake USDC → earn a RepBadge → build on-chain reputation\nBad work gets slashed. Good work grows your score.\n\nx402 pays · ERC-8004 identifies · rep24 verifies\n\n@Rep24_io`;
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://abdallerhnet-web.github.io/rep24/')}`, '_blank');
-}
-function shareBadge(tier, staked, score) {
-  const icons = { Silver:'🥈', Gold:'🥇', Diamond:'💎' };
-  const text = `Just earned my ${icons[tier]||'🏅'} ${tier} RepBadge on @Rep24_io\n\nStaked $${staked} USDC on Base · Rep Score: ${score}\n\nx402 pays · ERC-8004 identifies · rep24 verifies\n\nThe trust layer for AI agents 🤖⛓️`;
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://abdallerhnet-web.github.io/rep24/')}`, '_blank');
-}
-
-// ── LEADERBOARD ────────────────────────────────────────
-async function loadLeaderboard() {
-  const body = document.getElementById('leaderboardBody');
-  body.innerHTML = `<div class="lb-empty">Fetching on-chain data...</div>`;
-  try {
-    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
-    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
-    const scoreR = new ethers.Contract(CONTRACTS.RepScore, REPSCORE_ABI, rp);
-
-    const events = await vaultR.queryFilter(vaultR.filters.Staked(), 0, 'latest');
-    if (events.length === 0) { body.innerHTML = `<div class="lb-empty">No agents staked yet — be the first! 🚀</div>`; return; }
-
-    const uniqueAddrs = [...new Set(events.map(e => e.args[0].toLowerCase()))];
-    const rows = await Promise.all(uniqueAddrs.map(async addr => {
-      let stake = 0, score = 0;
-      try { stake = parseFloat(ethers.utils.formatUnits(await vaultR.getStakeBalance(addr), 6)); } catch {}
-      try {
-        let raw;
-        try       { raw = await scoreR.getRepScore(addr); }
-        catch     { try { raw = await scoreR.scores(addr); }
-        catch     { raw = await scoreR.scoreOf(addr); } }
-        score = raw.toNumber ? raw.toNumber() : parseInt(raw.toString());
-      } catch {}
-      return { addr, stake, score };
-    }));
-
-    const sorted = rows.filter(r => r.stake > 0).sort((a,b) => b.stake - a.stake).slice(0, 10);
-    if (sorted.length === 0) { body.innerHTML = `<div class="lb-empty">No active stakes found yet.</div>`; return; }
-
-    const rankIcons = ['🥇','🥈','🥉'];
-    body.innerHTML = sorted.map((r, i) => {
-      const isMe = userAddress && r.addr === userAddress.toLowerCase();
-      let badgeTier = 'silver', badgeLabel = '🥈 Silver';
-      if (r.stake >= 500) { badgeTier = 'diamond'; badgeLabel = '💎 Diamond'; }
-      else if (r.stake >= 100) { badgeTier = 'gold'; badgeLabel = '🥇 Gold'; }
-      return `
-        <div class="lb-row ${isMe?'me':''}">
-          <div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${rankIcons[i]||i+1}</div>
-          <div class="lb-agent">
-            <div class="lb-agent-addr">${r.addr.slice(0,6)+'...'+r.addr.slice(-4)}</div>
-            ${isMe?'<div class="lb-agent-you">← YOU</div>':''}
-          </div>
-          <div class="lb-stake">$${r.stake.toFixed(0)}</div>
-          <div><span class="lb-badge-pill ${badgeTier}">${badgeLabel}</span></div>
-          <div class="lb-score">${r.score}</div>
-        </div>`;
-    }).join('');
-  } catch(e) { body.innerHTML = `<div class="lb-empty">Could not load — ${e.message}</div>`; }
-}
-
-function copy(addr) {
-  navigator.clipboard.writeText(addr).then(() => log(`Copied: ${addr}`, 'i'));
-}
-
-// ── ACTIVITY FEED ──────────────────────────────────────
-async function loadActivityFeed() {
-  const feed = document.getElementById('activityFeed');
-  try {
-    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
-    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
-    const events = await vaultR.queryFilter(vaultR.filters.Staked(), 0, 'latest');
-    if (!events.length) { feed.innerHTML = '<div class="feed-empty">No activity yet — be the first to stake 🚀</div>'; return; }
-
-    const recent = [...events].reverse().slice(0, 8);
-    const now = Math.floor(Date.now() / 1000);
-
-    const rows = await Promise.all(recent.map(async (e) => {
-      let ts = now;
-      try {
-        const block = await rp.getBlock(e.blockNumber);
-        ts = block.timestamp;
-      } catch {}
-      const ago = now - ts;
-      let timeStr;
-      if (ago < 60)         timeStr = `${ago}s ago`;
-      else if (ago < 3600)  timeStr = `${Math.floor(ago/60)}m ago`;
-      else if (ago < 86400) timeStr = `${Math.floor(ago/3600)}h ago`;
-      else                  timeStr = `${Math.floor(ago/86400)}d ago`;
-
-      const addr   = e.args[0];
-      const amt    = parseFloat(ethers.utils.formatUnits(e.args[1], 6)).toFixed(0);
-      const short  = addr.slice(0,6)+'...'+addr.slice(-4);
-      const txHash = e.transactionHash;
-      const isMe   = userAddress && addr.toLowerCase() === userAddress.toLowerCase();
-      return `<div class="feed-row">
-        <div class="feed-dot"></div>
-        <div class="feed-addr">${short}${isMe ? ' <span style="color:var(--blue);font-size:9px">YOU</span>' : ''}</div>
-        <div class="feed-amt">+$${amt} USDC</div>
-        <div class="feed-time">${timeStr}</div>
-        <a class="feed-link" href="https://sepolia.basescan.org/tx/${txHash}" target="_blank" rel="noopener">↗</a>
-      </div>`;
-    }));
-    feed.innerHTML = rows.join('');
-  } catch(e) {
-    feed.innerHTML = `<div class="feed-empty">Could not load activity — ${e.message}</div>`;
-  }
-}
-
-// ── AGENT PROFILE ──────────────────────────────────────
-async function lookupProfile(addr) {
-  const input = document.getElementById('profileInput');
-  const target = addr || input.value.trim();
-  if (!target || !/^0x[0-9a-fA-F]{40}$/.test(target)) {
-    document.getElementById('profileResult').innerHTML =
-      '<div class="profile-empty" style="color:var(--red)">Enter a valid 0x wallet address.</div>';
-    return;
-  }
-  if (input) input.value = target;
-  history.replaceState(null, '', '#' + target);
-
-  const result = document.getElementById('profileResult');
-  result.innerHTML = '<div class="profile-empty">Loading profile...</div>';
-
-  try {
-    const rp = new ethers.providers.JsonRpcProvider(PUBLIC_RPC);
-    const vaultR = new ethers.Contract(CONTRACTS.RepVault, REPVAULT_ABI, rp);
-    const scoreR = new ethers.Contract(CONTRACTS.RepScore, REPSCORE_ABI, rp);
-    const badgeR = new ethers.Contract(CONTRACTS.RepBadge, REPBADGE_ABI, rp);
-
-    let stake = 0, score = 0, hasBadge = false;
-    try { stake = parseFloat(ethers.utils.formatUnits(await vaultR.getStakeBalance(target), 6)); } catch {}
-    try {
-      let raw;
-      try       { raw = await scoreR.getRepScore(target); }
-      catch     { try { raw = await scoreR.scores(target); }
-      catch     { raw = await scoreR.scoreOf(target); } }
-      score = raw.toNumber ? raw.toNumber() : parseInt(raw.toString());
-    } catch {}
-    try { hasBadge = (await badgeR.balanceOf(target)).toNumber() > 0; } catch {}
-
-    let tier = 'none', tierIcon = '—', tierLabel = 'No Badge';
-    if (hasBadge) {
-      if      (stake >= 500) { tier='diamond'; tierIcon='💎'; tierLabel='Diamond'; }
-      else if (stake >= 100) { tier='gold';    tierIcon='🥇'; tierLabel='Gold'; }
-      else                   { tier='silver';  tierIcon='🥈'; tierLabel='Silver'; }
-    }
-
-    const shortAddr  = target.slice(0,8)+'...'+target.slice(-6);
-    const profileUrl = window.location.origin + window.location.pathname + '#' + target;
-
-    result.innerHTML = `
-      <div class="profile-card">
-        <div class="profile-header">
-          <div class="profile-avatar ${tier}">${tierIcon}</div>
-          <div>
-            <div class="profile-addr-full">${target}</div>
-            <div class="profile-tier-pill ${tier}">${tierLabel} ${hasBadge ? '· Verified ✓' : '· No Badge'}</div>
-          </div>
-        </div>
-        <div class="profile-stats">
-          <div class="profile-stat">
-            <div class="profile-stat-v blue">$${stake.toFixed(0)}</div>
-            <div class="profile-stat-l">Staked</div>
-          </div>
-          <div class="profile-stat">
-            <div class="profile-stat-v" style="color:var(--blue)">${score}</div>
-            <div class="profile-stat-l">Rep Score</div>
-          </div>
-          <div class="profile-stat">
-            <div class="profile-stat-v" style="color:${hasBadge ? 'var(--green)' : 'var(--text3)'}">
-              ${hasBadge ? 'Active' : 'None'}
-            </div>
-            <div class="profile-stat-l">Status</div>
-          </div>
-        </div>
-        <div class="profile-actions">
-          <div class="profile-url">${profileUrl}</div>
-          <div class="profile-action-btns">
-            <button class="profile-copy-btn" onclick="copyProfileLink('${profileUrl}')">⎘ Copy Link</button>
-            <button class="copy-card-btn" onclick="copyShareCard('${shortAddr}','${tierIcon}','${tierLabel}','${stake.toFixed(0)}','${score}')">📋 Copy Card</button>
-            <button class="profile-share-x" onclick="shareProfile('${target}','${tierIcon}','${tierLabel}','${stake.toFixed(0)}','${score}')"><span>𝕏</span> Share</button>
-          </div>
-        </div>
-      </div>`;
-  } catch(e) {
-    result.innerHTML = `<div class="profile-empty" style="color:var(--red)">Error loading profile: ${e.message}</div>`;
-  }
-}
-
-function copyProfileLink(url) {
-  navigator.clipboard.writeText(url).then(() => log('Profile link copied ✓', 's'));
-}
-
-function shareProfile(addr, icon, tier, stake, score) {
-  const short = addr.slice(0,6)+'...'+addr.slice(-4);
-  const url   = window.location.origin + window.location.pathname + '#' + addr;
-  const text  = `${icon} ${short} — ${tier} rep24 Agent\n\nStaked $${stake} USDC · Rep Score: ${score}\n\nVerified on-chain · Base Sepolia\n\n@Rep24_io`;
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-}
-
-function copyShareCard(addr, icon, tier, stake, score) {
-  const card =
-`┌─────────────────────────────┐
-│  rep24 · Agent Profile      │
-│                             │
-│  ${icon} ${(tier + ' Tier').padEnd(24)}│
-│  ${addr.padEnd(28)}│
-│                             │
-│  Staked   $${stake.toString().padEnd(18)}│
-│  Rep Score ${score.toString().padEnd(18)}│
-│  Status   Active ✓          │
-│                             │
-│  Base Sepolia · @Rep24_io   │
-└─────────────────────────────┘`;
-  navigator.clipboard.writeText(card).then(() => log('Share card copied ✓', 's'));
-}
-
-function checkUrlHash() {
-  const hash = window.location.hash.slice(1);
-  if (/^0x[0-9a-fA-F]{40}$/.test(hash)) {
-    const input = document.getElementById('profileInput');
-    if (input) input.value = hash;
-    setTimeout(() => lookupProfile(hash), 800);
-  }
-}
-
-// ── INIT ───────────────────────────────────────────────
-loadProtocolStats();
-loadLeaderboard();
-loadActivityFeed();
-setInterval(loadActivityFeed, 30000);
-checkUrlHash();
+function toggleTheme(){const html=document.documentElement;const next=(html.getAttribute('data-theme')||'dark')==='dark'?'light':'dark';html.setAttribute('data-theme',next);localStorage.setItem('rep24-theme',next);document.getElementById('themeToggle').classList.toggle('light',next==='light');}
+(function(){const saved=localStorage.getItem('rep24-theme')||'dark';document.documentElement.setAttribute('data-theme',saved);if(saved==='light')document.getElementById('themeToggle').classList.add('light');})();
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');obs.unobserve(e.target);}});},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+function switchTab(tab){['Stake','Unstake'].forEach(t=>{document.getElementById('tab'+t).classList.remove('active');document.getElementById('pane'+t).classList.remove('active');});document.getElementById('tab'+tab).classList.add('active');document.getElementById('pane'+tab).classList.add('active');}
+let rawUsdcBalance='0',rawStakedBalance='0',currentUsdcDecimals=6;
+function setMax(type){if(type==='stake'){document.getElementById('stakeAmount').value=Math.floor(parseFloat(ethers.utils.formatUnits(rawUsdcBalance,currentUsdcDecimals)));}else{document.getElementById('unstakeAmount').value=parseFloat(ethers.utils.formatUnits(rawStakedBalance,6)).toFixed(2);}}
+function setBtnState(id,disabled,text){const btn=document.getElementById(id);if(!btn)return;btn.disabled=disabled;btn.textContent=text;}
+const BASE_SEPOLIA_CHAIN_ID=84532;
+const PUBLIC_RPC='https://sepolia.base.org';
+const CONTRACTS={RepBadge:'0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',RepScore:'0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',RepVault:'0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',SlashingGovernor:'0x78ee408d6174FB4836550340a012996136bC8c77',MockUSDC:'0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',JobManager:'0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51'};
+const ERC20_ABI=['function balanceOf(address) view returns (uint256)','function decimals() view returns (uint8)','function allowance(address, address) view returns (uint256)','function approve(address, uint256) returns (bool)','function mint(address, uint256)','function faucet() payable'];
+const REPVAULT_ABI=['function stake(address agentAddress, uint256 amount)','function unstake(address agentAddress, uint256 amount)','function getStakeBalance(address) view returns (uint256)','event Staked(address indexed agent, uint256 amount)'];
+const REPBADGE_ABI=['function balanceOf(address) view returns (uint256)'];
+const REPSCORE_ABI=['function getRepScore(address) view returns (uint256)','function scores(address) view returns (uint256)','function scoreOf(address) view returns (uint256)'];
+const JOBMANAGER_ABI=['function createJob(address provider, bytes32 referenceId, uint256 escrowAmount) external returns (uint256)','function completeJob(uint256 jobId, bool success) external','function failJob(uint256 jobId) external','function jobs(uint256 jobId) external view returns (address client, address provider, bytes32 referenceId, uint256 escrowAmount, uint8 status, uint256 createdAt)','function jobCounter() external view returns (uint256)'];
+let provider,signer,userAddress,usdcContract,vaultContract,badgeContract,scoreContract,jobManagerContract,localJobs=[];
+function log(msg,type='i'){const el=document.getElementById('txLog');const d=document.createElement('div');d.className=`le ${type}`;d.textContent=`[${new Date().toLocaleTimeString('en-US',{hour12:false})}] ${msg}`;el.insertBefore(d,el.firstChild);}
+function logTx(msg,type,hash){const el=document.getElementById('txLog');const d=document.createElement('div');d.className=`le ${type}`;const t=new Date().toLocaleTimeString('en-US',{hour12:false});if(hash){d.innerHTML=`[${t}] ${msg} <a href="https://sepolia.basescan.org/tx/${hash}" target="_blank">↗ Basescan</a>`;}else{d.textContent=`[${t}] ${msg}`;}el.insertBefore(d,el.firstChild);}
+async function connectWallet(){if(!window.ethereum){log('No wallet detected — install MetaMask','e');return;}try{await window.ethereum.request({method:'eth_requestAccounts'});provider=new ethers.providers.Web3Provider(window.ethereum);signer=provider.getSigner();userAddress=await signer.getAddress();const net=await provider.getNetwork();if(net.chainId!==BASE_SEPOLIA_CHAIN_ID){document.getElementById('networkWarn').classList.add('show');log('Wrong network — switch to Base Sepolia','e');}else{document.getElementById('networkWarn').classList.remove('show');}const short=userAddress.slice(0,6)+'...'+userAddress.slice(-4);document.getElementById('walletAddr').textContent=short;document.getElementById('statusBar').classList.add('show');const btn=document.getElementById('connectBtn');btn.textContent=short;btn.classList.add('connected');initContracts();await loadData();await loadJobs();log(`Wallet connected: ${userAddress}`,'s');window.ethereum.on('accountsChanged',()=>location.reload());window.ethereum.on('chainChanged',()=>location.reload());}catch(e){log(`Connection failed: ${e.message}`,'e');}}
+async function switchNetwork(){try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x14A34'}]});}catch(e){if(e.code===4902)await window.ethereum.request({method:'wallet_addEthereumChain',params:[{chainId:'0x14A34',chainName:'Base Sepolia',rpcUrls:['https://sepolia.base.org'],nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18},blockExplorerUrls:['https://sepolia.basescan.org']}]});}}
+function initContracts(){usdcContract=new ethers.Contract(CONTRACTS.MockUSDC,ERC20_ABI,signer);vaultContract=new ethers.Contract(CONTRACTS.RepVault,REPVAULT_ABI,signer);badgeContract=new ethers.Contract(CONTRACTS.RepBadge,REPBADGE_ABI,signer);scoreContract=new ethers.Contract(CONTRACTS.RepScore,REPSCORE_ABI,signer);jobManagerContract=new ethers.Contract(CONTRACTS.JobManager,JOBMANAGER_ABI,signer);document.getElementById('btnPostJob').disabled=false;document.getElementById('btnComplete').disabled=false;document.getElementById('btnFail').disabled=false;}
+async function loadData(){if(!userAddress)return;log('Loading data...','i');try{try{currentUsdcDecimals=await usdcContract.decimals();rawUsdcBalance=await usdcContract.balanceOf(userAddress);document.getElementById('usdcBalVal').textContent=parseFloat(ethers.utils.formatUnits(rawUsdcBalance,currentUsdcDecimals)).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}catch{}try{rawStakedBalance=await vaultContract.getStakeBalance(userAddress);document.getElementById('stakedVal').textContent=parseFloat(ethers.utils.formatUnits(rawStakedBalance,6)).toFixed(2);}catch{}let score=0;try{let raw;try{raw=await scoreContract.getRepScore(userAddress);}catch{try{raw=await scoreContract.scores(userAddress);}catch{raw=await scoreContract.scoreOf(userAddress);}}score=raw.toNumber?raw.toNumber():parseInt(raw.toString());}catch{}document.getElementById('repScoreVal').textContent=score;const pct=Math.min(score/10,100);document.getElementById('scoreBarFill').style.width=pct+'%';document.getElementById('scoreBarPct').textContent=`${score} / 1000`;document.getElementById('scoreBarWrap').style.display='block';let hasBadge=false;try{hasBadge=(await badgeContract.balanceOf(userAddress)).toNumber()>0;}catch{}const stakedNum=parseFloat(ethers.utils.formatUnits(rawStakedBalance,6));const bc=document.getElementById('badgeContent');const heroShare=document.getElementById('heroShareWrap');if(heroShare)heroShare.style.display=hasBadge?'block':'none';if(hasBadge){let tier,tierClass,tierIcon;if(stakedNum>=500){tier='Diamond';tierClass='diamond';tierIcon='💎';}else if(stakedNum>=100){tier='Gold';tierClass='gold';tierIcon='🥇';}else{tier='Silver';tierClass='silver';tierIcon='🥈';}bc.innerHTML=`<div class="badge-card ${tierClass} badge-glow"><div class="badge-top"><div class="badge-shimmer"></div><div class="badge-icon-wrap">${tierIcon}</div><div class="badge-info"><div class="badge-eyebrow">Soulbound RepBadge</div><div class="badge-tier-name">${tier} Tier</div><div class="badge-network">On-chain · Verified ✓</div></div><div class="badge-network-pill">Base Sepolia</div></div><div class="badge-stats"><div class="bstat"><div class="bstat-v">$${stakedNum.toFixed(2)}</div><div class="bstat-l">Staked USDC</div></div><div class="bstat"><div class="bstat-v blue">${score}</div><div class="bstat-l">Rep Score</div></div><div class="bstat"><div class="bstat-v green">Active</div><div class="bstat-l">Status</div></div></div><div class="badge-share-row"><div class="badge-share-text">Flex your reputation on X</div><button class="share-btn" onclick="shareBadge('${tier}','${stakedNum.toFixed(2)}','${score}')"><span>𝕏</span> Share Badge</button></div></div>`;}else{bc.innerHTML=`<div class="no-badge-wrap"><div class="no-badge-tiers"><div class="tier-preview"><div class="tier-dot s">🥈</div><div class="tier-label">Silver</div></div><div class="tier-preview"><div class="tier-dot g">🥇</div><div class="tier-label">Gold</div></div><div class="tier-preview"><div class="tier-dot d">💎</div><div class="tier-label">Diamond</div></div></div><div class="no-badge-text">No RepBadge found — stake USDC below to mint yours</div></div>`;}log('Data loaded','s');}catch(e){log(`Data error: ${e.message}`,'e');}}
+async function loadProtocolStats(){try{const rp=new ethers.providers.JsonRpcProvider(PUBLIC_RPC);const usdcR=new ethers.Contract(CONTRACTS.MockUSDC,ERC20_ABI,rp);const vaultR=new ethers.Contract(CONTRACTS.RepVault,REPVAULT_ABI,rp);try{const raw=await usdcR.balanceOf(CONTRACTS.RepVault);const total=parseFloat(ethers.utils.formatUnits(raw,6));document.getElementById('totalStaked').textContent=total>=1000?`$${(total/1000).toFixed(1)}K`:`$${total.toFixed(0)}`;}catch{document.getElementById('totalStaked').textContent='$0';}try{const events=await vaultR.queryFilter(vaultR.filters.Staked(),0,'latest');document.getElementById('totalAgents').textContent=new Set(events.map(e=>e.args[0].toLowerCase())).size;}catch{try{const badgeR=new ethers.Contract(CONTRACTS.RepBadge,['function totalSupply() view returns (uint256)'],rp);const s=await badgeR.totalSupply();document.getElementById('totalAgents').textContent=s.toNumber?s.toNumber():parseInt(s.toString());}catch{document.getElementById('totalAgents').textContent='0';}}}catch{document.getElementById('totalStaked').textContent='$0';document.getElementById('totalAgents').textContent='0';}}
+async function stakeUSDC(){if(!signer){log('Connect wallet first','e');return;}const amt=document.getElementById('stakeAmount').value;if(!amt||isNaN(amt)||+amt<10){log('Minimum stake is 10 USDC','e');return;}setBtnState('btnStake',true,'Processing...');try{const amount=ethers.utils.parseUnits(amt.toString(),currentUsdcDecimals);const allowance=await usdcContract.allowance(userAddress,CONTRACTS.RepVault);if(allowance.lt(amount)){setBtnState('btnStake',true,'Approving USDC...');log(`Approving ${amt} USDC...`,'p');const a=await usdcContract.approve(CONTRACTS.RepVault,amount);await a.wait();log('Approved ✓','p');await new Promise(r=>setTimeout(r,3000));}setBtnState('btnStake',true,'Staking...');log(`Staking ${amt} USDC...`,'p');const tx=await vaultContract.stake(userAddress,amount);await tx.wait();setBtnState('btnStake',true,'✓ Staked');logTx('Staked ✓','s',tx.hash);document.getElementById('stakeAmount').value='';await new Promise(r=>setTimeout(r,4000));await loadData();loadProtocolStats();}catch(e){log(`Stake failed: ${e.reason||e.message}`,'e');}setBtnState('btnStake',false,'Stake USDC');}
+async function unstake(){if(!signer){log('Connect wallet first','e');return;}const amt=document.getElementById('unstakeAmount').value;if(!amt||isNaN(amt)||+amt<=0){log('Enter a valid amount','e');return;}setBtnState('btnUnstake',true,'Processing...');try{const amount=ethers.utils.parseUnits(amt.toString(),6);log(`Unstaking ${amt} USDC...`,'p');const tx=await vaultContract.unstake(userAddress,amount);await tx.wait();setBtnState('btnUnstake',true,'✓ Unstaked');logTx('Unstaked ✓','s',tx.hash);document.getElementById('unstakeAmount').value='';await new Promise(r=>setTimeout(r,4000));await loadData();loadProtocolStats();}catch(e){log(`Unstake failed: ${e.reason||e.message}`,'e');}setBtnState('btnUnstake',false,'Unstake USDC');}
+async function getMockUSDC(){if(!signer){log('Connect wallet first','e');return;}try{log('Minting 1000 mock USDC...','p');let tx;try{tx=await usdcContract.mint(userAddress,ethers.utils.parseUnits('1000',currentUsdcDecimals));}catch{tx=await usdcContract.faucet({value:0});}await tx.wait();log('Got 1000 mock USDC ✓','s');await new Promise(r=>setTimeout(r,3000));await loadData();}catch(e){log(`Faucet failed: ${e.reason||e.message}`,'e');}}
+async function postJob(){if(!signer){log('Connect wallet first','e');return;}const agent=document.getElementById('jobAgentAddr').value.trim();const desc=document.getElementById('jobDescription').value.trim();const escrow=document.getElementById('jobEscrow').value.trim();if(!ethers.utils.isAddress(agent)){log('Job: enter a valid agent address','e');return;}if(!desc){log('Job: add a description','e');return;}if(!escrow||isNaN(escrow)||+escrow<=0){log('Job: enter escrow amount in USDC','e');return;}setBtnState('btnPostJob',true,'Approving USDC...');try{const escrowAmount=ethers.utils.parseUnits(escrow.toString(),6);const referenceId=ethers.utils.keccak256(ethers.utils.toUtf8Bytes(desc));log(`Approving ${escrow} USDC for JobManager...`,'p');const approveTx=await usdcContract.approve(CONTRACTS.JobManager,escrowAmount);await approveTx.wait();log('USDC approved ✓','p');setBtnState('btnPostJob',true,'Creating job...');log('Posting job on-chain...','p');const tx=await jobManagerContract.createJob(agent,referenceId,escrowAmount);await tx.wait();let jobId=localJobs.length+1;try{const counter=await jobManagerContract.jobCounter();jobId=counter.toNumber();}catch{}localJobs.push({id:jobId,agent,desc,escrow:parseFloat(escrow),status:0});document.getElementById('jobAgentAddr').value='';document.getElementById('jobDescription').value='';document.getElementById('jobEscrow').value='';renderJobs();logTx(`Job #${jobId} posted ✓  (${escrow} USDC escrowed)`,'s',tx.hash);}catch(e){log(`Post job failed: ${e.reason||e.message}`,'e');}setBtnState('btnPostJob',false,'Post Job');}
+async function loadJobs(){if(!jobManagerContract)return;log('Loading jobs...','i');try{const count=await jobManagerContract.jobCounter();const n=count.toNumber();localJobs=[];for(let i=1;i<=n;i++){try{const job=await jobManagerContract.jobs(i);let descLabel=`Job #${i}`;try{descLabel='Ref: '+job.referenceId.slice(0,10)+'…';}catch{}localJobs.push({id:i,agent:job.provider,desc:descLabel,escrow:parseFloat(ethers.utils.formatUnits(job.escrowAmount,6)),status:Number(job.status)});}catch{}}renderJobs();log(`Loaded ${n} job(s)`,'s');}catch(e){log(`Jobs load error: ${e.message}`,'e');renderJobs();}}
+async function resolveJob(action){if(!signer){log('Connect wallet first','e');return;}const idVal=document.getElementById('resolveJobId').value;if(idVal===''||idVal===null){log('Enter a job ID','e');return;}const jobId=parseInt(idVal);const isComplete=action==='complete';const btnId=isComplete?'btnComplete':'btnFail';setBtnState(btnId,true,'...');try{log(`${isComplete?'Completing':'Failing'} job #${jobId}...`,'p');let tx;if(isComplete){tx=await jobManagerContract.completeJob(jobId,true);}else{tx=await jobManagerContract.failJob(jobId);}await tx.wait();const job=localJobs.find(j=>j.id===jobId);if(job)job.status=isComplete?1:2;renderJobs();logTx(`Job #${jobId} ${isComplete?'completed ✓':'failed ✕'}`,isComplete?'s':'e',tx.hash);await loadData();}catch(e){log(`Resolve failed: ${e.reason||e.message}`,'e');}setBtnState(btnId,false,isComplete?'✓ Complete':'✕ Fail');}
+async function quickResolve(jobId,action){document.getElementById('resolveJobId').value=jobId;await resolveJob(action);}
+function renderJobs(){const el=document.getElementById('jobBoardList');if(!localJobs.length){el.innerHTML='<div class="jobs-empty"><div class="jobs-empty-icon">◌</div>No jobs yet — post the first job above.</div>';return;}const sMap={0:['js-pending','Pending'],1:['js-complete','Complete'],2:['js-failed','Failed']};el.innerHTML=[...localJobs].reverse().map(job=>{const[cls,label]=sMap[job.status]||['js-pending','Unknown'];const short=job.agent.slice(0,8)+'…'+job.agent.slice(-6);const canResolve=job.status===0;return`<div class="job-item"><div class="job-num">#${job.id}</div><div class="job-body"><div class="job-desc">${escHtml(job.desc)}</div><div class="job-meta">Provider: ${short}</div><div class="job-meta" style="color:var(--yellow)">Escrow: $${(job.escrow||0).toFixed(2)} USDC</div>${canResolve?`<div class="job-btns-row"><button class="btn-success btn-sm" onclick="quickResolve(${job.id},'complete')">✓ Complete</button><button class="btn-danger btn-sm" onclick="quickResolve(${job.id},'fail')">✕ Fail</button></div>`:''}</div><div class="job-status-pill ${cls}">${label}</div></div>`;}).join('');}
+function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function sharePublic(){const text='rep24 is building the trust layer for AI agents on Base 🤖⛓️\n\nAgents stake USDC → earn a RepBadge → build on-chain reputation\nBad work gets slashed. Good work grows your score.\n\nx402 pays · ERC-8004 identifies · rep24 verifies\n\n@Rep24_io';window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://abdallerhnet-web.github.io/rep24/')}`, '_blank');}
+function shareBadge(tier,staked,score){const icons={Silver:'🥈',Gold:'🥇',Diamond:'💎'};const text=`Just earned my ${icons[tier]||'🏅'} ${tier} RepBadge on @Rep24_io\n\nStaked $${staked} USDC on Base · Rep Score: ${score}\n\nx402 pays · ERC-8004 identifies · rep24 verifies\n\nThe trust layer for AI agents 🤖⛓️`;window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://abdallerhnet-web.github.io/rep24/')}`, '_blank');}
+async function loadLeaderboard(){const body=document.getElementById('leaderboardBody');body.innerHTML='<div class="lb-empty">Fetching on-chain data...</div>';try{const rp=new ethers.providers.JsonRpcProvider(PUBLIC_RPC);const vaultR=new ethers.Contract(CONTRACTS.RepVault,REPVAULT_ABI,rp);const scoreR=new ethers.Contract(CONTRACTS.RepScore,REPSCORE_ABI,rp);const events=await vaultR.queryFilter(vaultR.filters.Staked(),0,'latest');if(events.length===0){body.innerHTML='<div class="lb-empty">No agents staked yet — be the first! 🚀</div>';return;}const uniqueAddrs=[...new Set(events.map(e=>e.args[0].toLowerCase()))];const rows=await Promise.all(uniqueAddrs.map(async addr=>{let stake=0,score=0;try{stake=parseFloat(ethers.utils.formatUnits(await vaultR.getStakeBalance(addr),6));}catch{}try{let raw;try{raw=await scoreR.getRepScore(addr);}catch{try{raw=await scoreR.scores(addr);}catch{raw=await scoreR.scoreOf(addr);}}score=raw.toNumber?raw.toNumber():parseInt(raw.toString());}catch{}return{addr,stake,score};}));const sorted=rows.filter(r=>r.stake>0).sort((a,b)=>b.stake-a.stake).slice(0,10);if(sorted.length===0){body.innerHTML='<div class="lb-empty">No active stakes found yet.</div>';return;}const rankIcons=['🥇','🥈','🥉'];body.innerHTML=sorted.map((r,i)=>{const isMe=userAddress&&r.addr===userAddress.toLowerCase();let badgeTier='silver',badgeLabel='🥈 Silver';if(r.stake>=500){badgeTier='diamond';badgeLabel='💎 Diamond';}else if(r.stake>=100){badgeTier='gold';badgeLabel='🥇 Gold';}return`<div class="lb-row ${isMe?'me':''}"><div class="lb-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${rankIcons[i]||i+1}</div><div class="lb-agent"><div class="lb-agent-addr">${r.addr.slice(0,6)+'...'+r.addr.slice(-4)}</div>${isMe?'<div class="lb-agent-you">← YOU</div>':''}</div><div class="lb-stake">$${r.stake.toFixed(0)}</div><div><span class="lb-badge-pill ${badgeTier}">${badgeLabel}</span></div><div class="lb-score">${r.score}</div></div>`;}).join('');}catch(e){body.innerHTML=`<div class="lb-empty">Could not load — ${e.message}</div>`;}}
+function copy(addr){navigator.clipboard.writeText(addr).then(()=>log(`Copied: ${addr}`,'i'));}
+async function loadActivityFeed(){const feed=document.getElementById('activityFeed');try{const rp=new ethers.providers.JsonRpcProvider(PUBLIC_RPC);const vaultR=new ethers.Contract(CONTRACTS.RepVault,REPVAULT_ABI,rp);const events=await vaultR.queryFilter(vaultR.filters.Staked(),0,'latest');if(!events.length){feed.innerHTML='<div class="feed-empty">No activity yet — be the first to stake 🚀</div>';return;}const recent=[...events].reverse().slice(0,8);const now=Math.floor(Date.now()/1000);const rows=await Promise.all(recent.map(async(e)=>{let ts=now;try{const block=await rp.getBlock(e.blockNumber);ts=block.timestamp;}catch{}const ago=now-ts;let timeStr;if(ago<60)timeStr=`${ago}s ago`;else if(ago<3600)timeStr=`${Math.floor(ago/60)}m ago`;else if(ago<86400)timeStr=`${Math.floor(ago/3600)}h ago`;else timeStr=`${Math.floor(ago/86400)}d ago`;const addr=e.args[0];const amt=parseFloat(ethers.utils.formatUnits(e.args[1],6)).toFixed(0);const short=addr.slice(0,6)+'...'+addr.slice(-4);const txHash=e.transactionHash;const isMe=userAddress&&addr.toLowerCase()===userAddress.toLowerCase();return`<div class="feed-row"><div class="feed-dot"></div><div class="feed-addr">${short}${isMe?' <span style="color:var(--blue);font-size:9px">YOU</span>':''}</div><div class="feed-amt">+$${amt} USDC</div><div class="feed-time">${timeStr}</div><a class="feed-link" href="https://sepolia.basescan.org/tx/${txHash}" target="_blank">↗</a></div>`;}));feed.innerHTML=rows.join('');}catch(e){feed.innerHTML=`<div class="feed-empty">Could not load — ${e.message}</div>`;}}
+async function lookupProfile(addr){const input=document.getElementById('profileInput');const target=addr||input.value.trim();if(!target||!/^0x[0-9a-fA-F]{40}$/.test(target)){document.getElementById('profileResult').innerHTML='<div class="profile-empty" style="color:var(--red)">Enter a valid 0x wallet address.</div>';return;}if(input)input.value=target;history.replaceState(null,'','#'+target);const result=document.getElementById('profileResult');result.innerHTML='<div class="profile-empty">Loading profile...</div>';try{const rp=new ethers.providers.JsonRpcProvider(PUBLIC_RPC);const vaultR=new ethers.Contract(CONTRACTS.RepVault,REPVAULT_ABI,rp);const scoreR=new ethers.Contract(CONTRACTS.RepScore,REPSCORE_ABI,rp);const badgeR=new ethers.Contract(CONTRACTS.RepBadge,REPBADGE_ABI,rp);let stake=0,score=0,hasBadge=false;try{stake=parseFloat(ethers.utils.formatUnits(await vaultR.getStakeBalance(target),6));}catch{}try{let raw;try{raw=await scoreR.getRepScore(target);}catch{try{raw=await scoreR.scores(target);}catch{raw=await scoreR.scoreOf(target);}}score=raw.toNumber?raw.toNumber():parseInt(raw.toString());}catch{}try{hasBadge=(await badgeR.balanceOf(target)).toNumber()>0;}catch{}let tier='none',tierIcon='—',tierLabel='No Badge';if(hasBadge){if(stake>=500){tier='diamond';tierIcon='💎';tierLabel='Diamond';}else if(stake>=100){tier='gold';tierIcon='🥇';tierLabel='Gold';}else{tier='silver';tierIcon='🥈';tierLabel='Silver';}}const shortAddr=target.slice(0,8)+'...'+target.slice(-6);const profileUrl=window.location.origin+window.location.pathname+'#'+target;result.innerHTML=`<div class="profile-card"><div class="profile-header"><div class="profile-avatar ${tier}">${tierIcon}</div><div><div class="profile-addr-full">${target}</div><div class="profile-tier-pill ${tier}">${tierLabel} ${hasBadge?'· Verified ✓':'· No Badge'}</div></div></div><div class="profile-stats"><div class="profile-stat"><div class="profile-stat-v blue">$${stake.toFixed(0)}</div><div class="profile-stat-l">Staked</div></div><div class="profile-stat"><div class="profile-stat-v" style="color:var(--blue)">${score}</div><div class="profile-stat-l">Rep Score</div></div><div class="profile-stat"><div class="profile-stat-v" style="color:${hasBadge?'var(--green)':'var(--text3)'}">${hasBadge?'Active':'None'}</div><div class="profile-stat-l">Status</div></div></div><div class="profile-actions"><div class="profile-url">${profileUrl}</div><div class="profile-action-btns"><button class="profile-copy-btn" onclick="copyProfileLink('${profileUrl}')">⎘ Copy Link</button><button class="profile-share-x" onclick="shareProfile('${target}','${tierIcon}','${tierLabel}','${stake.toFixed(0)}','${score}')"><span>𝕏</span> Share</button></div></div></div>`;}catch(e){result.innerHTML=`<div class="profile-empty" style="color:var(--red)">Error: ${e.message}</div>`;}}
+function copyProfileLink(url){navigator.clipboard.writeText(url).then(()=>log('Profile link copied ✓','s'));}
+function shareProfile(addr,icon,tier,stake,score){const short=addr.slice(0,6)+'...'+addr.slice(-4);const url=window.location.origin+window.location.pathname+'#'+addr;const text=`${icon} ${short} — ${tier} rep24 Agent\n\nStaked $${stake} USDC · Rep Score: ${score}\n\nVerified on-chain · Base Sepolia\n\n@Rep24_io`;window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');}
+function checkUrlHash(){const hash=window.location.hash.slice(1);if(/^0x[0-9a-fA-F]{40}$/.test(hash)){const input=document.getElementById('profileInput');if(input)input.value=hash;setTimeout(()=>lookupProfile(hash),800);}}
+loadProtocolStats();loadLeaderboard();loadActivityFeed();setInterval(loadActivityFeed,30000);checkUrlHash();
 </script>
 </body>
-</html>
+                                                                                                                  </html>
