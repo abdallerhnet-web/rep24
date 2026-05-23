@@ -506,7 +506,7 @@ const BASE_SEPOLIA_CHAIN_ID=84532;
 const PUBLIC_RPC='https://sepolia.base.org';
 const CONTRACTS={RepBadge:'0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',RepScore:'0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',RepVault:'0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',SlashingGovernor:'0x78ee408d6174FB4836550340a012996136bC8c77',MockUSDC:'0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',JobManager:'0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51'};
 const ERC20_ABI=['function balanceOf(address) view returns (uint256)','function decimals() view returns (uint8)','function allowance(address, address) view returns (uint256)','function approve(address, uint256) returns (bool)','function mint(address, uint256)','function faucet() payable'];
-const REPVAULT_ABI=['function stake(address agentAddress, uint256 amount)','function unstake(address agentAddress, uint256 amount)','function getStakeBalance(address) view returns (uint256)','event Staked(address indexed agent, uint256 amount)'];
+const REPVAULT_ABI=['function stake(address agentAddress, uint256 amount)','function unstake(address agentAddress, uint256 amount)','function getStakeBalance(address) view returns (uint256)','function grantRole(bytes32 role, address account)','event Staked(address indexed agent, uint256 amount)'];
 const REPBADGE_ABI=['function balanceOf(address) view returns (uint256)'];
 const REPSCORE_ABI=['function getRepScore(address) view returns (uint256)','function scores(address) view returns (uint256)','function scoreOf(address) view returns (uint256)'];
 const JOBMANAGER_ABI=['function createJob(address provider, bytes32 referenceId, uint256 escrowAmount) external returns (uint256)','function completeJob(uint256 jobId, bool success) external','function failJob(uint256 jobId) external','function jobs(uint256 jobId) external view returns (address client, address provider, bytes32 referenceId, uint256 escrowAmount, uint8 status, uint256 createdAt)','function jobCounter() external view returns (uint256)'];
@@ -538,5 +538,32 @@ function shareProfile(addr,icon,tier,stake,score){const short=addr.slice(0,6)+'.
 function checkUrlHash(){const hash=window.location.hash.slice(1);if(/^0x[0-9a-fA-F]{40}$/.test(hash)){const input=document.getElementById('profileInput');if(input)input.value=hash;setTimeout(()=>lookupProfile(hash),800);}}
 loadProtocolStats();loadLeaderboard();loadActivityFeed();setInterval(loadActivityFeed,30000);checkUrlHash();
 </script>
+
+<!-- ======= TEMP ADMIN: Grant JobManager Role ======= -->
+<div style="position:fixed;bottom:20px;right:20px;z-index:999;">
+  <button onclick="grantJobManagerRole()" style="background:#FF4560;color:#fff;border:none;padding:12px 20px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 4px 20px rgba(255,69,96,0.4);">
+    🔐 Grant JobManager Role
+  </button>
+</div>
+<script>
+async function grantJobManagerRole(){
+  if(!signer){alert('Connect wallet first');return;}
+  try{
+    const repVault=new ethers.Contract(
+      '0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',
+      ['function grantRole(bytes32 role, address account)'],
+      signer
+    );
+    const tx=await repVault.grantRole(
+      '0x0000000000000000000000000000000000000000000000000000000000000000',
+      '0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51'
+    );
+    await tx.wait();
+    alert('✅ JobManager role granted! Try posting a job now.');
+  }catch(e){alert('Failed: '+e.message);}
+}
+</script>
+<!-- ======= END TEMP ADMIN ======= -->
+
 </body>
-                                                                                                                  </html>
+</html>
