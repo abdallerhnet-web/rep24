@@ -521,8 +521,57 @@ async function loadProtocolStats(){try{const rp=new ethers.providers.JsonRpcProv
 async function stakeUSDC(){if(!signer){log('Connect wallet first','e');return;}const amt=document.getElementById('stakeAmount').value;if(!amt||isNaN(amt)||+amt<10){log('Minimum stake is 10 USDC','e');return;}setBtnState('btnStake',true,'Processing...');try{const amount=ethers.utils.parseUnits(amt.toString(),currentUsdcDecimals);const allowance=await usdcContract.allowance(userAddress,CONTRACTS.RepVault);if(allowance.lt(amount)){setBtnState('btnStake',true,'Approving USDC...');log(`Approving ${amt} USDC...`,'p');const a=await usdcContract.approve(CONTRACTS.RepVault,amount);await a.wait();log('Approved ✓','p');await new Promise(r=>setTimeout(r,3000));}setBtnState('btnStake',true,'Staking...');log(`Staking ${amt} USDC...`,'p');const tx=await vaultContract.stake(userAddress,amount);await tx.wait();setBtnState('btnStake',true,'✓ Staked');logTx('Staked ✓','s',tx.hash);document.getElementById('stakeAmount').value='';await new Promise(r=>setTimeout(r,4000));await loadData();loadProtocolStats();}catch(e){log(`Stake failed: ${e.reason||e.message}`,'e');}setBtnState('btnStake',false,'Stake USDC');}
 async function unstake(){if(!signer){log('Connect wallet first','e');return;}const amt=document.getElementById('unstakeAmount').value;if(!amt||isNaN(amt)||+amt<=0){log('Enter a valid amount','e');return;}setBtnState('btnUnstake',true,'Processing...');try{const amount=ethers.utils.parseUnits(amt.toString(),6);log(`Unstaking ${amt} USDC...`,'p');const tx=await vaultContract.unstake(userAddress,amount);await tx.wait();setBtnState('btnUnstake',true,'✓ Unstaked');logTx('Unstaked ✓','s',tx.hash);document.getElementById('unstakeAmount').value='';await new Promise(r=>setTimeout(r,4000));await loadData();loadProtocolStats();}catch(e){log(`Unstake failed: ${e.reason||e.message}`,'e');}setBtnState('btnUnstake',false,'Unstake USDC');}
 async function getMockUSDC(){if(!signer){log('Connect wallet first','e');return;}try{log('Minting 1000 mock USDC...','p');let tx;try{tx=await usdcContract.mint(userAddress,ethers.utils.parseUnits('1000',currentUsdcDecimals));}catch{tx=await usdcContract.faucet({value:0});}await tx.wait();log('Got 1000 mock USDC ✓','s');await new Promise(r=>setTimeout(r,3000));await loadData();}catch(e){log(`Faucet failed: ${e.reason||e.message}`,'e');}}
-async function postJob(){if(!signer){log('Connect wallet first','e');return;}const agent=document.getElementById('jobAgentAddr').value.trim();const desc=document.getElementById('jobDescription').value.trim();const escrow=document.getElementById('jobEscrow').value.trim();if(!ethers.utils.isAddress(agent)){log('Job: enter a valid agent address','e');return;}if(!desc){log('Job: add a description','e');return;}if(!escrow||isNaN(escrow)||+escrow<=0){log('Job: enter escrow amount in USDC','e');return;}setBtnState('btnPostJob',true,'Approving USDC...');try{const escrowAmount=ethers.utils.parseUnits(escrow.toString(),6);const referenceId=ethers.utils.keccak256(ethers.utils.toUtf8Bytes(desc));log(`Approving ${escrow} USDC for JobManager...`,'p');const approveTx=await usdcContract.approve(CONTRACTS.JobManager,escrowAmount);await approveTx.wait();log('USDC approved ✓','p');setBtnState('btnPostJob',true,'Simulating...');log('Simulating call to get revert reason...','i');try{await jobManagerContract.callStatic.createJob(agent,referenceId,escrowAmount);}catch(simErr){const reason=simErr.reason||simErr.error?.message||simErr.data||simErr.message||'unknown';log(`REVERT REASON: ${reason}`,'e');setBtnState('btnPostJob',false,'Post Job');return;}setBtnState('btnPostJob',true,'Creating job...');log('Posting job on-chain...','p');const tx=await jobManagerContract.createJob(agent,referenceId,escrowAmount,{gasLimit:600000});await tx.wait();let jobId=localJobs.length+1;try{const counter=await jobManagerContract.jobCounter();jobId=counter.toNumber();}catch{}localJobs.push({id:jobId,agent,desc,escrow:parseFloat(escrow),status:0});document.getElementById('jobAgentAddr').value='';document.getElementById('jobDescription').value='';document.getElementById('jobEscrow').value='';renderJobs();logTx(`Job #${jobId} posted ✓  (${escrow} USDC escrowed)`,'s',tx.hash);}catch(e){log(`Post job failed: ${e.reason||e.data||e.message}`,'e');}setBtnState('btnPostJob',false,'Post Job');}
-async function loadJobs(){if(!jobManagerContract)return;log('Loading jobs...','i');try{const count=await jobManagerContract.jobCounter();const n=count.toNumber();localJobs=[];for(let i=1;i<=n;i++){try{const job=await jobManagerContract.jobs(i);let descLabel=`Job #${i}`;try{descLabel='Ref: '+job.referenceId.slice(0,10)+'…';}catch{}localJobs.push({id:i,agent:job.provider,desc:descLabel,escrow:parseFloat(ethers.utils.formatUnits(job.escrowAmount,6)),status:Number(job.status)});}catch{}}renderJobs();log(`Loaded ${n} job(s)`,'s');}catch(e){log(`Jobs load error: ${e.message}`,'e');renderJobs();}}
+async function postJob(){if(!signer){log('Connect wallet first','e');return;}
+  const agent=document.getElementById('jobAgentAddr').value.trim();
+  const desc=document.getElementById('jobDescription').value.trim();
+  const escrow=document.getElementById('jobEscrow').value.trim();
+  if(!ethers.utils.isAddress(agent)){log('Job: enter a valid agent address','e');return;}
+  if(!desc){log('Job: add a description','e');return;}
+  if(!escrow||isNaN(escrow)||+escrow<=0){log('Job: enter escrow amount in USDC','e');return;}
+  setBtnState('btnPostJob',true,'Checking agent...');
+  try{
+    const staked=await vaultContract.getStakeBalance(agent);
+    const stakedAmt=parseFloat(ethers.utils.formatUnits(staked,6));
+    if(stakedAmt<=0){log(`Agent ${agent.slice(0,8)}... has no stake in RepVault — cannot post job`,'e');setBtnState('btnPostJob',false,'Post Job');return;}
+    log(`Agent stake verified: $${stakedAmt.toFixed(2)} USDC ✓`,'s');
+  }catch(e){log(`Could not verify agent stake: ${e.message}`,'e');setBtnState('btnPostJob',false,'Post Job');return;}
+  setBtnState('btnPostJob',true,'Approving USDC...');
+  try{
+    const escrowAmount=ethers.utils.parseUnits(escrow.toString(),6);
+    const referenceId=ethers.utils.keccak256(ethers.utils.toUtf8Bytes(desc));
+    log(`Approving ${escrow} USDC for JobManager...`,'p');
+    const approveTx=await usdcContract.approve(CONTRACTS.JobManager,escrowAmount);
+    await approveTx.wait();
+    log('USDC approved ✓','p');
+    await new Promise(r=>setTimeout(r,2000));
+    setBtnState('btnPostJob',true,'Simulating...');
+    try{
+      await jobManagerContract.callStatic.createJob(agent,referenceId,escrowAmount,{from:userAddress});
+      log('Simulation passed ✓','s');
+    }catch(simErr){
+      let reason='unknown';
+      if(simErr.reason)reason=simErr.reason;
+      else if(simErr.error?.message)reason=simErr.error.message;
+      else if(typeof simErr.data==='string')reason=simErr.data;
+      else if(simErr.message)reason=simErr.message;
+      log(`Simulation reverted — reason: ${reason}`,'e');
+      setBtnState('btnPostJob',false,'Post Job');return;
+    }
+    setBtnState('btnPostJob',true,'Posting job...');
+    log('Posting job on-chain...','p');
+    const tx=await jobManagerContract.createJob(agent,referenceId,escrowAmount,{gasLimit:600000});
+    await tx.wait();
+    let jobId=localJobs.length+1;
+    try{const counter=await jobManagerContract.jobCounter();jobId=counter.toNumber();}catch{}
+    localJobs.push({id:jobId,agent,desc,escrow:parseFloat(escrow),status:0});
+    document.getElementById('jobAgentAddr').value='';
+    document.getElementById('jobDescription').value='';
+    document.getElementById('jobEscrow').value='';
+    renderJobs();
+    logTx(`Job #${jobId} posted ✓  (${escrow} USDC escrowed)`,'s',tx.hash);
+  }catch(e){log(`Post job failed: ${e.reason||e.error?.reason||e.data||e.message}`,'e');}
+  setBtnState('btnPostJob',false,'Post Job');
+}async function loadJobs(){if(!jobManagerContract)return;log('Loading jobs...','i');try{const count=await jobManagerContract.jobCounter();const n=count.toNumber();localJobs=[];for(let i=1;i<=n;i++){try{const job=await jobManagerContract.jobs(i);let descLabel=`Job #${i}`;try{descLabel='Ref: '+job.referenceId.slice(0,10)+'…';}catch{}localJobs.push({id:i,agent:job.provider,desc:descLabel,escrow:parseFloat(ethers.utils.formatUnits(job.escrowAmount,6)),status:Number(job.status)});}catch{}}renderJobs();log(`Loaded ${n} job(s)`,'s');}catch(e){log(`Jobs load error: ${e.message}`,'e');renderJobs();}}
 async function resolveJob(action){if(!signer){log('Connect wallet first','e');return;}const idVal=document.getElementById('resolveJobId').value;if(idVal===''||idVal===null){log('Enter a job ID','e');return;}const jobId=parseInt(idVal);const isComplete=action==='complete';const btnId=isComplete?'btnComplete':'btnFail';setBtnState(btnId,true,'...');try{log(`${isComplete?'Completing':'Failing'} job #${jobId}...`,'p');let tx;if(isComplete){tx=await jobManagerContract.completeJob(jobId,true);}else{tx=await jobManagerContract.failJob(jobId);}await tx.wait();const job=localJobs.find(j=>j.id===jobId);if(job)job.status=isComplete?1:2;renderJobs();logTx(`Job #${jobId} ${isComplete?'completed ✓':'failed ✕'}`,isComplete?'s':'e',tx.hash);await loadData();}catch(e){log(`Resolve failed: ${e.reason||e.message}`,'e');}setBtnState(btnId,false,isComplete?'✓ Complete':'✕ Fail');}
 async function quickResolve(jobId,action){document.getElementById('resolveJobId').value=jobId;await resolveJob(action);}
 function renderJobs(){const el=document.getElementById('jobBoardList');if(!localJobs.length){el.innerHTML='<div class="jobs-empty"><div class="jobs-empty-icon">◌</div>No jobs yet — post the first job above.</div>';return;}const sMap={0:['js-pending','Pending'],1:['js-complete','Complete'],2:['js-failed','Failed']};el.innerHTML=[...localJobs].reverse().map(job=>{const[cls,label]=sMap[job.status]||['js-pending','Unknown'];const short=job.agent.slice(0,8)+'…'+job.agent.slice(-6);const canResolve=job.status===0;return`<div class="job-item"><div class="job-num">#${job.id}</div><div class="job-body"><div class="job-desc">${escHtml(job.desc)}</div><div class="job-meta">Provider: ${short}</div><div class="job-meta" style="color:var(--yellow)">Escrow: $${(job.escrow||0).toFixed(2)} USDC</div>${canResolve?`<div class="job-btns-row"><button class="btn-success btn-sm" onclick="quickResolve(${job.id},'complete')">✓ Complete</button><button class="btn-danger btn-sm" onclick="quickResolve(${job.id},'fail')">✕ Fail</button></div>`:''}</div><div class="job-status-pill ${cls}">${label}</div></div>`;}).join('');}
