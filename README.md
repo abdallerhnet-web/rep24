@@ -127,9 +127,9 @@ rep24 is the economic middleware that transforms passive identity into **stakabl
 |----------|---------|
 | 🏅 RepBadge | [`0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3`](https://sepolia.basescan.org/address/0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3) |
 | 📊 RepScore | [`0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3`](https://sepolia.basescan.org/address/0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3) |
-| 🏦 RepVault | [`0x31229262DE71e12B1eC1CE1BEf62d815b565573F`](https://sepolia.basescan.org/address/0x31229262DE71e12B1eC1CE1BEf62d815b565573F) |
+| 🏦 RepVault | [`0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5`](https://sepolia.basescan.org/address/0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5) |
 | ⚖️ SlashingGovernor | [`0x78ee408d6174FB4836550340a012996136bC8c77`](https://sepolia.basescan.org/address/0x78ee408d6174FB4836550340a012996136bC8c77) |
-| ⚙️ JobManager | [`0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51`](https://sepolia.basescan.org/address/0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51) |
+| ⚙️ JobManager | [`0x7d084111A83414604243116a49a8beA67409875D`](https://sepolia.basescan.org/address/0x7d084111A83414604243116a49a8beA67409875D) |
 | 🪙 Mock USDC | [`0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de`](https://sepolia.basescan.org/address/0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de) |
 
 ---

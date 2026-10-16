@@ -422,7 +422,7 @@ header { display: flex; align-items: center; justify-content: space-between; pad
       <div class="crow"><span class="cname">RepVault</span><span class="caddr">0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5</span><button class="cbtn" onclick="copy('0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5')">⎘</button></div>
       <div class="crow"><span class="cname">MockUSDC</span><span class="caddr">0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de</span><button class="cbtn" onclick="copy('0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de')">⎘</button></div>
       <div class="crow"><span class="cname">SlashingGovernor</span><span class="caddr">0x78ee408d6174FB4836550340a012996136bC8c77</span><button class="cbtn" onclick="copy('0x78ee408d6174FB4836550340a012996136bC8c77')">⎘</button></div>
-      <div class="crow"><span class="cname">JobManager</span><span class="caddr">0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51</span><button class="cbtn" onclick="copy('0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51')">⎘</button></div>
+      <div class="crow"><span class="cname">JobManager</span><span class="caddr">0x7d084111A83414604243116a49a8beA67409875D</span><button class="cbtn" onclick="copy('0x7d084111A83414604243116a49a8beA67409875D')">⎘</button></div>
     </div>
   </div>
   <hr class="divider"/>
@@ -504,9 +504,9 @@ function setMax(type){if(type==='stake'){document.getElementById('stakeAmount').
 function setBtnState(id,disabled,text){const btn=document.getElementById(id);if(!btn)return;btn.disabled=disabled;btn.textContent=text;}
 const BASE_SEPOLIA_CHAIN_ID=84532;
 const PUBLIC_RPC='https://sepolia.base.org';
-const CONTRACTS={RepBadge:'0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',RepScore:'0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',RepVault:'0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',SlashingGovernor:'0x78ee408d6174FB4836550340a012996136bC8c77',MockUSDC:'0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',JobManager:'0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51'};
+const CONTRACTS={RepBadge:'0xFc933B401F2932A93c3d29b188a00f7c88ceAEd3',RepScore:'0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',RepVault:'0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',SlashingGovernor:'0x78ee408d6174FB4836550340a012996136bC8c77',MockUSDC:'0xDdB4dA5EAF928b8dfCAe8eF5B758b4A9DC1695de',JobManager:'0x7d084111A83414604243116a49a8beA67409875D'};
 const ERC20_ABI=['function balanceOf(address) view returns (uint256)','function decimals() view returns (uint8)','function allowance(address, address) view returns (uint256)','function approve(address, uint256) returns (bool)','function mint(address, uint256)','function faucet() payable'];
-const REPVAULT_ABI=['function stake(address agentAddress, uint256 amount)','function unstake(address agentAddress, uint256 amount)','function getStakeBalance(address) view returns (uint256)','function grantRole(bytes32 role, address account)','event Staked(address indexed agent, uint256 amount)'];
+const REPVAULT_ABI=['function stake(address agentAddress, uint256 amount)','function unstake(address agentAddress, uint256 amount)','function getStakeBalance(address) view returns (uint256)','function grantRole(bytes32 role, address account)','event Staked(address indexed agentAddress, uint256 amount, uint256 newBalance)'];
 const REPBADGE_ABI=['function balanceOf(address) view returns (uint256)'];
 const REPSCORE_ABI=['function getRepScore(address) view returns (uint256)','function scores(address) view returns (uint256)','function scoreOf(address) view returns (uint256)'];
 const JOBMANAGER_ABI=['function createJob(address provider, bytes32 referenceId, uint256 escrowAmount) external returns (uint256)','function completeJob(uint256 jobId, bool success) external','function failJob(uint256 jobId) external','function jobs(uint256 jobId) external view returns (address client, address provider, bytes32 referenceId, uint256 escrowAmount, uint8 status, uint256 createdAt)','function jobCounter() external view returns (uint256)'];
@@ -588,29 +588,6 @@ function checkUrlHash(){const hash=window.location.hash.slice(1);if(/^0x[0-9a-fA
 loadProtocolStats();loadLeaderboard();loadActivityFeed();setInterval(loadActivityFeed,30000);checkUrlHash();
 </script>
 
-<!-- ======= TEMP ADMIN PANEL ======= -->
-<div style="position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
-  <button onclick="grantCustomAdminRole()" style="background:#8060FF;color:#fff;border:none;padding:10px 16px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 4px 20px rgba(128,96,255,0.4);">🔑 Grant ADMIN_ROLE</button>
-  <button onclick="grantDefaultAdminRole()" style="background:#FF4560;color:#fff;border:none;padding:10px 16px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 4px 20px rgba(255,69,96,0.4);">🔐 Grant DEFAULT_ADMIN</button>
-  <button onclick="grantScoreUpdaterRole()" style="background:#00A86B;color:#fff;border:none;padding:10px 16px;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:12px;cursor:pointer;box-shadow:0 4px 20px rgba(0,168,107,0.4);">📊 Grant Score Updater</button>
-</div>
-<script>
-const JM='0x6B51090ED106616ddB52c20EE8Fb1F2306D7aF51';
-const ROLE_ABI=['function grantRole(bytes32 role, address account)'];
-async function grantCustomAdminRole(){
-  if(!signer){alert('Connect wallet first');return;}
-  try{const c=new ethers.Contract('0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',ROLE_ABI,signer);const tx=await c.grantRole('0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775',JM);await tx.wait();alert('✅ ADMIN_ROLE granted to JobManager on RepVault!');}catch(e){alert('Failed: '+e.message);}
-}
-async function grantDefaultAdminRole(){
-  if(!signer){alert('Connect wallet first');return;}
-  try{const c=new ethers.Contract('0x47b8055E25FBda1cfEe3b8d6D0ED4c2ccbe947E5',ROLE_ABI,signer);const tx=await c.grantRole('0x0000000000000000000000000000000000000000000000000000000000000000',JM);await tx.wait();alert('✅ DEFAULT_ADMIN_ROLE granted to JobManager on RepVault!');}catch(e){alert('Failed: '+e.message);}
-}
-async function grantScoreUpdaterRole(){
-  if(!signer){alert('Connect wallet first');return;}
-  try{const c=new ethers.Contract('0x2Bcc43973B600f29E0Cd8Dc740B8b0c3043F08c3',ROLE_ABI,signer);const tx=await c.grantRole('0x0000000000000000000000000000000000000000000000000000000000000000',JM);await tx.wait();alert('✅ DEFAULT_ADMIN_ROLE granted to JobManager on RepScore!');}catch(e){alert('Failed: '+e.message);}
-}
-</script>
-<!-- ======= END TEMP ADMIN ======= -->
 
 </body>
 </html>
