@@ -1,0 +1,35 @@
+name: contracts-ci
+on:
+  push:
+    branches: [jm-auto-finalize]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Compile and test
+        run: |
+          mkdir -p ci-report
+          set +e
+          npx hardhat test 2>&1 | tee ci-report/test-output.txt
+          echo "${PIPESTATUS[0]}" > ci-report/exit-code.txt
+          set -e
+      - name: Build deploy page
+        run: node scripts/make-report.js
+      - name: Publish report branch
+        run: |
+          git config user.name "contracts-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git checkout -B ci-report
+          git add -f ci-report
+          git commit -m "CI report for ${GITHUB_SHA}"
+          git push -f origin ci-report
+      - name: Fail if tests failed
+        run: exit "$(cat ci-report/exit-code.txt)"

@@ -1,0 +1,22 @@
+name: finalize-bot
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+concurrency:
+  group: finalize-bot
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --prefix "$RUNNER_TEMP/bot" --no-audit --no-fund ethers@6.13.4
+      - run: node scripts/finalize-bot.js
+        env:
+          NODE_PATH: ${{ runner.temp }}/bot/node_modules
+          RELAYER_PRIVATE_KEY: ${{ secrets.RELAYER_PRIVATE_KEY }}
+          JOB_MANAGER_ADDRESS: ${{ vars.JOB_MANAGER_ADDRESS }}
