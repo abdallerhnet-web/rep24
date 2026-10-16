@@ -1,0 +1,39 @@
+Downloading compiler 0.8.24
+[1m[33mWarning:[39m[22m Unreachable code.
+   --> @openzeppelin/contracts/token/ERC721/ERC721.sol:161:9:
+    |
+161 |         _checkOnERC721Received(from, to, tokenId, data);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Compiled 27 Solidity files successfully (evm target: paris).
+
+
+  JobManager
+    happy path: auto-finalize
+      ✔ pays the provider and adds +40 rep once the window passes, via a third party (547ms)
+      ✔ client can approve early (51ms)
+      ✔ cannot finalize twice (46ms)
+    anti-farming and validation
+      ✔ blocks self-dealing (44ms)
+      ✔ enforces the 5 USDC minimum escrow (42ms)
+      ✔ requires the provider to be staked (43ms)
+      ✔ only the provider can submit (39ms)
+      ✔ pays but stops scoring after 3 jobs per client-provider pair per day (64ms)
+    disputes
+      ✔ dispute inside the window blocks finalize (41ms)
+      ✔ cannot dispute after the window closes (42ms)
+      ✔ only the client can dispute (42ms)
+      ✔ owner rules for the provider: paid and +40 (46ms)
+      ✔ owner rules for the client: refund, 10% slash, half of slash to client (45ms)
+      ✔ only the owner can resolve (40ms)
+    expiry
+      ✔ refunds the client if the provider never submits, with no rep penalty (40ms)
+      ✔ provider cannot submit after the submit window (38ms)
+    safety
+      ✔ escrow still pays out if the roles were never granted (rep update is skipped, flagged) (41ms)
+      ✔ dispute window is bounded (40ms)
+
+
+  18 passing (1s)
+
